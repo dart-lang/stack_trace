@@ -15,9 +15,9 @@ packages/*: Skip
 test/*: Skip
 
 [ $runtime == d8 || $runtime == jsshell ]
-*/chain_test: Fail # Issues 15171 and 15105
-*/vm_test: RuntimeError, OK # VM-specific traces
+build/test/chain_test: Fail # Issues 15171 and 15105
+build/test/vm_test: RuntimeError, OK # VM-specific traces
 
 [ $compiler == dart2js && $browser ]
-*/vm_test: Fail, OK # VM-specific traces
-*/chain_test: Fail # Issues 15171 and 15105
+build/test/vm_test: Fail, OK # VM-specific traces
+build/test/chain_test: Fail # Issues 15171 and 15105
