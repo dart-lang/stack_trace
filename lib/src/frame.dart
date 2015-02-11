@@ -10,8 +10,9 @@ import 'package:path/path.dart' as path;
 import 'trace.dart';
 
 // #1      Foo._bar (file:///home/nweiz/code/stuff.dart:42:21)
-final _vmFrame = new RegExp(
-    r'^#\d+\s+(\S.*) \((.+?):(\d+)(?::(\d+))?\)$');
+// #1      Foo._bar (file:///home/nweiz/code/stuff.dart:42)
+// #1      Foo._bar (file:///home/nweiz/code/stuff.dart)
+final _vmFrame = new RegExp(r'^#\d+\s+(\S.*) \((.+?)((?::\d+){0,2})\)$');
 
 //     at VW.call$0 (http://pub.dartlang.org/stuff.dart.js:560:28)
 //     at VW.call$0 (eval as fn
@@ -135,14 +136,14 @@ class Frame {
 
     // Get the pieces out of the regexp match. Function, URI and line should
     // always be found. The column is optional.
-    var member = match[1].replaceAll("<anonymous closure>", "<fn>");
+    var member = match[1]
+        .replaceAll("<<anonymous closure>_async_body>", "<async>")
+        .replaceAll("<anonymous closure>", "<fn>");
     var uri = Uri.parse(match[2]);
-    var line = int.parse(match[3]);
-    var column = null;
-    var columnMatch = match[4];
-    if (columnMatch != null) {
-      column = int.parse(columnMatch);
-    }
+
+    var lineAndColumn = match[3].split(':');
+    var line = lineAndColumn.length > 1 ? int.parse(lineAndColumn[1]) : null;
+    var column = lineAndColumn.length > 2 ? int.parse(lineAndColumn[2]) : null;
     return new Frame(uri, line, column, member);
   }
 

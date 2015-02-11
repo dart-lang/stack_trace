@@ -30,6 +30,17 @@ void main() {
       expect(frame.member, equals('Foo._bar'));
     });
 
+    // This can happen with async stack traces. See issue 22009.
+    test('parses a stack frame without line or column correctly', () {
+      var frame = new Frame.parseVM("#1      Foo._bar "
+          "(file:///home/nweiz/code/stuff.dart)");
+      expect(frame.uri,
+          equals(Uri.parse("file:///home/nweiz/code/stuff.dart")));
+      expect(frame.line, isNull);
+      expect(frame.column, isNull);
+      expect(frame.member, equals('Foo._bar'));
+    });
+
     test('converts "<anonymous closure>" to "<fn>"', () {
       String parsedMember(String member) =>
           new Frame.parseVM('#0 $member (foo:0:0)').member;
@@ -37,6 +48,18 @@ void main() {
       expect(parsedMember('Foo.<anonymous closure>'), equals('Foo.<fn>'));
       expect(parsedMember('<anonymous closure>.<anonymous closure>.bar'),
           equals('<fn>.<fn>.bar'));
+    });
+
+    test('converts "<<anonymous closure>_async_body>" to "<async>"', () {
+      var frame = new Frame.parseVM(
+          '#0 Foo.<<anonymous closure>_async_body> (foo:0:0)');
+      expect(frame.member, equals('Foo.<async>'));
+    });
+
+    test('converts "<<anonymous closure>_async_body>" to "<async>"', () {
+      var frame = new Frame.parseVM(
+          '#0 Foo.<<anonymous closure>_async_body> (foo:0:0)');
+      expect(frame.member, equals('Foo.<async>'));
     });
 
     test('parses a folded frame correctly', () {
@@ -52,8 +75,6 @@ void main() {
       expect(() => new Frame.parseVM(''), throwsFormatException);
       expect(() => new Frame.parseVM('#1'), throwsFormatException);
       expect(() => new Frame.parseVM('#1      Foo'), throwsFormatException);
-      expect(() => new Frame.parseVM('#1      Foo (dart:async/future.dart)'),
-          throwsFormatException);
       expect(() => new Frame.parseVM('#1      (dart:async/future.dart:10:15)'),
           throwsFormatException);
       expect(() => new Frame.parseVM('Foo (dart:async/future.dart:10:15)'),

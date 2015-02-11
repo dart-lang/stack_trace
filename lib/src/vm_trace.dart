@@ -22,7 +22,9 @@ class VMTrace implements StackTrace {
     var i = 1;
     return frames.map((frame) {
       var number = padRight("#${i++}", 8);
-      var member = frame.member.replaceAll("<fn>", "<anonymous closure>");
+      var member = frame.member
+          .replaceAll("<fn>", "<anonymous closure>")
+          .replaceAll("<async>", "<<anonymous closure>_async_body>");
       var line = frame.line == null ? 0 : frame.line;
       var column = frame.column == null ? 0 : frame.column;
       return "$number$member (${frame.uri}:$line:$column)\n";

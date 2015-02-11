@@ -1,3 +1,11 @@
+## 1.1.2
+
+* Support VM frames without line *or* column numbers, which async/await programs
+  occasionally generate.
+
+* Replace `<<anonymous closure>_async_body>` in VM frames' members with the
+  terser `<async>`.
+
 ## 1.1.1
 
 * Widen the SDK constraint to include 1.7.0-dev.4.0.
