@@ -283,6 +283,20 @@ dart:async      bottom
 '''));
   });
 
+  test('.terse folds empty async frames', () {
+    var trace = new Trace.parse('''
+#0 notCore (foo.dart:42:21)
+#1 top (dart:async/future.dart:0:2)
+#2 empty.<<anonymous closure>_async_body> (bar.dart)
+#3 bottom (dart:async-patch/future.dart:9:11)
+''');
+
+    expect(trace.terse.toString(), equals('''
+foo.dart 42:21  notCore
+dart:async      bottom
+'''));
+  });
+
   test('.foldFrames folds frames together bottom-up', () {
     var trace = new Trace.parse('''
 #0 notFoo (foo.dart:42:21)

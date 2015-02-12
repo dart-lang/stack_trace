@@ -205,7 +205,18 @@ class Trace implements StackTrace {
   /// removed.
   Trace get terse {
     return new Trace(foldFrames((frame) {
-      return frame.isCore || frame.package == 'stack_trace';
+      if (frame.isCore) return true;
+      if (frame.package == 'stack_trace') return true;
+
+      // Ignore async stack frames without any line or column information. These
+      // come from the VM's async/await implementation and represent internal
+      // frames. They only ever show up in stack chains and are always
+      // surrounded by other traces that are actually useful, so we can just get
+      // rid of them.
+      // TODO(nweiz): Get rid of this logic some time after issue 22009 is
+      // fixed.
+      if (!frame.member.contains('<async>')) return false;
+      return frame.line == null;
     }).frames.map((frame) {
       if (!frame.isCore) return frame;
       var library = frame.library.replaceAll(_terseRegExp, '');

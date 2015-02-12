@@ -1,3 +1,8 @@
+## 1.1.3
+
+* Produce nicer-looking stack chains when using the VM's async/await
+  implementation.
+
 ## 1.1.2
 
 * Support VM frames without line *or* column numbers, which async/await programs
