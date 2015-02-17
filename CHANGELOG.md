@@ -1,3 +1,9 @@
+## 1.2.0
+
+* Add a `terse` argument to `Trace.foldFrames()` and `Chain.foldFrames()`. This
+  allows them to inherit the behavior of `Trace.terse` and `Chain.terse` without
+  having to duplicate the logic.
+
 ## 1.1.3
 
 * Produce nicer-looking stack chains when using the VM's async/await

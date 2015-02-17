@@ -572,6 +572,33 @@ void main() {
           'b.dart 10:11  Zop.zoop\n'));
     });
 
+    test('with terse: true, folds core frames as well', () {
+      var chain = new Chain([
+        new Trace.parse(
+            'a.dart 10:11                        Foo.bar\n'
+            'dart:async-patch/future.dart 10:11  Zip.zap\n'
+            'b.dart 10:11                        Bang.qux\n'
+            'dart:core 10:11                     Bar.baz\n'
+            'a.dart 10:11                        Zop.zoop'),
+        new Trace.parse(
+            'a.dart 10:11  Foo.bar\n'
+            'a.dart 10:11  Bar.baz\n'
+            'a.dart 10:11  Bang.qux\n'
+            'a.dart 10:11  Zip.zap\n'
+            'b.dart 10:11  Zop.zoop')
+      ]);
+
+      var folded = chain.foldFrames((frame) => frame.library == 'a.dart',
+          terse: true);
+      expect(folded.toString(), equals(
+          'dart:async    Zip.zap\n'
+          'b.dart 10:11  Bang.qux\n'
+          'a.dart 10:11  Zop.zoop\n'
+          '===== asynchronous gap ===========================\n'
+          'a.dart 10:11  Zip.zap\n'
+          'b.dart 10:11  Zop.zoop\n'));
+    });
+
     test('eliminates completely-folded traces', () {
       var chain = new Chain([
         new Trace.parse(
