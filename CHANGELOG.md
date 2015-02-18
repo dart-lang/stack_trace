@@ -1,5 +1,7 @@
 ## 1.2.1
 
+* Add `terse` to `LazyTrace.foldFrames()`.
+
 * Further improve stack chains when using the VM's async/await implementation.
 
 ## 1.2.0
