@@ -1,3 +1,7 @@
+## 1.2.1
+
+* Further improve stack chains when using the VM's async/await implementation.
+
 ## 1.2.0
 
 * Add a `terse` argument to `Trace.foldFrames()` and `Chain.foldFrames()`. This

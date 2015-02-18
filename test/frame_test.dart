@@ -56,9 +56,9 @@ void main() {
       expect(frame.member, equals('Foo.<async>'));
     });
 
-    test('converts "<<anonymous closure>_async_body>" to "<async>"', () {
+    test('converts "<function_name_async_body>" to "<async>"', () {
       var frame = new Frame.parseVM(
-          '#0 Foo.<<anonymous closure>_async_body> (foo:0:0)');
+          '#0 Foo.<function_name_async_body> (foo:0:0)');
       expect(frame.member, equals('Foo.<async>'));
     });
 
