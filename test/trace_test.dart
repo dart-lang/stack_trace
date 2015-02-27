@@ -267,33 +267,58 @@ http://pub.dartlang.org/thing.dart 1:100  zip.<fn>.zap
 
   test('.terse folds core frames together bottom-up', () {
     var trace = new Trace.parse('''
-#0 notCore (foo.dart:42:21)
 #1 top (dart:async/future.dart:0:2)
 #2 bottom (dart:core/uri.dart:1:100)
-#3 alsoNotCore (bar.dart:10:20)
-#4 top (dart:io:5:10)
-#5 bottom (dart:async-patch/future.dart:9:11)
+#0 notCore (foo.dart:42:21)
+#3 top (dart:io:5:10)
+#4 bottom (dart:async-patch/future.dart:9:11)
+#5 alsoNotCore (bar.dart:10:20)
 ''');
 
     expect(trace.terse.toString(), equals('''
-foo.dart 42:21  notCore
 dart:core       bottom
-bar.dart 10:20  alsoNotCore
+foo.dart 42:21  notCore
 dart:async      bottom
+bar.dart 10:20  alsoNotCore
 '''));
   });
 
   test('.terse folds empty async frames', () {
     var trace = new Trace.parse('''
+#0 top (dart:async/future.dart:0:2)
+#1 empty.<<anonymous closure>_async_body> (bar.dart)
+#2 bottom (dart:async-patch/future.dart:9:11)
+#3 notCore (foo.dart:42:21)
+''');
+
+    expect(trace.terse.toString(), equals('''
+dart:async      bottom
+foo.dart 42:21  notCore
+'''));
+  });
+
+  test('.terse removes the bottom-most async frame', () {
+    var trace = new Trace.parse('''
 #0 notCore (foo.dart:42:21)
 #1 top (dart:async/future.dart:0:2)
-#2 empty.<<anonymous closure>_async_body> (bar.dart)
-#3 bottom (dart:async-patch/future.dart:9:11)
+#2 bottom (dart:core/uri.dart:1:100)
+#3 top (dart:io:5:10)
+#4 bottom (dart:async-patch/future.dart:9:11)
 ''');
 
     expect(trace.terse.toString(), equals('''
 foo.dart 42:21  notCore
-dart:async      bottom
+'''));
+  });
+
+  test(".terse won't make a trace empty", () {
+    var trace = new Trace.parse('''
+#1 top (dart:async/future.dart:0:2)
+#2 bottom (dart:core/uri.dart:1:100)
+''');
+
+    expect(trace.terse.toString(), equals('''
+dart:core  bottom
 '''));
   });
 
@@ -316,7 +341,7 @@ dart:async-patch/future.dart 9:11  fooBottom
 '''));
   });
 
-  test('.foldFrames with terse: true, folds core frames as well', () {
+  test('.foldFrames with terse: true folds core frames as well', () {
     var trace = new Trace.parse('''
 #0 notFoo (foo.dart:42:21)
 #1 fooTop (bar.dart:0:2)
@@ -332,7 +357,6 @@ dart:async-patch/future.dart 9:11  fooBottom
 foo.dart 42:21  notFoo
 dart:async      coreBottom
 bar.dart 10:20  alsoNotFoo
-dart:async      coreBottom
 '''));
   });
 }

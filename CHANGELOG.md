@@ -1,3 +1,9 @@
+## 1.2.2
+
+* Don't print the first folded frame of terse stack traces. This frame
+  is always just an internal isolate message handler anyway. This
+  improves the readability of stack traces, especially in stack chains.
+
 ## 1.2.1
 
 * Add `terse` to `LazyTrace.foldFrames()`.

@@ -155,9 +155,14 @@ class Chain implements StackTrace {
     var foldedTraces = traces.map(
         (trace) => trace.foldFrames(predicate, terse: terse));
     var nonEmptyTraces = foldedTraces.where((trace) {
-      // Ignore traces that contain only folded frames. These traces will be
-      // folded into a single frame each.
-      return trace.frames.length > 1;
+      // Ignore traces that contain only folded frames.
+      if (trace.frames.length > 1) return true;
+
+      // In terse mode, the trace may have removed an outer folded frame,
+      // leaving a single non-folded frame. We can detect a folded frame because
+      // it has no line information.
+      if (!terse) return false;
+      return trace.frames.single.line != null;
     });
 
     // If all the traces contain only internal processing, preserve the last

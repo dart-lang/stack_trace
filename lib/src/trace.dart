@@ -202,7 +202,8 @@ class Trace implements StackTrace {
   /// This is accomplished by folding together multiple stack frames from the
   /// core library or from this package, as in [foldFrames]. Remaining core
   /// library frames have their libraries, "-patch" suffixes, and line numbers
-  /// removed.
+  /// removed. If the outermost frame of the stack trace is a core library
+  /// frame, it's removed entirely.
   ///
   /// For custom folding, see [foldFrames].
   Trace get terse => foldFrames((_) => false, terse: true);
@@ -216,8 +217,8 @@ class Trace implements StackTrace {
   /// code and code that's called by user code.
   ///
   /// If [terse] is true, this will also fold together frames from the core
-  /// library or from this package, and simplify core library frames as in
-  /// [Trace.terse].
+  /// library or from this package, simplify core library frames, and
+  /// potentially remove the outermost frame as in [Trace.terse].
   Trace foldFrames(bool predicate(Frame frame), {bool terse: false}) {
     if (terse) {
       var oldPredicate = predicate;
@@ -255,6 +256,7 @@ class Trace implements StackTrace {
         var library = frame.library.replaceAll(_terseRegExp, '');
         return new Frame(Uri.parse(library), null, null, frame.member);
       }).toList();
+      if (newFrames.first.isCore && newFrames.length > 1) newFrames.removeAt(0);
     }
 
     return new Trace(newFrames.reversed);

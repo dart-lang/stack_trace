@@ -500,7 +500,6 @@ void main() {
       expect(chain.terse.toString(), equals(
           'dart:core             Bar.baz\n'
           '$userSlashCode 10:11  Bang.qux\n'
-          'dart:core             Zop.zoop\n'
           '===== asynchronous gap ===========================\n'
           '$userSlashCode 10:11  Bang.qux\n'
           'dart:core             Zip.zap\n'
@@ -523,10 +522,8 @@ void main() {
 
       expect(chain.terse.toString(), equals(
           '$userSlashCode 10:11  Foo.bar\n'
-          'dart:core             Bar.baz\n'
           '===== asynchronous gap ===========================\n'
-          '$userSlashCode 10:11  Foo.bar\n'
-          'dart:core             Bar.baz\n'));
+          '$userSlashCode 10:11  Foo.bar\n'));
     });
 
     test("doesn't return an empty chain", () {
