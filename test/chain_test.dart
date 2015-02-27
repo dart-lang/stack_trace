@@ -590,9 +590,9 @@ void main() {
       expect(folded.toString(), equals(
           'dart:async    Zip.zap\n'
           'b.dart 10:11  Bang.qux\n'
-          'a.dart 10:11  Zop.zoop\n'
+          'a.dart        Zop.zoop\n'
           '===== asynchronous gap ===========================\n'
-          'a.dart 10:11  Zip.zap\n'
+          'a.dart        Zip.zap\n'
           'b.dart 10:11  Zop.zoop\n'));
     });
 

@@ -359,4 +359,24 @@ dart:async      coreBottom
 bar.dart 10:20  alsoNotFoo
 '''));
   });
+
+  test('.foldFrames with terse: true shortens folded frames', () {
+    var trace = new Trace.parse('''
+#0 notFoo (foo.dart:42:21)
+#1 fooTop (bar.dart:0:2)
+#2 fooBottom (package:foo/bar.dart:0:2)
+#3 alsoNotFoo (bar.dart:10:20)
+#4 fooTop (foo.dart:9:11)
+#5 fooBottom (foo/bar.dart:9:11)
+''');
+
+    var folded = trace.foldFrames((frame) => frame.member.startsWith('foo'),
+        terse: true);
+    expect(folded.toString(), equals('''
+foo.dart 42:21  notFoo
+package:foo     fooBottom
+bar.dart 10:20  alsoNotFoo
+foo             fooBottom
+'''));
+  });
 }

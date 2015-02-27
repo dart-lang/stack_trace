@@ -4,6 +4,9 @@
   is always just an internal isolate message handler anyway. This
   improves the readability of stack traces, especially in stack chains.
 
+* Remove the line numbers and specific files in all terse folded frames, not
+  just those from core libraries.
+
 ## 1.2.1
 
 * Add `terse` to `LazyTrace.foldFrames()`.

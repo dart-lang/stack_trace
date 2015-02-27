@@ -54,7 +54,6 @@ example:
     pkg/stack_trace/lib/src/trace.dart 40:35    Trace.terse
     pkg/stack_trace/lib/stack_trace.dart 24:28  format
     test.dart 21:29                             main.<fn>
-    dart:async                                  Timer.Timer.<fn>
 
 ## Stack Chains
 
@@ -194,14 +193,12 @@ this:
 
     test.dart 17:3   runAsync
     test.dart 13:28  scheduleAsync.<fn>
-    dart:isolate     _RawReceivePortImpl._handleMessage
     ===== asynchronous gap ===========================
-    dart:async                                _Future.then
-    test.dart 13:12                           scheduleAsync
-    test.dart 7:18                            main.<fn>
-    package:stack_trace/src/chain.dart 93:20  Chain.capture
-    test.dart 6:16                            main
-    dart:isolate                              _RawReceivePortImpl._handleMessage
+    dart:async           _Future.then
+    test.dart 13:12      scheduleAsync
+    test.dart 7:18       main.<fn>
+    package:stack_trace  Chain.capture
+    test.dart 6:16       main
 
 That's a lot easier to understand!
 

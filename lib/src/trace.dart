@@ -252,7 +252,7 @@ class Trace implements StackTrace {
 
     if (terse) {
       newFrames = newFrames.map((frame) {
-        if (!frame.isCore) return frame;
+        if (!predicate(frame)) return frame;
         var library = frame.library.replaceAll(_terseRegExp, '');
         return new Frame(Uri.parse(library), null, null, frame.member);
       }).toList();
