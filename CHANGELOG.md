@@ -7,6 +7,8 @@
 * Remove the line numbers and specific files in all terse folded frames, not
   just those from core libraries.
 
+* Make padding consistent across all stack traces for `Chain.toString()`.
+
 ## 1.2.1
 
 * Add `terse` to `LazyTrace.foldFrames()`.

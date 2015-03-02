@@ -169,20 +169,20 @@ Now if we run it, it prints this:
     dart:io/timer_impl.dart 292                                   _handleTimeout
     dart:isolate-patch/isolate_patch.dart 115                     _RawReceivePortImpl._handleMessage
     ===== asynchronous gap ===========================
-    dart:async/zone.dart 476                   _ZoneDelegate.registerUnaryCallback
-    dart:async/zone.dart 666                   _CustomizedZone.registerUnaryCallback
-    dart:async/future_impl.dart 164            _Future._Future._then
-    dart:async/future_impl.dart 187            _Future.then
-    test.dart 13:12                            scheduleAsync
-    test.dart 7:18                             main.<fn>
-    dart:async/zone.dart 710                   _rootRun
-    dart:async/zone.dart 440                   _ZoneDelegate.run
-    dart:async/zone.dart 650                   _CustomizedZone.run
-    dart:async/zone.dart 944                   runZoned
-    package:stack_trace/src/chain.dart 93:20   Chain.capture
-    test.dart 6:16                             main
-    dart:isolate-patch/isolate_patch.dart 216  _startIsolate.isolateStartHandler
-    dart:isolate-patch/isolate_patch.dart 115  _RawReceivePortImpl._handleMessage
+    dart:async/zone.dart 476                                      _ZoneDelegate.registerUnaryCallback
+    dart:async/zone.dart 666                                      _CustomizedZone.registerUnaryCallback
+    dart:async/future_impl.dart 164                               _Future._Future._then
+    dart:async/future_impl.dart 187                               _Future.then
+    test.dart 13:12                                               scheduleAsync
+    test.dart 7:18                                                main.<fn>
+    dart:async/zone.dart 710                                      _rootRun
+    dart:async/zone.dart 440                                      _ZoneDelegate.run
+    dart:async/zone.dart 650                                      _CustomizedZone.run
+    dart:async/zone.dart 944                                      runZoned
+    package:stack_trace/src/chain.dart 93:20                      Chain.capture
+    test.dart 6:16                                                main
+    dart:isolate-patch/isolate_patch.dart 216                     _startIsolate.isolateStartHandler
+    dart:isolate-patch/isolate_patch.dart 115                     _RawReceivePortImpl._handleMessage
 
 That's a lot of text! If you look closely, though, you can see that `main` is
 listed in the first trace in the chain.
@@ -191,8 +191,8 @@ Thankfully, you can call `Chain.terse` just like `Trace.terse` to get rid of all
 the frames you don't care about. The terse version of the stack chain above is
 this:
 
-    test.dart 17:3   runAsync
-    test.dart 13:28  scheduleAsync.<fn>
+    test.dart 17:3       runAsync
+    test.dart 13:28      scheduleAsync.<fn>
     ===== asynchronous gap ===========================
     dart:async           _Future.then
     test.dart 13:12      scheduleAsync

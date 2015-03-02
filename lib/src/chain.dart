@@ -6,6 +6,7 @@ library stack_trace.chain;
 
 import 'dart:async';
 import 'dart:collection';
+import 'dart:math' as math;
 
 import 'frame.dart';
 import 'stack_zone_specification.dart';
@@ -14,6 +15,10 @@ import 'utils.dart';
 
 /// A function that handles errors in the zone wrapped by [Chain.capture].
 typedef void ChainHandler(error, Chain chain);
+
+/// The line used in the string representation of stack chains to represent
+/// the gap between traces.
+const _gap = '===== asynchronous gap ===========================\n';
 
 /// A chain of stack traces.
 ///
@@ -36,9 +41,6 @@ typedef void ChainHandler(error, Chain chain);
 ///             "$stackChain");
 ///     });
 class Chain implements StackTrace {
-  /// The line used in the string representation of stack chains to represent
-  /// the gap between traces.
-  static const _GAP = '===== asynchronous gap ===========================\n';
 
   /// The stack traces that make up this chain.
   ///
@@ -180,5 +182,19 @@ class Chain implements StackTrace {
   /// in the chain.
   Trace toTrace() => new Trace(flatten(traces.map((trace) => trace.frames)));
 
-  String toString() => traces.join(_GAP);
+  String toString() {
+    // Figure out the longest path so we know how much to pad.
+    var longest = traces.map((trace) {
+      return trace.frames.map((frame) => frame.location.length)
+          .fold(0, math.max);
+    }).fold(0, math.max);
+
+    // Don't call out to [Trace.toString] here because that doesn't ensure that
+    // padding is consistent across all traces.
+    return traces.map((trace) {
+      return trace.frames.map((frame) {
+        return '${padRight(frame.location, longest)}  ${frame.member}\n';
+      }).join();
+    }).join(_gap);
+  }
 }

@@ -479,6 +479,18 @@ void main() {
     });
   });
 
+  test("toString() ensures that all traces are aligned", () {
+    var chain = new Chain([
+      new Trace.parse('short 10:11  Foo.bar\n'),
+      new Trace.parse('loooooooooooong 10:11  Zop.zoop')
+    ]);
+
+    expect(chain.toString(), equals(
+        'short 10:11            Foo.bar\n'
+        '===== asynchronous gap ===========================\n'
+        'loooooooooooong 10:11  Zop.zoop\n'));
+  });
+
   var userSlashCode = p.join('user', 'code.dart');
   group('Chain.terse', () {
     test('makes each trace terse', () {
