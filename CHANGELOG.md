@@ -1,3 +1,7 @@
+## 1.2.3
+
+* Fix a crash in `Chain.parse`.
+
 ## 1.2.2
 
 * Don't print the first folded frame of terse stack traces. This frame
