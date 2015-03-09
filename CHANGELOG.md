@@ -1,3 +1,7 @@
+## 1.2.4
+
+* Fix a type annotation in `LazyTrace`.
+
 ## 1.2.3
 
 * Fix a crash in `Chain.parse`.
