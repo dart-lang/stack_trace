@@ -115,6 +115,7 @@ class Trace implements StackTrace {
     try {
       if (trace.isEmpty) return new Trace(<Frame>[]);
       if (trace.contains(_v8Trace)) return new Trace.parseV8(trace);
+      if (trace.startsWith("\tat ")) return new Trace.parseJSCore(trace);
       if (trace.contains(_firefoxSafariTrace)) {
         return new Trace.parseFirefox(trace);
       }
@@ -146,6 +147,10 @@ class Trace implements StackTrace {
           // Unfortunately, that's impossible to detect.
           .skipWhile((line) => !line.startsWith(_v8TraceLine))
           .map((line) => new Frame.parseV8(line)));
+
+  /// Parses a string representation of a JavaScriptCore stack trace.
+  Trace.parseJSCore(String trace)
+      : this(trace.split("\n").map((line) => new Frame.parseV8(line)));
 
   /// Parses a string representation of an Internet Explorer stack trace.
   ///

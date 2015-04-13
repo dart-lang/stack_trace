@@ -92,6 +92,23 @@ void main() {
           equals(Uri.parse("http://pub.dartlang.org/thing.js")));
     });
 
+    // JavaScriptCore traces are just like V8, except that it doesn't have a
+    // header and it starts with a tab rather than spaces.
+    test('parses a JavaScriptCore stack trace correctly', () {
+      var trace = new Trace.parse(
+          '\tat Foo._bar (http://pub.dartlang.org/stuff.js:42:21)\n'
+          '\tat http://pub.dartlang.org/stuff.js:0:2\n'
+          '\tat zip.<anonymous>.zap '
+              '(http://pub.dartlang.org/thing.js:1:100)');
+
+      expect(trace.frames[0].uri,
+          equals(Uri.parse("http://pub.dartlang.org/stuff.js")));
+      expect(trace.frames[1].uri,
+          equals(Uri.parse("http://pub.dartlang.org/stuff.js")));
+      expect(trace.frames[2].uri,
+          equals(Uri.parse("http://pub.dartlang.org/thing.js")));
+    });
+
     test('parses a Firefox/Safari stack trace correctly', () {
       var trace = new Trace.parse(
           'Foo._bar@http://pub.dartlang.org/stuff.js:42\n'
