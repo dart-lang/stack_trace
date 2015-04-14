@@ -150,7 +150,9 @@ class Trace implements StackTrace {
 
   /// Parses a string representation of a JavaScriptCore stack trace.
   Trace.parseJSCore(String trace)
-      : this(trace.split("\n").map((line) => new Frame.parseV8(line)));
+      : this(trace.split("\n")
+            .where((line) => line != "\tat ")
+            .map((line) => new Frame.parseV8(line)));
 
   /// Parses a string representation of an Internet Explorer stack trace.
   ///

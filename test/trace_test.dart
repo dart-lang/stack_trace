@@ -107,6 +107,17 @@ void main() {
           equals(Uri.parse("http://pub.dartlang.org/stuff.js")));
       expect(trace.frames[2].uri,
           equals(Uri.parse("http://pub.dartlang.org/thing.js")));
+
+      trace = new Trace.parse(
+          '\tat Foo._bar (http://pub.dartlang.org/stuff.js:42:21)\n'
+          '\tat \n'
+          '\tat zip.<anonymous>.zap '
+              '(http://pub.dartlang.org/thing.js:1:100)');
+
+      expect(trace.frames[0].uri,
+          equals(Uri.parse("http://pub.dartlang.org/stuff.js")));
+      expect(trace.frames[1].uri,
+          equals(Uri.parse("http://pub.dartlang.org/thing.js")));
     });
 
     test('parses a Firefox/Safari stack trace correctly', () {
