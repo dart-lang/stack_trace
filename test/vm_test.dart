@@ -56,6 +56,19 @@ void main() {
       expect(trace.frames.first.member, equals('getStackTraceObject'));
     });
 
+    test('.from handles a stack overflow trace correctly', () {
+      overflow() => overflow();
+
+      var trace;
+      try {
+        overflow();
+      } catch (_, stackTrace) {
+        trace = new Trace.from(stackTrace);
+      }
+
+      expect(trace.frames.first.member, equals('main.<fn>.<fn>.overflow'));
+    });
+
     group('.current()', () {
       test('with no argument returns a trace starting at the current frame',
           () {

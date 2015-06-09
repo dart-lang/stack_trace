@@ -6,6 +6,8 @@
 
 * Add support for empty chains and chains of empty traces to `Chain.parse()`.
 
+* Don't crash when parsing stack traces from Dart VM stack overflows.
+
 ## 1.3.2
 
 * Don't crash when running `Trace.terse` on empty stack traces.
