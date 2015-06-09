@@ -1,3 +1,9 @@
+## 1.3.3
+
+* When a `null` stack trace is passed to a completer or stream controller in
+  nested `Chain.capture()` blocks, substitute the inner block's chain rather
+  than the outer block's.
+
 ## 1.3.2
 
 * Don't crash when running `Trace.terse` on empty stack traces.
