@@ -2,13 +2,14 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-library chain_test;
+// dart2js currently doesn't support chain-capturing. See sdk#15171.
+@TestOn('vm')
 
 import 'dart:async';
 
 import 'package:path/path.dart' as p;
 import 'package:stack_trace/stack_trace.dart';
-import 'package:unittest/unittest.dart';
+import 'package:test/test.dart';
 
 import 'utils.dart';
 
@@ -349,16 +350,21 @@ void main() {
 
   test('current() outside of capture() returns a chain wrapping the current '
       'trace', () {
-    var completer = new Completer();
-    inMicrotask(() => completer.complete(new Chain.current()));
+    // The test runner runs all tests with chains enabled, so to test without we
+    // have to do some zone munging.
+    return runZoned(() {
+      var completer = new Completer();
+      inMicrotask(() => completer.complete(new Chain.current()));
 
-    return completer.future.then((chain) {
-      // Since the chain wasn't loaded within [Chain.capture], the full stack
-      // chain isn't available and it just returns the current stack when
-      // called.
-      expect(chain.traces, hasLength(1));
-      expect(chain.traces.first.frames.first, frameMember(startsWith('main')));
-    });
+      return completer.future.then((chain) {
+        // Since the chain wasn't loaded within [Chain.capture], the full stack
+        // chain isn't available and it just returns the current stack when
+        // called.
+        expect(chain.traces, hasLength(1));
+        expect(chain.traces.first.frames.first,
+            frameMember(startsWith('main')));
+      });
+    }, zoneValues: {#stack_trace.stack_zone.spec: null});
   });
 
   group('forTrace() within capture()', () {

@@ -6,10 +6,11 @@
 /// dual of dartium_test.dart, since method names can differ somewhat from
 /// platform to platform. No similar file exists for dart2js since the specific
 /// method names there are implementation details.
+@TestOn('vm')
 
 import 'package:path/path.dart' as path;
 import 'package:stack_trace/stack_trace.dart';
-import 'package:unittest/unittest.dart';
+import 'package:test/test.dart';
 
 String getStackTraceString() {
   try {

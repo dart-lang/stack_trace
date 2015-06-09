@@ -4,7 +4,7 @@
 
 library stack_trace.test.utils;
 
-import 'package:unittest/unittest.dart';
+import 'package:test/test.dart';
 
 /// Returns a matcher that runs [matcher] against a [Frame]'s `member` field.
 Matcher frameMember(matcher) =>
