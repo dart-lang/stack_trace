@@ -127,8 +127,11 @@ class Chain implements StackTrace {
   /// Parses a string representation of a stack chain.
   ///
   /// Specifically, this parses the output of [Chain.toString].
-  factory Chain.parse(String chain) =>
-    new Chain(chain.split(_gap).map((trace) => new Trace.parseFriendly(trace)));
+  factory Chain.parse(String chain) {
+    if (chain.isEmpty) return new Chain([]);
+    return new Chain(
+        chain.split(_gap).map((trace) => new Trace.parseFriendly(trace)));
+  }
 
   /// Returns a new [Chain] comprised of [traces].
   Chain(Iterable<Trace> traces)

@@ -472,10 +472,28 @@ void main() {
         equals(new Trace.from(trace).toString()));
   });
 
-  test('Chain.parse() parses a real Chain', () {
-    return captureFuture(() => inMicrotask(() => throw 'error')).then((chain) {
-      expect(new Chain.parse(chain.toString()).toString(),
-          equals(chain.toString()));
+  group('Chain.parse()', () {
+    test('parses a real Chain', () {
+      return captureFuture(() => inMicrotask(() => throw 'error'))
+          .then((chain) {
+        expect(new Chain.parse(chain.toString()).toString(),
+            equals(chain.toString()));
+      });
+    });
+
+    test('parses an empty string', () {
+      var chain = new Chain.parse('');
+      expect(chain.traces, isEmpty);
+    });
+
+    test('parses a chain containing empty traces', () {
+      var chain = new Chain.parse(
+          '===== asynchronous gap ===========================\n'
+          '===== asynchronous gap ===========================\n');
+      expect(chain.traces, hasLength(3));
+      expect(chain.traces[0].frames, isEmpty);
+      expect(chain.traces[1].frames, isEmpty);
+      expect(chain.traces[2].frames, isEmpty);
     });
   });
 

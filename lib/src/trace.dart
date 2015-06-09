@@ -188,10 +188,12 @@ class Trace implements StackTrace {
   /// This also parses string representations of [Chain]s. They parse to the
   /// same trace that [Chain.toTrace] would return.
   Trace.parseFriendly(String trace)
-      : this(trace.trim().split("\n")
-          // Filter out asynchronous gaps from [Chain]s.
-          .where((line) => !line.startsWith('====='))
-          .map((line) => new Frame.parseFriendly(line)));
+      : this(trace.isEmpty
+            ? []
+            : trace.trim().split("\n")
+                // Filter out asynchronous gaps from [Chain]s.
+                .where((line) => !line.startsWith('====='))
+                .map((line) => new Frame.parseFriendly(line)));
 
   /// Returns a new [Trace] comprised of [frames].
   Trace(Iterable<Frame> frames)

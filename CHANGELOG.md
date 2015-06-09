@@ -4,6 +4,8 @@
   nested `Chain.capture()` blocks, substitute the inner block's chain rather
   than the outer block's.
 
+* Add support for empty chains and chains of empty traces to `Chain.parse()`.
+
 ## 1.3.2
 
 * Don't crash when running `Trace.terse` on empty stack traces.
