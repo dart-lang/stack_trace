@@ -1,3 +1,10 @@
+## 1.3.4
+
+* No longer say that stack chains aren't supported on dart2js now that
+  [sdk#15171][] is fixed. Note that this fix only applies to Dart 1.12.
+
+[sdk#15171]: https://github.com/dart-lang/sdk/issues/15171
+
 ## 1.3.3
 
 * When a `null` stack trace is passed to a completer or stream controller in

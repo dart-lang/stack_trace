@@ -68,13 +68,6 @@ class Chain implements StackTrace {
   /// considered unhandled.
   ///
   /// If [callback] returns a value, it will be returned by [capture] as well.
-  ///
-  /// Currently, capturing stack chains doesn't work when using dart2js due to
-  /// issues [15171] and [15105]. Stack chains reported on dart2js will contain
-  /// only one trace.
-  ///
-  /// [15171]: https://code.google.com/p/dart/issues/detail?id=15171
-  /// [15105]: https://code.google.com/p/dart/issues/detail?id=15105
   static capture(callback(), {ChainHandler onError}) {
     var spec = new StackZoneSpecification(onError);
     return runZoned(() {
