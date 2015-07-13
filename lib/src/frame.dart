@@ -4,7 +4,6 @@
 
 library frame;
 
-
 import 'package:path/path.dart' as path;
 
 import 'trace.dart';

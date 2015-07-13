@@ -13,7 +13,7 @@ import 'lazy_trace.dart';
 import 'utils.dart';
 import 'vm_trace.dart';
 
-final _terseRegExp = new RegExp(r"(-patch)?(/.*)?$");
+final _terseRegExp = new RegExp(r"(-patch)?([/\\].*)?$");
 
 /// A RegExp to match V8's stack traces.
 ///

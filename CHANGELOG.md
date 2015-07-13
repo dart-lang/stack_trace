@@ -1,3 +1,7 @@
+## 1.3.5
+
+* Properly shorten library names for pathnames of folded frames on Windows.
+
 ## 1.3.4
 
 * No longer say that stack chains aren't supported on dart2js now that
