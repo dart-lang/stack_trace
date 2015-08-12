@@ -22,5 +22,5 @@ class UnparsedFrame implements Frame {
 
   UnparsedFrame(this.member);
 
-  String toString() => _original;
+  String toString() => member;
 }

@@ -352,7 +352,7 @@ dart:core  bottom
     });
 
     test(".terse won't panic on an empty trace", () {
-      expect(Trace.parse("").terse.toString(), equals(""));
+      expect(new Trace.parse("").terse.toString(), equals(""));
     });
 
     test('.foldFrames folds frames together bottom-up', () {

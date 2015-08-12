@@ -1,3 +1,7 @@
+## 1.4.1
+
+* Fix a crashing bug in `UnparsedFrame.toString()`.
+
 ## 1.4.0
 
 * `new Trace.parse()` and related constructors will no longer throw an exception
