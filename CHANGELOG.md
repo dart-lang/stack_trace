@@ -1,4 +1,9 @@
-## 1.3.6
+## 1.4.0
+
+* `new Trace.parse()` and related constructors will no longer throw an exception
+  if they encounter an unparseable stack frame. Instead, they will generate an
+  `UnparsedFrame`, which exposes no metadata but preserves the frame's original
+  text.
 
 * Properly parse native-code V8 frames.
 

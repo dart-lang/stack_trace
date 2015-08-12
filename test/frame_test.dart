@@ -71,14 +71,14 @@ void main() {
       expect(frame.column, isNull);
     });
 
-    test('throws a FormatException for malformed frames', () {
-      expect(() => new Frame.parseVM(''), throwsFormatException);
-      expect(() => new Frame.parseVM('#1'), throwsFormatException);
-      expect(() => new Frame.parseVM('#1      Foo'), throwsFormatException);
-      expect(() => new Frame.parseVM('#1      (dart:async/future.dart:10:15)'),
-          throwsFormatException);
-      expect(() => new Frame.parseVM('Foo (dart:async/future.dart:10:15)'),
-          throwsFormatException);
+    test('returns an UnparsedFrame for malformed frames', () {
+      expectIsUnparsed((text) => new Frame.parseV8(text), '');
+      expectIsUnparsed((text) => new Frame.parseV8(text), '#1');
+      expectIsUnparsed((text) => new Frame.parseV8(text), '#1      Foo');
+      expectIsUnparsed((text) => new Frame.parseV8(text),
+          '#1      (dart:async/future.dart:10:15)');
+      expectIsUnparsed((text) => new Frame.parseV8(text),
+          'Foo (dart:async/future.dart:10:15)');
     });
   });
 
@@ -219,24 +219,22 @@ void main() {
           equals('<fn>.<fn>.bar'));
     });
 
-    test('throws a FormatException for malformed frames', () {
-      expect(() => new Frame.parseV8(''), throwsFormatException);
-      expect(() => new Frame.parseV8('    at'), throwsFormatException);
-      expect(() => new Frame.parseV8('    at Foo'), throwsFormatException);
-      expect(() => new Frame.parseV8('    at Foo (dart:async/future.dart)'),
-          throwsFormatException);
-      expect(() => new Frame.parseV8('    at Foo (dart:async/future.dart:10)'),
-          throwsFormatException);
-      expect(() => new Frame.parseV8('    at (dart:async/future.dart:10:15)'),
-          throwsFormatException);
-      expect(() => new Frame.parseV8('Foo (dart:async/future.dart:10:15)'),
-          throwsFormatException);
-      expect(() => new Frame.parseV8('    at dart:async/future.dart'),
-          throwsFormatException);
-      expect(() => new Frame.parseV8('    at dart:async/future.dart:10'),
-          throwsFormatException);
-      expect(() => new Frame.parseV8('dart:async/future.dart:10:15'),
-          throwsFormatException);
+    test('returns an UnparsedFrame for malformed frames', () {
+      expectIsUnparsed((text) => new Frame.parseV8(text), '');
+      expectIsUnparsed((text) => new Frame.parseV8(text), '    at');
+      expectIsUnparsed((text) => new Frame.parseV8(text), '    at Foo');
+      expectIsUnparsed((text) => new Frame.parseV8(text),
+          '    at Foo (dart:async/future.dart)');
+      expectIsUnparsed((text) => new Frame.parseV8(text),
+          '    at (dart:async/future.dart:10:15)');
+      expectIsUnparsed((text) => new Frame.parseV8(text),
+          'Foo (dart:async/future.dart:10:15)');
+      expectIsUnparsed((text) => new Frame.parseV8(text),
+          '    at dart:async/future.dart');
+      expectIsUnparsed((text) => new Frame.parseV8(text),
+          '    at dart:async/future.dart:10');
+      expectIsUnparsed((text) => new Frame.parseV8(text),
+          'dart:async/future.dart:10:15');
     });
   });
 
@@ -376,15 +374,15 @@ void main() {
       expect(frame.member, equals("convertDartClosureToJS.<fn>.<fn>"));
     });
 
-    test('throws a FormatException for malformed frames', () {
-      expect(() => new Frame.parseFirefox(''), throwsFormatException);
-      expect(() => new Frame.parseFirefox('.foo'), throwsFormatException);
-      expect(() => new Frame.parseFirefox('.foo@dart:async/future.dart'),
-          throwsFormatException);
-      expect(() => new Frame.parseFirefox('.foo(@dart:async/future.dart:10'),
-          throwsFormatException);
-      expect(() => new Frame.parseFirefox('@dart:async/future.dart'),
-          throwsFormatException);
+    test('returns an UnparsedFrame for malformed frames', () {
+      expectIsUnparsed((text) => new Frame.parseFirefox(text), '');
+      expectIsUnparsed((text) => new Frame.parseFirefox(text), '.foo');
+      expectIsUnparsed((text) => new Frame.parseFirefox(text),
+          '.foo@dart:async/future.dart');
+      expectIsUnparsed((text) => new Frame.parseFirefox(text),
+          '.foo(@dart:async/future.dart:10');
+      expectIsUnparsed((text) => new Frame.parseFirefox(text),
+          '@dart:async/future.dart');
     });
 
     test('parses a simple stack frame correctly', () {
@@ -470,12 +468,11 @@ void main() {
       expect(frame.member, equals('Foo.<fn>.bar'));
     });
 
-    test('throws a FormatException for malformed frames', () {
-      expect(() => new Frame.parseFriendly(''), throwsFormatException);
-      expect(() => new Frame.parseFriendly('foo/bar.dart'),
-          throwsFormatException);
-      expect(() => new Frame.parseFriendly('foo/bar.dart 10:11'),
-          throwsFormatException);
+    test('returns an UnparsedFrame for malformed frames', () {
+      expectIsUnparsed((text) => new Frame.parseFriendly(text), '');
+      expectIsUnparsed((text) => new Frame.parseFriendly(text), 'foo/bar.dart');
+      expectIsUnparsed((text) => new Frame.parseFriendly(text),
+          'foo/bar.dart 10:11');
     });
   });
 
@@ -561,4 +558,10 @@ void main() {
           equals('$relative 5:10 in Foo'));
     });
   });
+}
+
+void expectIsUnparsed(Frame constructor(String text), String text) {
+  var frame = constructor(text);
+  expect(frame, new isInstanceOf<UnparsedFrame>());
+  expect(frame.toString(), equals(text));
 }
