@@ -149,6 +149,15 @@ void main() {
       expect(frame.member, equals('<fn>'));
     });
 
+    test('parses a native stack frame correctly', () {
+      var frame = new Frame.parseV8(
+          "    at Object.stringify (native)");
+      expect(frame.uri, Uri.parse('native'));
+      expect(frame.line, isNull);
+      expect(frame.column, isNull);
+      expect(frame.member, equals('Object.stringify'));
+    });
+
     test('parses a stack frame with [as ...] correctly', () {
       // Ignore "[as ...]", since other stack trace formats don't support a
       // similar construct.

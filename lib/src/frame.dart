@@ -13,6 +13,7 @@ import 'trace.dart';
 // #1      Foo._bar (file:///home/nweiz/code/stuff.dart)
 final _vmFrame = new RegExp(r'^#\d+\s+(\S.*) \((.+?)((?::\d+){0,2})\)$');
 
+//     at Object.stringify (native)
 //     at VW.call$0 (http://pub.dartlang.org/stuff.dart.js:560:28)
 //     at VW.call$0 (eval as fn
 //         (http://pub.dartlang.org/stuff.dart.js:560:28), efn:3:28)
@@ -21,7 +22,7 @@ final _v8Frame = new RegExp(
     r'^\s*at (?:(\S.*?)(?: \[as [^\]]+\])? \((.*)\)|(.*))$');
 
 // http://pub.dartlang.org/stuff.dart.js:560:28
-final _v8UrlLocation = new RegExp(r'^(.*):(\d+):(\d+)$');
+final _v8UrlLocation = new RegExp(r'^(.*):(\d+):(\d+)|native$');
 
 // eval as function (http://pub.dartlang.org/stuff.dart.js:560:28), efn:3:28
 // eval as function (http://pub.dartlang.org/stuff.dart.js:560:28)
@@ -164,6 +165,10 @@ class Frame {
       while (evalMatch != null) {
         location = evalMatch[1];
         evalMatch = _v8EvalLocation.firstMatch(location);
+      }
+
+      if (location == 'native') {
+        return new Frame(Uri.parse('native'), null, null, member);
       }
 
       var urlMatch = _v8UrlLocation.firstMatch(location);

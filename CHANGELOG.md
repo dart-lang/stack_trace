@@ -1,3 +1,7 @@
+## 1.3.6
+
+* Properly parse native-code V8 frames.
+
 ## 1.3.5
 
 * Properly shorten library names for pathnames of folded frames on Windows.
