@@ -1,3 +1,7 @@
+## 1.4.2
+
+* Improve the display of `data:` URIs in stack traces.
+
 ## 1.4.1
 
 * Fix a crashing bug in `UnparsedFrame.toString()`.

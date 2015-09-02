@@ -503,6 +503,12 @@ void main() {
       expect(new Frame.parseVM('#0 Foo (foo/bar.dart:0:0)').library,
           equals(path.join('foo', 'bar.dart')));
     });
+
+    test('truncates data: URIs', () {
+      var frame = new Frame.parseVM(
+          '#0 Foo (data:application/dart;charset=utf-8,blah:0:0)');
+      expect(frame.library, equals('data:...'));
+    });
   });
 
   group('.location', () {
