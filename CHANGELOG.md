@@ -1,3 +1,12 @@
+## 1.5.0
+
+* `new Chain.parse()` now parses all the stack trace formats supported by `new
+  Trace.parse()`. Formats other than that emitted by `Chain.toString()` will
+  produce single-element chains.
+
+* `new Trace.parse()` now parses the output of `Chain.toString()`. It produces
+  the same result as `Chain.parse().toTrace()`.
+
 ## 1.4.2
 
 * Improve the display of `data:` URIs in stack traces.

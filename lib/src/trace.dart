@@ -111,7 +111,8 @@ class Trace implements StackTrace {
   /// Parses a string representation of a stack trace.
   ///
   /// [trace] should be formatted in the same way as a Dart VM or browser stack
-  /// trace.
+  /// trace. If it's formatted as a stack chain, this will return the equivalent
+  /// of [Chain.toTrace].
   factory Trace.parse(String trace) {
     try {
       if (trace.isEmpty) return new Trace(<Frame>[]);
@@ -120,6 +121,7 @@ class Trace implements StackTrace {
       if (trace.contains(_firefoxSafariTrace)) {
         return new Trace.parseFirefox(trace);
       }
+      if (trace.contains(chainGap)) return new Chain.parse(trace).toTrace();
       if (trace.contains(_friendlyTrace)) {
         return new Trace.parseFriendly(trace);
       }

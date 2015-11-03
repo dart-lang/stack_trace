@@ -16,10 +16,6 @@ import 'utils.dart';
 /// A function that handles errors in the zone wrapped by [Chain.capture].
 typedef void ChainHandler(error, Chain chain);
 
-/// The line used in the string representation of stack chains to represent
-/// the gap between traces.
-const _gap = '===== asynchronous gap ===========================\n';
-
 /// A chain of stack traces.
 ///
 /// A stack chain is a collection of one or more stack traces that collectively
@@ -119,11 +115,15 @@ class Chain implements StackTrace {
 
   /// Parses a string representation of a stack chain.
   ///
-  /// Specifically, this parses the output of [Chain.toString].
+  /// If [chain] is the output of a call to [Chain.toString], it will be parsed
+  /// as a full stack chain. Otherwise, it will be parsed as in [Trace.parse]
+  /// and returned as a single-trace chain.
   factory Chain.parse(String chain) {
     if (chain.isEmpty) return new Chain([]);
+    if (!chain.contains(chainGap)) return new Chain([new Trace.parse(chain)]);
+
     return new Chain(
-        chain.split(_gap).map((trace) => new Trace.parseFriendly(trace)));
+        chain.split(chainGap).map((trace) => new Trace.parseFriendly(trace)));
   }
 
   /// Returns a new [Chain] comprised of [traces].
@@ -191,6 +191,6 @@ class Chain implements StackTrace {
       return trace.frames.map((frame) {
         return '${padRight(frame.location, longest)}  ${frame.member}\n';
       }).join();
-    }).join(_gap);
+    }).join(chainGap);
   }
 }
