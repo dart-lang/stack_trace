@@ -109,6 +109,20 @@ void main() {
 
       expect(chain.terse.toString(), equals('dart:core  E.f\n'));
     });
+
+    // Regression test for #9
+    test("doesn't crash on empty traces", () {
+      var chain = new Chain([
+        new Trace.parse('user/code.dart 10:11  Bang.qux'),
+        new Trace([]),
+        new Trace.parse('user/code.dart 10:11  Bang.qux')
+      ]);
+
+      expect(chain.terse.toString(), equals(
+          '$userSlashCode 10:11  Bang.qux\n'
+          '===== asynchronous gap ===========================\n'
+          '$userSlashCode 10:11  Bang.qux\n'));
+    });
   });
 
   group('Chain.foldFrames', () {

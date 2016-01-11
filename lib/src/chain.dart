@@ -37,7 +37,6 @@ typedef void ChainHandler(error, Chain chain);
 ///             "$stackChain");
 ///     });
 class Chain implements StackTrace {
-
   /// The stack traces that make up this chain.
   ///
   /// Like the frames in a stack trace, the traces are ordered from most local
@@ -155,6 +154,7 @@ class Chain implements StackTrace {
     var nonEmptyTraces = foldedTraces.where((trace) {
       // Ignore traces that contain only folded frames.
       if (trace.frames.length > 1) return true;
+      if (trace.frames.isEmpty) return false;
 
       // In terse mode, the trace may have removed an outer folded frame,
       // leaving a single non-folded frame. We can detect a folded frame because

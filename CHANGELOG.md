@@ -1,3 +1,8 @@
+## 1.5.1
+
+* Fix a crash in `Chain.foldFrames()` and `Chain.terse` when one of the chain's
+  traces has no frames.
+
 ## 1.5.0
 
 * `new Chain.parse()` now parses all the stack trace formats supported by `new
