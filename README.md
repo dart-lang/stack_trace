@@ -28,20 +28,20 @@ Here's an example native stack trace from debugging this library:
 
 and its human-readable representation:
 
-    dart:core-patch                             Object.noSuchMethod
+    dart:core-patch 1884:25                     Object.noSuchMethod
     pkg/stack_trace/lib/src/trace.dart 47:21    Trace.terse.<fn>
-    dart:collection                             IterableMixinWorkaround.reduce
-    dart:core-patch                             List.reduce
+    dart:collection 29:29                       IterableMixinWorkaround.reduce
+    dart:core-patch 1247:42                     List.reduce
     pkg/stack_trace/lib/src/trace.dart 40:35    Trace.terse
     pkg/stack_trace/lib/stack_trace.dart 24:28  format
     test.dart 21:29                             main.<fn>
-    dart:async                                  _CatchErrorFuture._sendError
-    dart:async                                  _FutureImpl._setErrorWithoutAsyncTrace
-    dart:async                                  _FutureImpl._setError
-    dart:async                                  _ThenFuture._sendValue
-    dart:async                                  _FutureImpl._handleValue.<fn>
-    dart:async                                  Timer.run.<fn>
-    dart:async-patch                            Timer.Timer.<fn>
+    dart:async 525:24                           _CatchErrorFuture._sendError
+    dart:async 393:26                           _FutureImpl._setErrorWithoutAsyncTrace
+    dart:async 378:31                           _FutureImpl._setError
+    dart:async 490:16                           _ThenFuture._sendValue
+    dart:async 349:28                           _FutureImpl._handleValue.<fn>
+    dart:async 2402:21                          Timer.run.<fn>
+    dart:async-patch 15:15                      Timer.Timer.<fn>
 
 You can further clean up the stack trace using `Trace.terse`. This folds
 together multiple stack frames from the Dart core libraries, so that only the
