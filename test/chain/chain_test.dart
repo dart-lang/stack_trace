@@ -36,6 +36,22 @@ void main() {
     });
   });
 
+  group("Chain.capture() with when: false", () {
+    test("with no onError doesn't block errors", () {
+      expect(Chain.capture(() => new Future.error("oh no"), when: false),
+          throwsA("oh no"));
+    });
+
+    test("with onError blocks errors", () {
+      Chain.capture(() {
+        return new Future.error("oh no");
+      }, onError: expectAsync((error, chain) {
+        expect(error, equals("oh no"));
+        expect(chain, new isInstanceOf<Chain>());
+      }), when: false);
+    });
+  });
+
   test("toString() ensures that all traces are aligned", () {
     var chain = new Chain([
       new Trace.parse('short 10:11  Foo.bar\n'),

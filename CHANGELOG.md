@@ -1,4 +1,8 @@
-## 1.5.2
+## 1.6.0
+
+* Add a `when` parameter to `Chain.capture()`. This allows capturing to be
+  easily enabled and disabled based on whether the application is running in
+  debug/development mode or not.
 
 * Deprecate the `ChainHandler` typedef. This didn't provide any value over
   directly annotating the function argument, and it made the documentation less

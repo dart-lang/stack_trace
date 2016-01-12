@@ -49,8 +49,14 @@ class Chain implements StackTrace {
   static StackZoneSpecification get _currentSpec =>
     Zone.current[#stack_trace.stack_zone.spec];
 
-  /// Runs [callback] in a [Zone] in which the current stack chain is tracked
-  /// and automatically associated with (most) errors.
+  /// If [when] is `true`, runs [callback] in a [Zone] in which the current
+  /// stack chain is tracked and automatically associated with (most) errors.
+  ///
+  /// If [when] is `false`, this does not track stack chains. Instead, it's
+  /// identical to [runZoned], except that it wraps any errors in [new
+  /// Chain.forTrace]—which will only wrap the trace unless there's a different
+  /// [Chain.capture] active. This makes it easy for the caller to only capture
+  /// stack chains in debug mode or during development.
   ///
   /// If [onError] is passed, any error in the zone that would otherwise go
   /// unhandled is passed to it, along with the [Chain] associated with that
@@ -64,7 +70,19 @@ class Chain implements StackTrace {
   /// considered unhandled.
   ///
   /// If [callback] returns a value, it will be returned by [capture] as well.
-  static capture(callback(), {void onError(error, Chain chain)}) {
+  static capture(callback(), {void onError(error, Chain chain),
+      bool when: true}) {
+    if (!when) {
+      var newOnError;
+      if (onError != null) {
+        newOnError = (error, stackTrace) {
+          onError(error, new Chain.forTrace(stackTrace));
+        };
+      }
+
+      return runZoned(callback, onError: newOnError);
+    }
+
     var spec = new StackZoneSpecification(onError);
     return runZoned(() {
       try {
