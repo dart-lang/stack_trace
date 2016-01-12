@@ -9,6 +9,9 @@ import 'dart:async';
 import 'trace.dart';
 import 'chain.dart';
 
+/// A function that handles errors in the zone wrapped by [Chain.capture].
+typedef void _ChainHandler(error, Chain chain);
+
 /// A class encapsulating the zone specification for a [Chain.capture] zone.
 ///
 /// Until they're materialized and exposed to the user, stack chains are tracked
@@ -43,7 +46,7 @@ class StackZoneSpecification {
   ///
   /// If this is null, that indicates that any unhandled errors should be passed
   /// to the parent zone.
-  final ChainHandler _onError;
+  final _ChainHandler _onError;
 
   /// The most recent node of the current stack chain.
   _Node _currentNode;

@@ -14,6 +14,7 @@ import 'trace.dart';
 import 'utils.dart';
 
 /// A function that handles errors in the zone wrapped by [Chain.capture].
+@Deprecated("Will be removed in stack_trace 2.0.0.")
 typedef void ChainHandler(error, Chain chain);
 
 /// A chain of stack traces.
@@ -63,7 +64,7 @@ class Chain implements StackTrace {
   /// considered unhandled.
   ///
   /// If [callback] returns a value, it will be returned by [capture] as well.
-  static capture(callback(), {ChainHandler onError}) {
+  static capture(callback(), {void onError(error, Chain chain)}) {
     var spec = new StackZoneSpecification(onError);
     return runZoned(() {
       try {

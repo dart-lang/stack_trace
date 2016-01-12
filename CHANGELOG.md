@@ -1,3 +1,9 @@
+## 1.5.2
+
+* Deprecate the `ChainHandler` typedef. This didn't provide any value over
+  directly annotating the function argument, and it made the documentation less
+  clear.
+
 ## 1.5.1
 
 * Fix a crash in `Chain.foldFrames()` and `Chain.terse` when one of the chain's
