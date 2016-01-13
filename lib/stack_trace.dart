@@ -21,8 +21,6 @@
  * [pub]: http://pub.dartlang.org
  * [pkg]: http://pub.dartlang.org/packages/stack_trace
  */
-library stack_trace;
-
 export 'src/chain.dart';
 export 'src/frame.dart';
 export 'src/trace.dart';

@@ -2,8 +2,6 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-library stack_trace.unparsed_frame;
-
 import 'frame.dart';
 
 /// A frame that failed to parse.
