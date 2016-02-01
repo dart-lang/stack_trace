@@ -1,3 +1,7 @@
+## 1.6.1
+
+* Use `StacktTrace.current` in Dart SDK 1.14 to get the current stack trace.
+
 ## 1.6.0
 
 * Add a `when` parameter to `Chain.capture()`. This allows capturing to be

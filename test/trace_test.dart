@@ -6,22 +6,6 @@ import 'package:path/path.dart' as path;
 import 'package:stack_trace/stack_trace.dart';
 import 'package:test/test.dart';
 
-String getStackTraceString() {
-  try {
-    throw '';
-  } catch (_, stackTrace) {
-    return stackTrace.toString();
-  }
-}
-
-StackTrace getStackTraceObject() {
-  try {
-    throw '';
-  } catch (_, stackTrace) {
-    return stackTrace;
-  }
-}
-
 Trace getCurrentTrace([int level]) => new Trace.current(level);
 
 Trace nestedGetCurrentTrace(int level) => getCurrentTrace(level);

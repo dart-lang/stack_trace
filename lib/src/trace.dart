@@ -81,12 +81,8 @@ class Trace implements StackTrace {
           "to 0.");
     }
 
-    try {
-      throw '';
-    } catch (_, nativeTrace) {
-      var trace = new Trace.from(nativeTrace);
-      return new LazyTrace(() => new Trace(trace.frames.skip(level + 1)));
-    }
+    var trace = new Trace.from(StackTrace.current);
+    return new LazyTrace(() => new Trace(trace.frames.skip(level + 1)));
   }
 
   /// Returns a new stack trace containing the same data as [trace].

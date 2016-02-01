@@ -12,22 +12,6 @@ import 'package:path/path.dart' as path;
 import 'package:stack_trace/stack_trace.dart';
 import 'package:test/test.dart';
 
-String getStackTraceString() {
-  try {
-    throw '';
-  } catch (_, stackTrace) {
-    return stackTrace.toString();
-  }
-}
-
-StackTrace getStackTraceObject() {
-  try {
-    throw '';
-  } catch (_, stackTrace) {
-    return stackTrace;
-  }
-}
-
 Frame getCaller([int level]) {
   if (level == null) return new Frame.caller();
   return new Frame.caller(level);
@@ -42,7 +26,7 @@ Trace nestedGetCurrentTrace(int level) => getCurrentTrace(level);
 void main() {
   group('Trace', () {
     test('.parse parses a real stack trace correctly', () {
-      var string = getStackTraceString();
+      var string = StackTrace.current.toString();
       var trace = new Trace.parse(string);
       expect(path.url.basename(trace.frames.first.uri.path),
           equals('vm_test.dart'));
@@ -50,7 +34,7 @@ void main() {
     });
 
     test('converts from a native stack trace correctly', () {
-      var trace = new Trace.from(getStackTraceObject());
+      var trace = new Trace.from(StackTrace.current);
       expect(path.url.basename(trace.frames.first.uri.path),
           equals('vm_test.dart'));
       expect(trace.frames.first.member, equals('getStackTraceObject'));
