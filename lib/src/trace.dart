@@ -257,7 +257,7 @@ class Trace implements StackTrace {
       };
     }
 
-    var newFrames = [];
+    var newFrames = <Frame>[];
     for (var frame in frames.reversed) {
       if (frame is UnparsedFrame || !predicate(frame)) {
         newFrames.add(frame);

@@ -1,6 +1,10 @@
+## 1.6.2
+
+* Fix all strong mode warnings.
+
 ## 1.6.1
 
-* Use `StacktTrace.current` in Dart SDK 1.14 to get the current stack trace.
+* Use `StackTrace.current` in Dart SDK 1.14 to get the current stack trace.
 
 ## 1.6.0
 
