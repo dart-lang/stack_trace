@@ -1,3 +1,7 @@
+## 1.6.4
+
+* Fix a syntax error introduced in 1.6.3.
+
 ## 1.6.3
 
 * Make `Chain.capture()` generic. Its signature is now `T Chain.capture<T>(T
