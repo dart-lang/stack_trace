@@ -1,3 +1,8 @@
+## 1.6.3
+
+* Make `Chain.capture()` generic. Its signature is now `T Chain.capture<T>(T
+  callback(), ...)`.
+
 ## 1.6.2
 
 * Fix all strong mode warnings.

@@ -68,8 +68,8 @@ class Chain implements StackTrace {
   /// considered unhandled.
   ///
   /// If [callback] returns a value, it will be returned by [capture] as well.
-  static capture(callback(), {void onError(error, Chain chain),
-      bool when: true}) {
+  static /*=T*? capture/*<T>*/(/*=T*/ callback(),
+      {void onError(error, Chain chain), bool when: true}) {
     if (!when) {
       var newOnError;
       if (onError != null) {
