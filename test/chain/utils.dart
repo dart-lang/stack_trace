@@ -73,8 +73,11 @@ Future<Chain> chainForTrace(asyncFn(callback()), callback()) {
     new Future.value().then((_) => callback())
         .catchError(completer.completeError);
   });
+
+  // TODO(rnystrom): Remove this cast if catchError() gets a better type.
   return completer.future
-      .catchError((_, stackTrace) => new Chain.forTrace(stackTrace));
+          .catchError((_, stackTrace) => new Chain.forTrace(stackTrace))
+      as Future<Chain>;
 }
 
 /// Runs [callback] in a [Chain.capture] zone and returns a Future that

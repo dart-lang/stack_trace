@@ -78,7 +78,8 @@ class Chain implements StackTrace {
         };
       }
 
-      return runZoned(callback, onError: newOnError);
+      // TODO(rnystrom): Remove this cast if runZoned() gets a generic type.
+      return runZoned(callback, onError: newOnError) as dynamic/*=T*/;
     }
 
     var spec = new StackZoneSpecification(onError);
@@ -91,7 +92,8 @@ class Chain implements StackTrace {
       }
     }, zoneSpecification: spec.toSpec(), zoneValues: {
       #stack_trace.stack_zone.spec: spec
-    });
+    }) as dynamic/*=T*/;
+    // TODO(rnystrom): Remove this cast if runZoned() gets a generic type.
   }
 
   /// Returns [futureOrStream] unmodified.

@@ -10,6 +10,8 @@ import 'package:test/test.dart';
 
 import 'utils.dart';
 
+typedef void ChainErrorCallback(stack, Chain chain);
+
 void main() {
   group('Chain.parse()', () {
     test('parses a real Chain', () {
@@ -48,7 +50,8 @@ void main() {
       }, onError: expectAsync((error, chain) {
         expect(error, equals("oh no"));
         expect(chain, new isInstanceOf<Chain>());
-      }), when: false);
+      }) as ChainErrorCallback, when: false);
+      // TODO(rnystrom): Remove this cast if expectAsync() gets a better type.
     });
   });
 

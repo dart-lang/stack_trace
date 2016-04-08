@@ -1,3 +1,7 @@
+## 1.6.5
+
+* Really fix strong mode warnings.
+
 ## 1.6.4
 
 * Fix a syntax error introduced in 1.6.3.
