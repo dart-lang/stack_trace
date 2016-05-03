@@ -3,7 +3,6 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'dart:async';
-import 'dart:collection';
 import 'dart:math' as math;
 
 import 'frame.dart';
@@ -146,7 +145,7 @@ class Chain implements StackTrace {
 
   /// Returns a new [Chain] comprised of [traces].
   Chain(Iterable<Trace> traces)
-      : traces = new UnmodifiableListView<Trace>(traces.toList());
+      : traces = new List<Trace>.unmodifiable(traces);
 
   /// Returns a terser version of [this].
   ///

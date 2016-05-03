@@ -2,7 +2,6 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-import 'dart:collection';
 import 'dart:math' as math;
 
 import 'chain.dart';
@@ -205,7 +204,7 @@ class Trace implements StackTrace {
 
   /// Returns a new [Trace] comprised of [frames].
   Trace(Iterable<Frame> frames)
-      : frames = new UnmodifiableListView<Frame>(frames.toList());
+      : frames = new List<Frame>.unmodifiable(frames);
 
   /// Returns a VM-style [StackTrace] object.
   ///
