@@ -1,3 +1,8 @@
+## 1.6.6
+
+* `new Trace.current()` and `new Chain.current()` now skip an extra frame when
+  run in a JS context. This makes their return values match the VM context.
+
 ## 1.6.5
 
 * Really fix strong mode warnings.

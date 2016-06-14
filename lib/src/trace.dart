@@ -81,7 +81,11 @@ class Trace implements StackTrace {
     }
 
     var trace = new Trace.from(StackTrace.current);
-    return new LazyTrace(() => new Trace(trace.frames.skip(level + 1)));
+    return new LazyTrace(() {
+      // JS includes a frame for the call to StackTrace.current, but the VM
+      // doesn't, so we skip an extra frame in a JS context.
+      return new Trace(trace.frames.skip(level + (inJS ? 2 : 1)));
+    });
   }
 
   /// Returns a new stack trace containing the same data as [trace].
