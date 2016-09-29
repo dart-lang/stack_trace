@@ -10,7 +10,7 @@ const chainGap = '===== asynchronous gap ===========================\n';
 
 // TODO(nweiz): When cross-platform imports work, use them to set this.
 /// Whether we're running in a JS context.
-final bool inJS = p.style == p.Style.url;
+final bool inJS = 0.0 is int;
 
 /// Returns [string] with enough spaces added to the end to make it [length]
 /// characters long.
