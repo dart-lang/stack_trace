@@ -3,7 +3,6 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'frame.dart';
-import 'utils.dart';
 
 /// An implementation of [StackTrace] that emulates the behavior of the VM's
 /// implementation.
@@ -19,7 +18,7 @@ class VMTrace implements StackTrace {
   String toString() {
     var i = 1;
     return frames.map((frame) {
-      var number = padRight("#${i++}", 8);
+      var number = "#${i++}".padRight(8);
       var member = frame.member
           .replaceAllMapped(new RegExp(r"[^.]+\.<async>"),
               (match) => "${match[1]}.<${match[1]}_async_body>")

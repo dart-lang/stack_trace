@@ -291,7 +291,7 @@ class Trace implements StackTrace {
     // Print out the stack trace nicely formatted.
     return frames.map((frame) {
       if (frame is UnparsedFrame) return "$frame\n";
-      return '${padRight(frame.location, longest)}  ${frame.member}\n';
+      return '${frame.location.padRight(longest)}  ${frame.member}\n';
     }).join();
   }
 }
