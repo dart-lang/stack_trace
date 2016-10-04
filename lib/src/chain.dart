@@ -77,8 +77,7 @@ class Chain implements StackTrace {
         };
       }
 
-      // TODO(rnystrom): Remove this cast if runZoned() gets a generic type.
-      return runZoned(callback, onError: newOnError) as dynamic/*=T*/;
+      return runZoned(callback, onError: newOnError);
     }
 
     var spec = new StackZoneSpecification(onError);
@@ -207,7 +206,7 @@ class Chain implements StackTrace {
     // padding is consistent across all traces.
     return traces.map((trace) {
       return trace.frames.map((frame) {
-        return '${padRight(frame.location, longest)}  ${frame.member}\n';
+        return '${frame.location.padRight(longest)}  ${frame.member}\n';
       }).join();
     }).join(chainGap);
   }
