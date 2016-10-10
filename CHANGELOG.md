@@ -1,3 +1,7 @@
+## 1.6.8
+
+* Add a note to the documentation of `Chain.terse` and `Trace.terse`.
+
 ## 1.6.7
 
 * Fix a bug where `new Frame.caller()` returned the wrong depth of frame on
