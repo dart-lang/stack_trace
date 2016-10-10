@@ -150,6 +150,13 @@ class Chain implements StackTrace {
   ///
   /// This calls [Trace.terse] on every trace in [traces], and discards any
   /// trace that contain only internal frames.
+  ///
+  /// This won't do anything with a raw JavaScript trace, since there's no way
+  /// to determine which frames come from which Dart libraries. However, the
+  /// [`source_map_stack_trace`][source_map_stack_trace] package can be used to
+  /// convert JavaScript traces into Dart-style traces.
+  ///
+  /// [source_map_stack_trace]: https://pub.dartlang.org/packages/source_map_stack_trace
   Chain get terse => foldFrames((_) => false, terse: true);
 
   /// Returns a new [Chain] based on [this] where multiple stack frames matching
