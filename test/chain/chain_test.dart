@@ -8,6 +8,7 @@ import 'package:path/path.dart' as p;
 import 'package:stack_trace/stack_trace.dart';
 import 'package:test/test.dart';
 
+import '../utils.dart';
 import 'utils.dart';
 
 typedef void ChainErrorCallback(stack, Chain chain);
@@ -52,6 +53,82 @@ void main() {
         expect(chain, new isInstanceOf<Chain>());
       }) as ChainErrorCallback, when: false);
       // TODO(rnystrom): Remove this cast if expectAsync() gets a better type.
+    });
+
+    test("doesn't enable chain-tracking", () {
+      return Chain.disable(() {
+        return Chain.capture(() {
+          var completer = new Completer();
+          inMicrotask(() {
+            completer.complete(new Chain.current());
+          });
+
+          return completer.future.then((chain) {
+            expect(chain.traces, hasLength(1));
+          });
+        }, when: false);
+      });
+    });
+  });
+
+  group("Chain.disable()", () {
+    test("disables chain-tracking", () {
+      return Chain.disable(() {
+        var completer = new Completer();
+        inMicrotask(() => completer.complete(new Chain.current()));
+
+        return completer.future.then((chain) {
+          expect(chain.traces, hasLength(1));
+        });
+      });
+    });
+
+    test("Chain.capture() re-enables chain-tracking", () {
+      return Chain.disable(() {
+        return Chain.capture(() {
+          var completer = new Completer();
+          inMicrotask(() => completer.complete(new Chain.current()));
+
+          return completer.future.then((chain) {
+            expect(chain.traces, hasLength(2));
+          });
+        });
+      });
+    });
+
+    test("preserves parent zones of the capture zone", () {
+      // The outer disable call turns off the test package's chain-tracking.
+      return Chain.disable(() {
+        return runZoned(() {
+          return Chain.capture(() {
+            expect(Chain.disable(() => Zone.current[#enabled]), isTrue);
+          });
+        }, zoneValues: {#enabled: true});
+      });
+    });
+
+    test("preserves child zones of the capture zone", () {
+      // The outer disable call turns off the test package's chain-tracking.
+      return Chain.disable(() {
+        return Chain.capture(() {
+          return runZoned(() {
+            expect(Chain.disable(() => Zone.current[#enabled]), isTrue);
+          }, zoneValues: {#enabled: true});
+        });
+      });
+    });
+
+    test("with when: false doesn't disable", () {
+      return Chain.capture(() {
+        return Chain.disable(() {
+          var completer = new Completer();
+          inMicrotask(() => completer.complete(new Chain.current()));
+
+          return completer.future.then((chain) {
+            expect(chain.traces, hasLength(2));
+          });
+        }, when: false);
+      });
     });
   });
 
@@ -247,69 +324,5 @@ void main() {
         'dart:core 10:11       Bar.baz\n'
         '$userSlashCode 10:11  Foo.bar\n'
         'dart:core 10:11       Bar.baz\n'));
-  });
-
-  group('Chain.track(Future)', () {
-    test('forwards the future value within Chain.capture()', () {
-      Chain.capture(() {
-        expect(Chain.track(new Future.value('value')),
-            completion(equals('value')));
-
-        var trace = new Trace.current();
-        expect(Chain.track(new Future.error('error', trace))
-            .catchError((e, stackTrace) {
-          expect(e, equals('error'));
-          expect(stackTrace.toString(), equals(trace.toString()));
-        }), completes);
-      });
-    });
-
-    test('forwards the future value outside of Chain.capture()', () {
-      expect(Chain.track(new Future.value('value')),
-          completion(equals('value')));
-
-      var trace = new Trace.current();
-      expect(Chain.track(new Future.error('error', trace))
-          .catchError((e, stackTrace) {
-        expect(e, equals('error'));
-        expect(stackTrace.toString(), equals(trace.toString()));
-      }), completes);
-    });
-  });
-
-  group('Chain.track(Stream)', () {
-    test('forwards stream values within Chain.capture()', () {
-      Chain.capture(() {
-        var controller = new StreamController()
-            ..add(1)..add(2)..add(3)..close();
-        expect(Chain.track(controller.stream).toList(),
-            completion(equals([1, 2, 3])));
-
-        var trace = new Trace.current();
-        controller = new StreamController()..addError('error', trace);
-        expect(Chain.track(controller.stream).toList()
-            .catchError((e, stackTrace) {
-          expect(e, equals('error'));
-          expect(stackTrace.toString(), equals(trace.toString()));
-        }), completes);
-      });
-    });
-
-    test('forwards stream values outside of Chain.capture()', () {
-      Chain.capture(() {
-        var controller = new StreamController()
-            ..add(1)..add(2)..add(3)..close();
-        expect(Chain.track(controller.stream).toList(),
-            completion(equals([1, 2, 3])));
-
-        var trace = new Trace.current();
-        controller = new StreamController()..addError('error', trace);
-        expect(Chain.track(controller.stream).toList()
-            .catchError((e, stackTrace) {
-          expect(e, equals('error'));
-          expect(stackTrace.toString(), equals(trace.toString()));
-        }), completes);
-      });
-    });
   });
 }

@@ -240,9 +240,8 @@ void main() {
 
   test('current() outside of capture() returns a chain wrapping the current '
       'trace', () {
-    // The test runner runs all tests with chains enabled, so to test without we
-    // have to do some zone munging.
-    return runZoned(() async {
+    // The test runner runs all tests with chains enabled.
+    return Chain.disable(() async {
       var completer = new Completer();
       inMicrotask(() => completer.complete(new Chain.current()));
 
@@ -251,7 +250,7 @@ void main() {
       // chain isn't available and it just returns the current stack when
       // called.
       expect(chain.traces, hasLength(1));
-    }, zoneValues: {#stack_trace.stack_zone.spec: null});
+    });
   });
 
   group('forTrace() within capture()', () {
