@@ -1,3 +1,10 @@
+## 1.7.0
+
+* Add a `Chain.disable()` function that disables stack-chain tracking.
+
+* Fix a bug where `Chain.capture(..., when: false)` would throw if an error was
+  emitted without a stack trace.
+
 ## 1.6.8
 
 * Add a note to the documentation of `Chain.terse` and `Trace.terse`.
