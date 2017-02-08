@@ -51,8 +51,8 @@ final _firefoxSafariFrame = new RegExp(
                    // empty in Safari if it's unknown.
     r'$');
 
-// foo/bar.dart 10:11 in Foo._bar
-// http://dartlang.org/foo/bar.dart in Foo._bar
+// foo/bar.dart 10:11 Foo._bar
+// http://dartlang.org/foo/bar.dart Foo._bar
 final _friendlyFrame = new RegExp(
     r'^(\S+)(?: (\d+)(?::(\d+))?)?\s+([^\d]\S*)$');
 
