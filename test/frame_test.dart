@@ -68,7 +68,9 @@ void main() {
       expect(frame.line, isNull);
       expect(frame.column, isNull);
     });
+  });
 
+  group('.parseV8', () {
     test('returns an UnparsedFrame for malformed frames', () {
       expectIsUnparsed((text) => new Frame.parseV8(text), '');
       expectIsUnparsed((text) => new Frame.parseV8(text), '#1');
@@ -78,9 +80,7 @@ void main() {
       expectIsUnparsed((text) => new Frame.parseV8(text),
           'Foo (dart:async/future.dart:10:15)');
     });
-  });
 
-  group('.parseV8', () {
     test('parses a stack frame correctly', () {
       var frame = new Frame.parseV8("    at VW.call\$0 "
           "(http://pub.dartlang.org/stuff.dart.js:560:28)");
