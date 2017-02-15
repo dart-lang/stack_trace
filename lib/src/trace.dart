@@ -51,7 +51,7 @@ final _firefoxSafariTrace = new RegExp(
     r"$", multiLine: true);
 
 /// A RegExp to match this package's stack traces.
-final _friendlyTrace = new RegExp(r"^[^\s]+( \d+(:\d+)?)?[ \t]+[^\s]+$",
+final _friendlyTrace = new RegExp(r"^[^\s<][^\s]*( \d+(:\d+)?)?[ \t]+[^\s]+$",
     multiLine: true);
 
 /// A stack trace, comprised of a list of stack frames.
@@ -137,7 +137,9 @@ class Trace implements StackTrace {
       : this(_parseVM(trace));
 
   static List<Frame> _parseVM(String trace) {
-    var lines = trace.trim().split("\n");
+    // Ignore [vmChainGap]. This matches the behavior of
+    // `Chain.parse().toTrace()`.
+    var lines = trace.trim().replaceAll(vmChainGap, '').split("\n");
     var frames = lines.take(lines.length - 1)
         .map((line) => new Frame.parseVM(line))
         .toList();

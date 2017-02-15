@@ -1,3 +1,10 @@
+## 1.7.1
+
+* Make `Trace.parse()`, `Chain.parse()`, treat the VM's new causal asynchronous
+  stack traces as chains. Outside of a `Chain.capture()` block, `new
+  Chain.current()` will return a stack chain constructed from the asynchronous
+  stack traces.
+
 ## 1.7.0
 
 * Add a `Chain.disable()` function that disables stack-chain tracking.
