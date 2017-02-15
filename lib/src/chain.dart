@@ -6,6 +6,7 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'frame.dart';
+import 'lazy_chain.dart';
 import 'stack_zone_specification.dart';
 import 'trace.dart';
 import 'utils.dart';
@@ -134,7 +135,15 @@ class Chain implements StackTrace {
   /// single-trace chain.
   factory Chain.current([int level=0]) {
     if (_currentSpec != null) return _currentSpec.currentChain(level + 1);
-    return new Chain([new Trace.current(level + 1)]);
+
+    var chain = new Chain.forTrace(StackTrace.current);
+    return new LazyChain(() {
+      // JS includes a frame for the call to StackTrace.current, but the VM
+      // doesn't, so we skip an extra frame in a JS context.
+      var first = new Trace(
+          chain.traces.first.frames.skip(level + (inJS ? 2 : 1)));
+      return new Chain([first]..addAll(chain.traces.skip(1)));
+    });
   }
 
   /// Returns the stack chain associated with [trace].
@@ -147,8 +156,8 @@ class Chain implements StackTrace {
   /// If [trace] is already a [Chain], it will be returned as-is.
   factory Chain.forTrace(StackTrace trace) {
     if (trace is Chain) return trace;
-    if (_currentSpec == null) return new Chain([new Trace.from(trace)]);
-    return _currentSpec.chainFor(trace);
+    if (_currentSpec != null) return _currentSpec.chainFor(trace);
+    return new LazyChain(() => new Chain.parse(trace.toString()));
   }
 
   /// Parses a string representation of a stack chain.
@@ -158,6 +167,10 @@ class Chain implements StackTrace {
   /// and returned as a single-trace chain.
   factory Chain.parse(String chain) {
     if (chain.isEmpty) return new Chain([]);
+    if (chain.contains(vmChainGap)) {
+      return new Chain(
+          chain.split(vmChainGap).map((trace) => new Trace.parseVM(trace)));
+    }
     if (!chain.contains(chainGap)) return new Chain([new Trace.parse(chain)]);
 
     return new Chain(

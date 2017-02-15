@@ -4,8 +4,10 @@
 
 import 'dart:async';
 
-import 'trace.dart';
 import 'chain.dart';
+import 'lazy_trace.dart';
+import 'trace.dart';
+import 'utils.dart';
 
 /// A function that handles errors in the zone wrapped by [Chain.capture].
 typedef void _ChainHandler(error, Chain chain);
@@ -170,7 +172,7 @@ class StackZoneSpecification {
   /// [_createNode] is called. If [level] is passed, the first trace will start
   /// that many frames up instead.
   _Node _createNode([int level=0]) =>
-    new _Node(new Trace.current(level + 1), _currentNode);
+    new _Node(_currentTrace(level + 1), _currentNode);
 
   // TODO(nweiz): use a more robust way of detecting and tracking errors when
   // issue 15105 is fixed.
@@ -201,7 +203,7 @@ class _Node {
   final _Node previous;
 
   _Node(StackTrace trace, [this.previous])
-      : trace = trace == null ? new Trace.current() : new Trace.from(trace);
+      : trace = trace == null ? _currentTrace() : new Trace.from(trace);
 
   /// Converts this to a [Chain].
   Chain toChain() {
@@ -213,4 +215,23 @@ class _Node {
     }
     return new Chain(nodes);
   }
+}
+
+/// Like [new Trace.current], but if the current stack trace has VM chaining
+/// enabled, this only returns the innermost sub-trace.
+Trace _currentTrace([int level]) {
+  level ??= 0;
+  var stackTrace = StackTrace.current;
+  return new LazyTrace(() {
+    // Ignore the VM's stack chains when we generate our own. Otherwise we'll
+    // end up with duplicate frames all over the place.
+    var text = stackTrace.toString();
+    var index = text.indexOf(vmChainGap);
+    if (index != -1) text = text.substring(0, index);
+
+    var trace = new Trace.parse(text);
+    // JS includes a frame for the call to StackTrace.current, but the VM
+    // doesn't, so we skip an extra frame in a JS context.
+    return new Trace(trace.frames.skip(level + (inJS ? 2 : 1)));
+  });
 }
