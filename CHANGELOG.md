@@ -1,3 +1,8 @@
+## 1.7.2
+
+* `Trace.foldFrames()` and `Chain.foldFrames()` now remove the outermost folded
+  frame. This matches the behavior of `.terse` with core frames.
+
 ## 1.7.1
 
 * Make `Trace.parse()`, `Chain.parse()`, treat the VM's new causal asynchronous
