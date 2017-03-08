@@ -293,8 +293,9 @@ http://pub.dartlang.org/thing.dart 1:100  zip.<fn>.zap
   });
 
   group("folding", () {
-    test('.terse folds core frames together bottom-up', () {
-      var trace = new Trace.parse('''
+    group(".terse", () {
+      test('folds core frames together bottom-up', () {
+        var trace = new Trace.parse('''
 #1 top (dart:async/future.dart:0:2)
 #2 bottom (dart:core/uri.dart:1:100)
 #0 notCore (foo.dart:42:21)
@@ -303,30 +304,30 @@ http://pub.dartlang.org/thing.dart 1:100  zip.<fn>.zap
 #5 alsoNotCore (bar.dart:10:20)
 ''');
 
-      expect(trace.terse.toString(), equals('''
+        expect(trace.terse.toString(), equals('''
 dart:core       bottom
 foo.dart 42:21  notCore
 dart:async      bottom
 bar.dart 10:20  alsoNotCore
 '''));
-    });
+      });
 
-    test('.terse folds empty async frames', () {
-      var trace = new Trace.parse('''
+      test('folds empty async frames', () {
+        var trace = new Trace.parse('''
 #0 top (dart:async/future.dart:0:2)
 #1 empty.<<anonymous closure>_async_body> (bar.dart)
 #2 bottom (dart:async-patch/future.dart:9:11)
 #3 notCore (foo.dart:42:21)
 ''');
 
-      expect(trace.terse.toString(), equals('''
+        expect(trace.terse.toString(), equals('''
 dart:async      bottom
 foo.dart 42:21  notCore
 '''));
-    });
+      });
 
-    test('.terse removes the bottom-most async frame', () {
-      var trace = new Trace.parse('''
+      test('removes the bottom-most async frame', () {
+        var trace = new Trace.parse('''
 #0 notCore (foo.dart:42:21)
 #1 top (dart:async/future.dart:0:2)
 #2 bottom (dart:core/uri.dart:1:100)
@@ -337,25 +338,27 @@ foo.dart 42:21  notCore
       expect(trace.terse.toString(), equals('''
 foo.dart 42:21  notCore
 '''));
-    });
+      });
 
-    test(".terse won't make a trace empty", () {
-      var trace = new Trace.parse('''
+      test("won't make a trace empty", () {
+        var trace = new Trace.parse('''
 #1 top (dart:async/future.dart:0:2)
 #2 bottom (dart:core/uri.dart:1:100)
 ''');
 
-      expect(trace.terse.toString(), equals('''
+        expect(trace.terse.toString(), equals('''
 dart:core  bottom
 '''));
+      });
+
+      test("won't panic on an empty trace", () {
+        expect(new Trace.parse("").terse.toString(), equals(""));
+      });
     });
 
-    test(".terse won't panic on an empty trace", () {
-      expect(new Trace.parse("").terse.toString(), equals(""));
-    });
-
-    test('.foldFrames folds frames together bottom-up', () {
-      var trace = new Trace.parse('''
+    group(".foldFrames", () {
+      test('folds frames together bottom-up', () {
+        var trace = new Trace.parse('''
 #0 notFoo (foo.dart:42:21)
 #1 fooTop (bar.dart:0:2)
 #2 fooBottom (foo.dart:1:100)
@@ -364,17 +367,32 @@ dart:core  bottom
 #5 fooBottom (dart:async-patch/future.dart:9:11)
 ''');
 
-      var folded = trace.foldFrames((frame) => frame.member.startsWith('foo'));
-      expect(folded.toString(), equals('''
+        var folded = trace.foldFrames((frame) => frame.member.startsWith('foo'));
+        expect(folded.toString(), equals('''
 foo.dart 42:21                     notFoo
 foo.dart 1:100                     fooBottom
 bar.dart 10:20                     alsoNotFoo
 dart:async-patch/future.dart 9:11  fooBottom
 '''));
-    });
+      });
 
-    test('.foldFrames with terse: true folds core frames as well', () {
-      var trace = new Trace.parse('''
+      test('will never fold unparsed frames', () {
+        var trace = new Trace.parse(r'''
+.g"cs$#:b";a#>sw{*{ul$"$xqwr`p
+%+j-?uppx<([j@#nu{{>*+$%x-={`{
+!e($b{nj)zs?cgr%!;bmw.+$j+pfj~
+''');
+
+        expect(trace.foldFrames((frame) => true).toString(), equals(r'''
+.g"cs$#:b";a#>sw{*{ul$"$xqwr`p
+%+j-?uppx<([j@#nu{{>*+$%x-={`{
+!e($b{nj)zs?cgr%!;bmw.+$j+pfj~
+'''));
+      });
+
+      group("with terse: true", () {
+        test('folds core frames as well', () {
+          var trace = new Trace.parse('''
 #0 notFoo (foo.dart:42:21)
 #1 fooTop (bar.dart:0:2)
 #2 coreBottom (dart:async/future.dart:0:2)
@@ -383,47 +401,52 @@ dart:async-patch/future.dart 9:11  fooBottom
 #5 coreBottom (dart:async-patch/future.dart:9:11)
 ''');
 
-      var folded = trace.foldFrames((frame) => frame.member.startsWith('foo'),
-          terse: true);
-      expect(folded.toString(), equals('''
+          var folded = trace.foldFrames((frame) => frame.member.startsWith('foo'),
+              terse: true);
+          expect(folded.toString(), equals('''
 foo.dart 42:21  notFoo
 dart:async      coreBottom
 bar.dart 10:20  alsoNotFoo
 '''));
-    });
+      });
 
-    test('.foldFrames with terse: true shortens folded frames', () {
-      var trace = new Trace.parse('''
+        test('shortens folded frames', () {
+          var trace = new Trace.parse('''
 #0 notFoo (foo.dart:42:21)
 #1 fooTop (bar.dart:0:2)
 #2 fooBottom (package:foo/bar.dart:0:2)
 #3 alsoNotFoo (bar.dart:10:20)
 #4 fooTop (foo.dart:9:11)
 #5 fooBottom (foo/bar.dart:9:11)
+#6 againNotFoo (bar.dart:20:20)
 ''');
 
-      var folded = trace.foldFrames((frame) => frame.member.startsWith('foo'),
-          terse: true);
-      expect(folded.toString(), equals('''
+          var folded = trace.foldFrames((frame) => frame.member.startsWith('foo'),
+              terse: true);
+          expect(folded.toString(), equals('''
 foo.dart 42:21  notFoo
 package:foo     fooBottom
 bar.dart 10:20  alsoNotFoo
 foo             fooBottom
+bar.dart 20:20  againNotFoo
 '''));
-    });
+        });
 
-    test('.foldFrames will never fold unparsed frames', () {
-      var trace = new Trace.parse(r'''
-.g"cs$#:b";a#>sw{*{ul$"$xqwr`p
-%+j-?uppx<([j@#nu{{>*+$%x-={`{
-!e($b{nj)zs?cgr%!;bmw.+$j+pfj~
+        test('removes the bottom-most folded frame', () {
+          var trace = new Trace.parse('''
+#2 fooTop (package:foo/bar.dart:0:2)
+#3 notFoo (bar.dart:10:20)
+#5 fooBottom (foo/bar.dart:9:11)
 ''');
 
-      expect(trace.foldFrames((frame) => true).toString(), equals(r'''
-.g"cs$#:b";a#>sw{*{ul$"$xqwr`p
-%+j-?uppx<([j@#nu{{>*+$%x-={`{
-!e($b{nj)zs?cgr%!;bmw.+$j+pfj~
+          var folded = trace.foldFrames((frame) => frame.member.startsWith('foo'),
+              terse: true);
+          expect(folded.toString(), equals('''
+package:foo     fooTop
+bar.dart 10:20  notFoo
 '''));
+        });
+      });
     });
   });
 }
