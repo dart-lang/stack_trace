@@ -72,6 +72,23 @@ void main() {
           equals(Uri.parse("http://pub.dartlang.org/stuff.js")));
       expect(trace.frames[2].uri,
           equals(Uri.parse("http://pub.dartlang.org/thing.js")));
+
+      trace = new Trace.parse(
+          'Exception: foo\n'
+          '    bar\n'
+          '    at Foo._bar (http://pub.dartlang.org/stuff.js:42:21)\n'
+          '    at http://pub.dartlang.org/stuff.js:0:2\n'
+          '    at (anonymous function).zip.zap '
+              '(http://pub.dartlang.org/thing.js:1:100)');
+
+      expect(trace.frames[0].uri,
+          equals(Uri.parse("http://pub.dartlang.org/stuff.js")));
+      expect(trace.frames[1].uri,
+          equals(Uri.parse("http://pub.dartlang.org/stuff.js")));
+      expect(trace.frames[1].member, equals("<fn>"));
+      expect(trace.frames[2].uri,
+          equals(Uri.parse("http://pub.dartlang.org/thing.js")));
+      expect(trace.frames[2].member, equals("<fn>.zip.zap"));
     });
 
     // JavaScriptCore traces are just like V8, except that it doesn't have a

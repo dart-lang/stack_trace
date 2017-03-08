@@ -448,7 +448,7 @@ void main() {
       expect(frame.member, equals('Foo.<fn>.bar'));
     });
 
-    test('parses a stack frame with no line correctly', () {
+    test('parses a stack frame with no column correctly', () {
       var frame = new Frame.parseFriendly(
           "http://dartlang.org/foo/bar.dart 10  Foo.<fn>.bar");
       expect(frame.uri, equals(Uri.parse("http://dartlang.org/foo/bar.dart")));
@@ -471,6 +471,45 @@ void main() {
       expectIsUnparsed((text) => new Frame.parseFriendly(text), 'foo/bar.dart');
       expectIsUnparsed((text) => new Frame.parseFriendly(text),
           'foo/bar.dart 10:11');
+    });
+
+    test('parses a data url stack frame with no line or column correctly', () {
+      var frame = new Frame.parseFriendly(
+          "data:...  main");
+      expect(frame.uri.scheme, equals('data'));
+      expect(frame.line, isNull);
+      expect(frame.column, isNull);
+      expect(frame.member, equals('main'));
+    });
+
+    test('parses a data url stack frame correctly', () {
+      var frame = new Frame.parseFriendly(
+          "data:... 10:11    main");
+      expect(frame.uri.scheme, equals('data'));
+      expect(frame.line, equals(10));
+      expect(frame.column, equals(11));
+      expect(frame.member, equals('main'));
+    });
+
+    test('parses a stack frame with spaces in the member name correctly', () {
+      var frame = new Frame.parseFriendly(
+          "foo/bar.dart 10:11    (anonymous function).dart.fn");
+      expect(frame.uri,
+          equals(path.toUri(path.absolute(path.join('foo', 'bar.dart')))));
+      expect(frame.line, equals(10));
+      expect(frame.column, equals(11));
+      expect(frame.member, equals('(anonymous function).dart.fn'));
+    });
+
+    test('parses a stack frame with spaces in the member name and no line or '
+         'column correctly', () {
+      var frame = new Frame.parseFriendly(
+          "http://dartlang.org/foo/bar.dart  (anonymous function).dart.fn");
+      expect(
+          frame.uri, equals(Uri.parse("http://dartlang.org/foo/bar.dart")));
+      expect(frame.line, isNull);
+      expect(frame.column, isNull);
+      expect(frame.member, equals('(anonymous function).dart.fn'));
     });
   });
 

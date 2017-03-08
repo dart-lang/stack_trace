@@ -3,6 +3,10 @@
 * `Trace.foldFrames()` and `Chain.foldFrames()` now remove the outermost folded
   frame. This matches the behavior of `.terse` with core frames.
 
+* Fix bug parsing a friendly frame with spaces in the member name.
+
+* Fix bug parsing a friendly frame where the location is a data url.
+
 ## 1.7.1
 
 * Make `Trace.parse()`, `Chain.parse()`, treat the VM's new causal asynchronous
