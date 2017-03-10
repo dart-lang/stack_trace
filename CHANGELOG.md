@@ -1,3 +1,7 @@
+## 1.7.3
+
+* Fix broken links in the README.
+
 ## 1.7.2
 
 * `Trace.foldFrames()` and `Chain.foldFrames()` now remove the outermost folded

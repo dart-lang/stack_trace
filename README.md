@@ -7,7 +7,7 @@ the native [StackTrace] implementation.
 using `Trace.current`. Native [StackTrace]s can also be directly converted to
 human-readable strings using `Trace.format`.
 
-[StackTrace]: http://api.dartlang.org/docs/releases/latest/dart_core/StackTrace.html
+[StackTrace]: https://api.dartlang.org/stable/dart-core/StackTrace-class.html
 
 Here's an example native stack trace from debugging this library:
 
@@ -202,4 +202,4 @@ this:
 
 That's a lot easier to understand!
 
-[Zone]: https://api.dartlang.org/apidocs/channels/stable/#dart-async.Zone
+[Zone]: https://api.dartlang.org/stable/dart-async/Zone-class.html
