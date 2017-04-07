@@ -70,7 +70,7 @@ class Chain implements StackTrace {
   /// considered unhandled.
   ///
   /// If [callback] returns a value, it will be returned by [capture] as well.
-  static /*=T*/ capture/*<T>*/(/*=T*/ callback(),
+  static/*=T*/ capture/*<T>*/(/*=T*/ callback(),
       {void onError(error, Chain chain), bool when: true}) {
     if (!when) {
       var newOnError;
@@ -106,13 +106,9 @@ class Chain implements StackTrace {
   /// [callback] in a [Zone] in which chain capturing is disabled.
   ///
   /// If [callback] returns a value, it will be returned by [disable] as well.
-  static /*=T*/ disable/*<T>*/(/*=T*/ callback(), {bool when: true}) {
-    var zoneValues = when
-        ? {
-            _specKey: null,
-            StackZoneSpecification.disableKey: true
-          }
-        : null;
+  static/*=T*/ disable/*<T>*/(/*=T*/ callback(), {bool when: true}) {
+    var zoneValues =
+        when ? {_specKey: null, StackZoneSpecification.disableKey: true} : null;
 
     return runZoned(callback, zoneValues: zoneValues);
   }
@@ -133,15 +129,15 @@ class Chain implements StackTrace {
   ///
   /// If this is called outside of a [capture] zone, it just returns a
   /// single-trace chain.
-  factory Chain.current([int level=0]) {
+  factory Chain.current([int level = 0]) {
     if (_currentSpec != null) return _currentSpec.currentChain(level + 1);
 
     var chain = new Chain.forTrace(StackTrace.current);
     return new LazyChain(() {
       // JS includes a frame for the call to StackTrace.current, but the VM
       // doesn't, so we skip an extra frame in a JS context.
-      var first = new Trace(
-          chain.traces.first.frames.skip(level + (inJS ? 2 : 1)));
+      var first =
+          new Trace(chain.traces.first.frames.skip(level + (inJS ? 2 : 1)));
       return new Chain([first]..addAll(chain.traces.skip(1)));
     });
   }
@@ -178,8 +174,7 @@ class Chain implements StackTrace {
   }
 
   /// Returns a new [Chain] comprised of [traces].
-  Chain(Iterable<Trace> traces)
-      : traces = new List<Trace>.unmodifiable(traces);
+  Chain(Iterable<Trace> traces) : traces = new List<Trace>.unmodifiable(traces);
 
   /// Returns a terser version of [this].
   ///
@@ -208,8 +203,8 @@ class Chain implements StackTrace {
   /// library or from this package, and simplify core library frames as in
   /// [Trace.terse].
   Chain foldFrames(bool predicate(Frame frame), {bool terse: false}) {
-    var foldedTraces = traces.map(
-        (trace) => trace.foldFrames(predicate, terse: terse));
+    var foldedTraces =
+        traces.map((trace) => trace.foldFrames(predicate, terse: terse));
     var nonEmptyTraces = foldedTraces.where((trace) {
       // Ignore traces that contain only folded frames.
       if (trace.frames.length > 1) return true;
@@ -240,7 +235,8 @@ class Chain implements StackTrace {
   String toString() {
     // Figure out the longest path so we know how much to pad.
     var longest = traces.map((trace) {
-      return trace.frames.map((frame) => frame.location.length)
+      return trace.frames
+          .map((frame) => frame.location.length)
           .fold(0, math.max);
     }).fold(0, math.max);
 

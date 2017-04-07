@@ -6,11 +6,11 @@ import 'package:test/test.dart';
 
 /// Returns a matcher that runs [matcher] against a [Frame]'s `member` field.
 Matcher frameMember(matcher) =>
-  transform((frame) => frame.member, matcher, 'member');
+    transform((frame) => frame.member, matcher, 'member');
 
 /// Returns a matcher that runs [matcher] against a [Frame]'s `library` field.
 Matcher frameLibrary(matcher) =>
-  transform((frame) => frame.library, matcher, 'library');
+    transform((frame) => frame.library, matcher, 'library');
 
 /// Returns a matcher that runs [transformation] on its input, then matches
 /// the output against [matcher].
@@ -18,7 +18,7 @@ Matcher frameLibrary(matcher) =>
 /// [description] should be a noun phrase that describes the relation of the
 /// output of [transformation] to its input.
 Matcher transform(transformation(value), matcher, String description) =>
-  new _TransformMatcher(transformation, wrapMatcher(matcher), description);
+    new _TransformMatcher(transformation, wrapMatcher(matcher), description);
 
 class _TransformMatcher extends Matcher {
   final Function _transformation;
@@ -28,8 +28,8 @@ class _TransformMatcher extends Matcher {
   _TransformMatcher(this._transformation, this._matcher, this._description);
 
   bool matches(item, Map matchState) =>
-    _matcher.matches(_transformation(item), matchState);
+      _matcher.matches(_transformation(item), matchState);
 
   Description describe(Description description) =>
-    description.add(_description).add(' ').addDescriptionOf(_matcher);
+      description.add(_description).add(' ').addDescriptionOf(_matcher);
 }
