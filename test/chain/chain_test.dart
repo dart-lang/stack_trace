@@ -8,7 +8,6 @@ import 'package:path/path.dart' as p;
 import 'package:stack_trace/stack_trace.dart';
 import 'package:test/test.dart';
 
-import '../utils.dart';
 import 'utils.dart';
 
 typedef void ChainErrorCallback(stack, Chain chain);
@@ -48,11 +47,10 @@ void main() {
     test("with onError blocks errors", () {
       Chain.capture(() {
         return new Future.error("oh no");
-      }, onError: expectAsync((error, chain) {
+      }, onError: expectAsync2((error, chain) {
         expect(error, equals("oh no"));
         expect(chain, new isInstanceOf<Chain>());
-      }) as ChainErrorCallback, when: false);
-      // TODO(rnystrom): Remove this cast if expectAsync() gets a better type.
+      }), when: false);
     });
 
     test("doesn't enable chain-tracking", () {
