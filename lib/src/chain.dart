@@ -70,7 +70,7 @@ class Chain implements StackTrace {
   /// considered unhandled.
   ///
   /// If [callback] returns a value, it will be returned by [capture] as well.
-  static/*=T*/ capture/*<T>*/(/*=T*/ callback(),
+  static T capture<T>(T callback(),
       {void onError(error, Chain chain), bool when: true}) {
     if (!when) {
       var newOnError;
@@ -95,11 +95,9 @@ class Chain implements StackTrace {
         // TODO(nweiz): Don't special-case this when issue 19566 is fixed.
         return Zone.current.handleUncaughtError(error, stackTrace);
       }
-    }, zoneSpecification: spec.toSpec(), zoneValues: {
-      _specKey: spec,
-      StackZoneSpecification.disableKey: false
-    }) as dynamic/*=T*/;
-    // TODO(rnystrom): Remove this cast if runZoned() gets a generic type.
+    },
+        zoneSpecification: spec.toSpec(),
+        zoneValues: {_specKey: spec, StackZoneSpecification.disableKey: false});
   }
 
   /// If [when] is `true` and this is called within a [Chain.capture] zone, runs
