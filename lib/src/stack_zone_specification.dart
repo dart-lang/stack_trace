@@ -92,8 +92,8 @@ class StackZoneSpecification {
 
   /// Tracks the current stack chain so it can be set to [_currentChain] when
   /// [f] is run.
-  ZoneCallback _registerCallback(
-      Zone self, ZoneDelegate parent, Zone zone, Function f) {
+  ZoneCallback<R> _registerCallback<R>(
+      Zone self, ZoneDelegate parent, Zone zone, R f()) {
     if (f == null || _disabled) return parent.registerCallback(zone, f);
     var node = _createNode(1);
     return parent.registerCallback(zone, () => _run(f, node));
@@ -101,8 +101,8 @@ class StackZoneSpecification {
 
   /// Tracks the current stack chain so it can be set to [_currentChain] when
   /// [f] is run.
-  ZoneUnaryCallback _registerUnaryCallback(
-      Zone self, ZoneDelegate parent, Zone zone, Function f) {
+  ZoneUnaryCallback<R, T> _registerUnaryCallback<R, T>(
+      Zone self, ZoneDelegate parent, Zone zone, R f(T arg) {
     if (f == null || _disabled) return parent.registerUnaryCallback(zone, f);
     var node = _createNode(1);
     return parent.registerUnaryCallback(zone, (arg) {
@@ -112,7 +112,7 @@ class StackZoneSpecification {
 
   /// Tracks the current stack chain so it can be set to [_currentChain] when
   /// [f] is run.
-  ZoneBinaryCallback _registerBinaryCallback(
+  ZoneBinaryCallback<R, T1, T2> _registerBinaryCallback<R, T1, T2>(
       Zone self, ZoneDelegate parent, Zone zone, Function f) {
     if (f == null || _disabled) return parent.registerBinaryCallback(zone, f);
 
@@ -124,26 +124,26 @@ class StackZoneSpecification {
 
   /// Looks up the chain associated with [stackTrace] and passes it either to
   /// [_onError] or [parent]'s error handler.
-  _handleUncaughtError(
+  void _handleUncaughtError(
       Zone self, ZoneDelegate parent, Zone zone, error, StackTrace stackTrace) {
     if (_disabled) {
-      return parent.handleUncaughtError(zone, error, stackTrace);
+      parent.handleUncaughtError(zone, error, stackTrace);
     }
 
     var stackChain = chainFor(stackTrace);
     if (_onError == null) {
-      return parent.handleUncaughtError(zone, error, stackChain);
+      parent.handleUncaughtError(zone, error, stackChain);
     }
 
     // TODO(nweiz): Currently this copies a lot of logic from [runZoned]. Just
     // allow [runBinary] to throw instead once issue 18134 is fixed.
     try {
-      return parent.runBinary(zone, _onError, error, stackChain);
+      parent.runBinary(zone, _onError, error, stackChain);
     } catch (newError, newStackTrace) {
       if (identical(newError, error)) {
-        return parent.handleUncaughtError(zone, error, stackChain);
+        parent.handleUncaughtError(zone, error, stackChain);
       } else {
-        return parent.handleUncaughtError(zone, newError, newStackTrace);
+        parent.handleUncaughtError(zone, newError, newStackTrace);
       }
     }
   }
@@ -180,7 +180,7 @@ class StackZoneSpecification {
   ///
   /// If [f] throws an error, this associates [node] with that error's stack
   /// trace.
-  _run(Function f, _Node node) {
+  T _run<T>(T f(), _Node node) {
     var previousNode = _currentNode;
     _currentNode = node;
     try {
