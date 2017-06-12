@@ -93,7 +93,8 @@ class Chain implements StackTrace {
         return callback();
       } catch (error, stackTrace) {
         // TODO(nweiz): Don't special-case this when issue 19566 is fixed.
-        return Zone.current.handleUncaughtError(error, stackTrace);
+        Zone.current.handleUncaughtError(error, stackTrace);
+        return null;
       }
     },
         zoneSpecification: spec.toSpec(),

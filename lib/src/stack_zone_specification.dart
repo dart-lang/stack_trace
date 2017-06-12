@@ -102,7 +102,7 @@ class StackZoneSpecification {
   /// Tracks the current stack chain so it can be set to [_currentChain] when
   /// [f] is run.
   ZoneUnaryCallback<R, T> _registerUnaryCallback<R, T>(
-      Zone self, ZoneDelegate parent, Zone zone, R f(T arg) {
+      Zone self, ZoneDelegate parent, Zone zone, R f(T arg)) {
     if (f == null || _disabled) return parent.registerUnaryCallback(zone, f);
     var node = _createNode(1);
     return parent.registerUnaryCallback(zone, (arg) {
