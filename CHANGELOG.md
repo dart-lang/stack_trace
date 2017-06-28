@@ -1,3 +1,7 @@
+## 1.7.4
+
+* Always run `onError` callbacks for `Chain.capture()` in the parent zone.
+
 ## 1.7.3
 
 * Fix broken links in the README.

@@ -138,7 +138,7 @@ class StackZoneSpecification {
     // TODO(nweiz): Currently this copies a lot of logic from [runZoned]. Just
     // allow [runBinary] to throw instead once issue 18134 is fixed.
     try {
-      return parent.runBinary(zone, _onError, error, stackChain);
+      return self.parent.runBinary(_onError, error, stackChain);
     } catch (newError, newStackTrace) {
       if (identical(newError, error)) {
         return parent.handleUncaughtError(zone, error, stackChain);
