@@ -134,8 +134,9 @@ class Chain implements StackTrace {
     return new LazyChain(() {
       // JS includes a frame for the call to StackTrace.current, but the VM
       // doesn't, so we skip an extra frame in a JS context.
-      var first =
-          new Trace(chain.traces.first.frames.skip(level + (inJS ? 2 : 1)));
+      var first = new Trace(
+          chain.traces.first.frames.skip(level + (inJS ? 2 : 1)),
+          original: chain.traces.first.original.toString());
       return new Chain([first]..addAll(chain.traces.skip(1)));
     });
   }
@@ -228,7 +229,8 @@ class Chain implements StackTrace {
   ///
   /// The trace version of a chain is just the concatenation of all the traces
   /// in the chain.
-  Trace toTrace() => new Trace(traces.expand((trace) => trace.frames));
+  Trace toTrace() => new Trace(traces.expand((trace) => trace.frames),
+      original: traces.map((trace) => trace.original).join('\n$chainGap'));
 
   String toString() {
     // Figure out the longest path so we know how much to pad.
