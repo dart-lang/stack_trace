@@ -229,8 +229,7 @@ class Chain implements StackTrace {
   ///
   /// The trace version of a chain is just the concatenation of all the traces
   /// in the chain.
-  Trace toTrace() => new Trace(traces.expand((trace) => trace.frames),
-      original: traces.map((trace) => trace.original).join('\n$chainGap'));
+  Trace toTrace() => new Trace(traces.expand((trace) => trace.frames));
 
   String toString() {
     // Figure out the longest path so we know how much to pad.
