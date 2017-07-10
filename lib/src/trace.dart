@@ -60,8 +60,7 @@ class Trace implements StackTrace {
   /// The stack frames that comprise this stack trace.
   final List<Frame> frames;
 
-  /// The original stack traces
-  /// from which the components of this chain were parsed.
+  /// The original stack trace from which this trace was parsed.
   final StackTrace original;
 
   /// Returns a human-readable representation of [stackTrace]. If [terse] is
