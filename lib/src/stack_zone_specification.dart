@@ -128,11 +128,13 @@ class StackZoneSpecification {
       Zone self, ZoneDelegate parent, Zone zone, error, StackTrace stackTrace) {
     if (_disabled) {
       parent.handleUncaughtError(zone, error, stackTrace);
+      return;
     }
 
     var stackChain = chainFor(stackTrace);
     if (_onError == null) {
       parent.handleUncaughtError(zone, error, stackChain);
+      return;
     }
 
     // TODO(nweiz): Currently this copies a lot of logic from [runZoned]. Just
