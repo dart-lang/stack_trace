@@ -1,3 +1,9 @@
+## 1.8.1
+
+* Use official generic function syntax.
+
+* Updated minimum SDK to 1.23.0.
+
 ## 1.8.0
 
 * Add a `Trace.original` field to provide access to the original `StackTrace`s
