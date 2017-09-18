@@ -140,7 +140,7 @@ class StackZoneSpecification {
     // TODO(nweiz): Currently this copies a lot of logic from [runZoned]. Just
     // allow [runBinary] to throw instead once issue 18134 is fixed.
     try {
-      parent.runBinary(zone, _onError, error, stackChain);
+      self.parent.runBinary(_onError, error, stackChain);
     } catch (newError, newStackTrace) {
       if (identical(newError, error)) {
         parent.handleUncaughtError(zone, error, stackChain);
@@ -234,6 +234,6 @@ Trace _currentTrace([int level]) {
     var trace = new Trace.parse(text);
     // JS includes a frame for the call to StackTrace.current, but the VM
     // doesn't, so we skip an extra frame in a JS context.
-    return new Trace(trace.frames.skip(level + (inJS ? 2 : 1)));
+    return new Trace(trace.frames.skip(level + (inJS ? 2 : 1)), original: text);
   });
 }

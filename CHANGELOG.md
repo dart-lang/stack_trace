@@ -1,3 +1,19 @@
+## 1.8.1
+
+* Use official generic function syntax.
+
+* Updated minimum SDK to 1.23.0.
+
+## 1.8.0
+
+* Add a `Trace.original` field to provide access to the original `StackTrace`s
+  from which the `Trace` was created, and a matching constructor parameter to
+  `new Trace()`.
+
+## 1.7.4
+
+* Always run `onError` callbacks for `Chain.capture()` in the parent zone.
+
 ## 1.7.3
 
 * Fix broken links in the README.

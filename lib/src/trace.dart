@@ -60,6 +60,9 @@ class Trace implements StackTrace {
   /// The stack frames that comprise this stack trace.
   final List<Frame> frames;
 
+  /// The original stack trace from which this trace was parsed.
+  final StackTrace original;
+
   /// Returns a human-readable representation of [stackTrace]. If [terse] is
   /// set, this folds together multiple stack frames from the Dart core
   /// libraries, so that only the core library method directly called from user
@@ -85,7 +88,8 @@ class Trace implements StackTrace {
     return new LazyTrace(() {
       // JS includes a frame for the call to StackTrace.current, but the VM
       // doesn't, so we skip an extra frame in a JS context.
-      return new Trace(trace.frames.skip(level + (inJS ? 2 : 1)));
+      return new Trace(trace.frames.skip(level + (inJS ? 2 : 1)),
+          original: trace.original.toString());
     });
   }
 
@@ -134,7 +138,7 @@ class Trace implements StackTrace {
   }
 
   /// Parses a string representation of a Dart VM stack trace.
-  Trace.parseVM(String trace) : this(_parseVM(trace));
+  Trace.parseVM(String trace) : this(_parseVM(trace), original: trace);
 
   static List<Frame> _parseVM(String trace) {
     // Ignore [vmChainGap]. This matches the behavior of
@@ -155,21 +159,25 @@ class Trace implements StackTrace {
 
   /// Parses a string representation of a Chrome/V8 stack trace.
   Trace.parseV8(String trace)
-      : this(trace
-            .split("\n")
-            .skip(1)
-            // It's possible that an Exception's description contains a line that
-            // looks like a V8 trace line, which will screw this up.
-            // Unfortunately, that's impossible to detect.
-            .skipWhile((line) => !line.startsWith(_v8TraceLine))
-            .map((line) => new Frame.parseV8(line)));
+      : this(
+            trace
+                .split("\n")
+                .skip(1)
+                // It's possible that an Exception's description contains a line that
+                // looks like a V8 trace line, which will screw this up.
+                // Unfortunately, that's impossible to detect.
+                .skipWhile((line) => !line.startsWith(_v8TraceLine))
+                .map((line) => new Frame.parseV8(line)),
+            original: trace);
 
   /// Parses a string representation of a JavaScriptCore stack trace.
   Trace.parseJSCore(String trace)
-      : this(trace
-            .split("\n")
-            .where((line) => line != "\tat ")
-            .map((line) => new Frame.parseV8(line)));
+      : this(
+            trace
+                .split("\n")
+                .where((line) => line != "\tat ")
+                .map((line) => new Frame.parseV8(line)),
+            original: trace);
 
   /// Parses a string representation of an Internet Explorer stack trace.
   ///
@@ -179,11 +187,13 @@ class Trace implements StackTrace {
 
   /// Parses a string representation of a Firefox stack trace.
   Trace.parseFirefox(String trace)
-      : this(trace
-            .trim()
-            .split("\n")
-            .where((line) => line.isNotEmpty && line != '[native code]')
-            .map((line) => new Frame.parseFirefox(line)));
+      : this(
+            trace
+                .trim()
+                .split("\n")
+                .where((line) => line.isNotEmpty && line != '[native code]')
+                .map((line) => new Frame.parseFirefox(line)),
+            original: trace);
 
   /// Parses a string representation of a Safari stack trace.
   Trace.parseSafari(String trace) : this.parseFirefox(trace);
@@ -195,28 +205,34 @@ class Trace implements StackTrace {
   /// Parses a string representation of a Safari 6.0 stack trace.
   @Deprecated("Use Trace.parseSafari instead.")
   Trace.parseSafari6_0(String trace)
-      : this(trace
-            .trim()
-            .split("\n")
-            .where((line) => line != '[native code]')
-            .map((line) => new Frame.parseFirefox(line)));
+      : this(
+            trace
+                .trim()
+                .split("\n")
+                .where((line) => line != '[native code]')
+                .map((line) => new Frame.parseFirefox(line)),
+            original: trace);
 
   /// Parses this package's string representation of a stack trace.
   ///
   /// This also parses string representations of [Chain]s. They parse to the
   /// same trace that [Chain.toTrace] would return.
   Trace.parseFriendly(String trace)
-      : this(trace.isEmpty
-            ? []
-            : trace
-                .trim()
-                .split("\n")
-                // Filter out asynchronous gaps from [Chain]s.
-                .where((line) => !line.startsWith('====='))
-                .map((line) => new Frame.parseFriendly(line)));
+      : this(
+            trace.isEmpty
+                ? []
+                : trace
+                    .trim()
+                    .split("\n")
+                    // Filter out asynchronous gaps from [Chain]s.
+                    .where((line) => !line.startsWith('====='))
+                    .map((line) => new Frame.parseFriendly(line)),
+            original: trace);
 
   /// Returns a new [Trace] comprised of [frames].
-  Trace(Iterable<Frame> frames) : frames = new List<Frame>.unmodifiable(frames);
+  Trace(Iterable<Frame> frames, {String original})
+      : frames = new List<Frame>.unmodifiable(frames),
+        original = new StackTrace.fromString(original);
 
   /// Returns a VM-style [StackTrace] object.
   ///
@@ -297,7 +313,7 @@ class Trace implements StackTrace {
       }
     }
 
-    return new Trace(newFrames.reversed);
+    return new Trace(newFrames.reversed, original: this.original.toString());
   }
 
   /// Returns a human-readable string representation of [this].
