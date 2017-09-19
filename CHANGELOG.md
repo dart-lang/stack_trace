@@ -1,3 +1,7 @@
+## 1.8.2
+
+* Update to use strong-mode clean Zone API.
+
 ## 1.8.1
 
 * Use official generic function syntax.
