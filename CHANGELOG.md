@@ -8,6 +8,11 @@
   synchronously within `Chain.capture()`. This matches the existing behavior
   outside `Chain.capture()`.
 
+* `Chain.forTrace()` now trims the VM's stack chains for the innermost stack
+  trace within `Chain.capture()` (unless it's called synchronously, as above).
+  This avoids duplicated frames and makes the format of the innermost traces
+  consistent with the other traces in the chain.
+
 ## 1.8.2
 
 * Update to use strong-mode clean Zone API.
