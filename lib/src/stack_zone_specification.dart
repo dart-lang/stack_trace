@@ -86,7 +86,7 @@ class StackZoneSpecification {
   /// with [trace], this just returns a single-trace chain containing [trace].
   Chain chainFor(StackTrace trace) {
     if (trace is Chain) return trace;
-    var previous = trace == null ? null : _chains[trace];
+    var previous = (trace == null ? null : _chains[trace]) ?? _currentNode;
     return new _Node(trace, previous).toChain();
   }
 

@@ -8,8 +8,10 @@
 
 import 'dart:async';
 
-import 'package:stack_trace/stack_trace.dart';
 import 'package:test/test.dart';
+
+import 'package:stack_trace/stack_trace.dart';
+import 'package:stack_trace/src/utils.dart';
 
 import '../utils.dart';
 import 'utils.dart';
@@ -444,11 +446,10 @@ void main() {
       });
     });
 
-    test(
-        'called for an unregistered stack trace returns a chain wrapping that '
-        'trace', () {
+    test('called for an unregistered stack trace uses the current chain',
+        () async {
       var trace;
-      var chain = Chain.capture(() {
+      var chain = await Chain.capture(() async {
         try {
           throw 'error';
         } catch (_, stackTrace) {
@@ -457,27 +458,33 @@ void main() {
         }
       });
 
-      expect(chain.traces, hasLength(1));
+      expect(chain.traces, hasLength(2));
       expect(chain.traces.first.toString(),
           equals(new Trace.from(trace).toString()));
+      expect(
+          chain.traces.last.frames, contains(frameMember(startsWith('main'))));
     });
   });
 
   test(
-      'forTrace() outside of capture() returns a chain wrapping the given '
-      'trace', () {
-    var trace;
-    var chain = Chain.capture(() {
-      try {
-        throw 'error';
-      } catch (_, stackTrace) {
-        trace = stackTrace;
-        return new Chain.forTrace(stackTrace);
-      }
-    });
+      'forTrace() outside of capture() returns a chain describing the VM stack '
+      'chain', () {
+    // Disable the test package's chain-tracking.
+    return Chain.disable(() async {
+      var trace;
+      await Chain.capture(() async {
+        try {
+          throw 'error';
+        } catch (_, stackTrace) {
+          trace = stackTrace;
+        }
+      });
 
-    expect(chain.traces, hasLength(1));
-    expect(chain.traces.first.toString(),
-        equals(new Trace.from(trace).toString()));
+      var chain = new Chain.forTrace(trace);
+      expect(chain.traces,
+          hasLength(vmChainGap.allMatches(trace.toString()).length + 1));
+      expect(
+          chain.traces.first.frames, contains(frameMember(startsWith('main'))));
+    });
   });
 }

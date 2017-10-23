@@ -1,3 +1,9 @@
+## 1.8.3
+
+* `Chain.forTrace()` now returns a full stack chain for *all* `StackTrace`s
+  within `Chain.capture()`, even those that haven't been processed by
+  `dart:async` yet.
+
 ## 1.8.2
 
 * Update to use strong-mode clean Zone API.
