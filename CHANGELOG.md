@@ -4,6 +4,10 @@
   within `Chain.capture()`, even those that haven't been processed by
   `dart:async` yet.
 
+* `Chain.forTrace()` now uses the Dart VM's stack chain information when called
+  synchronously within `Chain.capture()`. This matches the existing behavior
+  outside `Chain.capture()`.
+
 ## 1.8.2
 
 * Update to use strong-mode clean Zone API.

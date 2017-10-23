@@ -153,6 +153,7 @@ class Chain implements StackTrace {
   factory Chain.forTrace(StackTrace trace) {
     if (trace is Chain) return trace;
     if (_currentSpec != null) return _currentSpec.chainFor(trace);
+    if (trace is Trace) return new Chain([trace]);
     return new LazyChain(() => new Chain.parse(trace.toString()));
   }
 

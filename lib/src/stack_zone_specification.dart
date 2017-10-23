@@ -5,6 +5,7 @@
 import 'dart:async';
 
 import 'chain.dart';
+import 'lazy_chain.dart';
 import 'lazy_trace.dart';
 import 'trace.dart';
 import 'utils.dart';
@@ -86,8 +87,16 @@ class StackZoneSpecification {
   /// with [trace], this just returns a single-trace chain containing [trace].
   Chain chainFor(StackTrace trace) {
     if (trace is Chain) return trace;
-    var previous = (trace == null ? null : _chains[trace]) ?? _currentNode;
-    return new _Node(trace, previous).toChain();
+    trace ??= StackTrace.current;
+
+    var previous = _chains[trace] ?? _currentNode;
+    if (previous != null) return new _Node(trace, previous).toChain();
+
+    // If there's no [_currentNode], we're running synchronously beneath
+    // [Chain.capture] and we should fall back to the VM's stack chaining. We
+    // can't use [Chain.from] here because it'll just call [chainFor] again.
+    if (trace is Trace) return new Chain([trace]);
+    return new LazyChain(() => new Chain.parse(trace.toString()));
   }
 
   /// Tracks the current stack chain so it can be set to [_currentChain] when
