@@ -5,6 +5,7 @@
 import 'dart:async';
 
 import 'chain.dart';
+import 'lazy_chain.dart';
 import 'lazy_trace.dart';
 import 'trace.dart';
 import 'utils.dart';
@@ -86,8 +87,23 @@ class StackZoneSpecification {
   /// with [trace], this just returns a single-trace chain containing [trace].
   Chain chainFor(StackTrace trace) {
     if (trace is Chain) return trace;
-    var previous = trace == null ? null : _chains[trace];
-    return new _Node(trace, previous).toChain();
+    trace ??= StackTrace.current;
+
+    var previous = _chains[trace] ?? _currentNode;
+    if (previous == null) {
+      // If there's no [_currentNode], we're running synchronously beneath
+      // [Chain.capture] and we should fall back to the VM's stack chaining. We
+      // can't use [Chain.from] here because it'll just call [chainFor] again.
+      if (trace is Trace) return new Chain([trace]);
+      return new LazyChain(() => new Chain.parse(trace.toString()));
+    } else {
+      if (trace is! Trace) {
+        var original = trace;
+        trace = new LazyTrace(() => new Trace.parse(_trimVMChain(original)));
+      }
+
+      return new _Node(trace, previous).toChain();
+    }
   }
 
   /// Tracks the current stack chain so it can be set to [_currentChain] when
@@ -194,6 +210,29 @@ class StackZoneSpecification {
       _currentNode = previousNode;
     }
   }
+
+  /// Like [new Trace.current], but if the current stack trace has VM chaining
+  /// enabled, this only returns the innermost sub-trace.
+  Trace _currentTrace([int level]) {
+    level ??= 0;
+    var stackTrace = StackTrace.current;
+    return new LazyTrace(() {
+      var text = _trimVMChain(stackTrace);
+      var trace = new Trace.parse(text);
+      // JS includes a frame for the call to StackTrace.current, but the VM
+      // doesn't, so we skip an extra frame in a JS context.
+      return new Trace(trace.frames.skip(level + (inJS ? 2 : 1)),
+          original: text);
+    });
+  }
+
+  /// Removes the VM's stack chains from the native [trace], since we're
+  /// generating our own and we don't want duplicate frames.
+  String _trimVMChain(StackTrace trace) {
+    var text = trace.toString();
+    var index = text.indexOf(vmChainGap);
+    return index == -1 ? text : text.substring(0, index);
+  }
 }
 
 /// A linked list node representing a single entry in a stack chain.
@@ -204,8 +243,7 @@ class _Node {
   /// The previous node in the chain.
   final _Node previous;
 
-  _Node(StackTrace trace, [this.previous])
-      : trace = trace == null ? _currentTrace() : new Trace.from(trace);
+  _Node(StackTrace trace, [this.previous]) : trace = new Trace.from(trace);
 
   /// Converts this to a [Chain].
   Chain toChain() {
@@ -217,23 +255,4 @@ class _Node {
     }
     return new Chain(nodes);
   }
-}
-
-/// Like [new Trace.current], but if the current stack trace has VM chaining
-/// enabled, this only returns the innermost sub-trace.
-Trace _currentTrace([int level]) {
-  level ??= 0;
-  var stackTrace = StackTrace.current;
-  return new LazyTrace(() {
-    // Ignore the VM's stack chains when we generate our own. Otherwise we'll
-    // end up with duplicate frames all over the place.
-    var text = stackTrace.toString();
-    var index = text.indexOf(vmChainGap);
-    if (index != -1) text = text.substring(0, index);
-
-    var trace = new Trace.parse(text);
-    // JS includes a frame for the call to StackTrace.current, but the VM
-    // doesn't, so we skip an extra frame in a JS context.
-    return new Trace(trace.frames.skip(level + (inJS ? 2 : 1)), original: text);
-  });
 }

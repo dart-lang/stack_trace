@@ -1,3 +1,18 @@
+## 1.8.3
+
+* `Chain.forTrace()` now returns a full stack chain for *all* `StackTrace`s
+  within `Chain.capture()`, even those that haven't been processed by
+  `dart:async` yet.
+
+* `Chain.forTrace()` now uses the Dart VM's stack chain information when called
+  synchronously within `Chain.capture()`. This matches the existing behavior
+  outside `Chain.capture()`.
+
+* `Chain.forTrace()` now trims the VM's stack chains for the innermost stack
+  trace within `Chain.capture()` (unless it's called synchronously, as above).
+  This avoids duplicated frames and makes the format of the innermost traces
+  consistent with the other traces in the chain.
+
 ## 1.8.2
 
 * Update to use strong-mode clean Zone API.

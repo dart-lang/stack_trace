@@ -8,20 +8,31 @@
 
 import 'dart:async';
 
-import 'package:stack_trace/stack_trace.dart';
 import 'package:test/test.dart';
+
+import 'package:stack_trace/stack_trace.dart';
+import 'package:stack_trace/src/utils.dart';
 
 import '../utils.dart';
 import 'utils.dart';
 
 void main() {
   group('capture() with onError catches exceptions', () {
-    test('thrown synchronously', () {
-      return captureFuture(() => throw 'error').then((chain) {
-        expect(chain.traces, hasLength(1));
-        expect(
-            chain.traces.single.frames.first, frameMember(startsWith('main')));
+    test('thrown synchronously', () async {
+      StackTrace vmTrace;
+      var chain = await captureFuture(() {
+        try {
+          throw 'error';
+        } catch (_, stackTrace) {
+          vmTrace = stackTrace;
+          rethrow;
+        }
       });
+
+      // Because there's no chain context for a synchronous error, we fall back
+      // on the VM's stack chain tracking.
+      expect(chain.toString(),
+          equals(new Chain.parse(vmTrace.toString()).toString()));
     });
 
     test('thrown in a microtask', () {
@@ -444,11 +455,10 @@ void main() {
       });
     });
 
-    test(
-        'called for an unregistered stack trace returns a chain wrapping that '
-        'trace', () {
+    test('called for an unregistered stack trace uses the current chain',
+        () async {
       var trace;
-      var chain = Chain.capture(() {
+      var chain = await Chain.capture(() async {
         try {
           throw 'error';
         } catch (_, stackTrace) {
@@ -457,27 +467,36 @@ void main() {
         }
       });
 
-      expect(chain.traces, hasLength(1));
+      expect(chain.traces, hasLength(2));
+
+      // Assert that we've trimmed the VM's stack chains here to avoid
+      // duplication.
       expect(chain.traces.first.toString(),
-          equals(new Trace.from(trace).toString()));
+          equals(new Chain.parse(trace.toString()).traces.first.toString()));
+      expect(
+          chain.traces.last.frames, contains(frameMember(startsWith('main'))));
     });
   });
 
   test(
-      'forTrace() outside of capture() returns a chain wrapping the given '
-      'trace', () {
-    var trace;
-    var chain = Chain.capture(() {
-      try {
-        throw 'error';
-      } catch (_, stackTrace) {
-        trace = stackTrace;
-        return new Chain.forTrace(stackTrace);
-      }
-    });
+      'forTrace() outside of capture() returns a chain describing the VM stack '
+      'chain', () {
+    // Disable the test package's chain-tracking.
+    return Chain.disable(() async {
+      var trace;
+      await Chain.capture(() async {
+        try {
+          throw 'error';
+        } catch (_, stackTrace) {
+          trace = stackTrace;
+        }
+      });
 
-    expect(chain.traces, hasLength(1));
-    expect(chain.traces.first.toString(),
-        equals(new Trace.from(trace).toString()));
+      var chain = new Chain.forTrace(trace);
+      expect(chain.traces,
+          hasLength(vmChainGap.allMatches(trace.toString()).length + 1));
+      expect(
+          chain.traces.first.frames, contains(frameMember(startsWith('main'))));
+    });
   });
 }
