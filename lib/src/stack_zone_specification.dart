@@ -61,12 +61,16 @@ class StackZoneSpecification {
   /// The most recent node of the current stack chain.
   _Node _currentNode;
 
-  StackZoneSpecification([this._onError]);
+  /// Whether this is an error zone.
+  final bool _errorZone;
+
+  StackZoneSpecification(this._onError, {bool errorZone: true})
+      : _errorZone = errorZone;
 
   /// Converts [this] to a real [ZoneSpecification].
   ZoneSpecification toSpec() {
     return new ZoneSpecification(
-        handleUncaughtError: _handleUncaughtError,
+        handleUncaughtError: _errorZone ? _handleUncaughtError : null,
         registerCallback: _registerCallback,
         registerUnaryCallback: _registerUnaryCallback,
         registerBinaryCallback: _registerBinaryCallback,

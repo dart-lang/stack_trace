@@ -38,33 +38,65 @@ void main() {
     });
   });
 
-  group("Chain.capture() with when: false", () {
-    test("with no onError doesn't block errors", () {
-      expect(Chain.capture(() => new Future.error("oh no"), when: false),
-          throwsA("oh no"));
-    });
-
+  group("Chain.capture()", () {
     test("with onError blocks errors", () {
       Chain.capture(() {
         return new Future.error("oh no");
       }, onError: expectAsync2((error, chain) {
         expect(error, equals("oh no"));
         expect(chain, new isInstanceOf<Chain>());
-      }), when: false);
+      }));
     });
 
-    test("doesn't enable chain-tracking", () {
-      return Chain.disable(() {
-        return Chain.capture(() {
-          var completer = new Completer();
-          inMicrotask(() {
-            completer.complete(new Chain.current());
-          });
+    test("with no onError blocks errors", () {
+      runZoned(() {
+        var future =
+            Chain.capture(() => new Future.error("oh no"), when: false);
+        future.then(expectAsync1((_) {}, count: 0));
+      }, onError: expectAsync2((error, chain) {
+        expect(error, equals("oh no"));
+        expect(chain, new isInstanceOf<Chain>());
+      }));
+    });
 
-          return completer.future.then((chain) {
-            expect(chain.traces, hasLength(1));
-          });
-        }, when: false);
+    test("with errorZone: false doesn't block errors", () {
+      expect(Chain.capture(() => new Future.error("oh no"), errorZone: false),
+          throwsA("oh no"));
+    });
+
+    test("doesn't allow onError and errorZone: false", () {
+      expect(() => Chain.capture(() {}, onError: (_, __) {}, errorZone: false),
+          throwsArgumentError);
+    });
+
+    group("with when: false", () {
+      test("with no onError doesn't block errors", () {
+        expect(Chain.capture(() => new Future.error("oh no"), when: false),
+            throwsA("oh no"));
+      });
+
+      test("with onError blocks errors", () {
+        Chain.capture(() {
+          return new Future.error("oh no");
+        }, onError: expectAsync2((error, chain) {
+          expect(error, equals("oh no"));
+          expect(chain, new isInstanceOf<Chain>());
+        }), when: false);
+      });
+
+      test("doesn't enable chain-tracking", () {
+        return Chain.disable(() {
+          return Chain.capture(() {
+            var completer = new Completer();
+            inMicrotask(() {
+              completer.complete(new Chain.current());
+            });
+
+            return completer.future.then((chain) {
+              expect(chain.traces, hasLength(1));
+            });
+          }, when: false);
+        });
       });
     });
   });

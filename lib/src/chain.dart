@@ -65,13 +65,21 @@ class Chain implements StackTrace {
   /// parent Zone's `unhandledErrorHandler` will be called with the error and
   /// its chain.
   ///
-  /// Note that even if [onError] isn't passed, this zone will still be an error
-  /// zone. This means that any errors that would cross the zone boundary are
-  /// considered unhandled.
+  /// If [errorZone] is `true`, the zone this creates will be an error zone,
+  /// even if [onError] isn't passed. This means that any errors that would
+  /// cross the zone boundary are considered unhandled. If [errorZone] is
+  /// `false`, [onError] must be `null`.
   ///
   /// If [callback] returns a value, it will be returned by [capture] as well.
   static T capture<T>(T callback(),
-      {void onError(error, Chain chain), bool when: true}) {
+      {void onError(error, Chain chain),
+      bool when: true,
+      bool errorZone: true}) {
+    if (!errorZone && onError != null) {
+      throw new ArgumentError.value(
+          onError, "onError", "must be null if errorZone is false");
+    }
+
     if (!when) {
       var newOnError;
       if (onError != null) {
@@ -87,7 +95,7 @@ class Chain implements StackTrace {
       return runZoned(callback, onError: newOnError);
     }
 
-    var spec = new StackZoneSpecification(onError);
+    var spec = new StackZoneSpecification(onError, errorZone: errorZone);
     return runZoned(() {
       try {
         return callback();
