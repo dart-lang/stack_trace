@@ -1,3 +1,8 @@
+## 1.9.0
+
+* Add an `errorZone` parameter to `Chain.capture()` that makes it avoid creating
+  an error zone.
+
 ## 1.8.3
 
 * `Chain.forTrace()` now returns a full stack chain for *all* `StackTrace`s
