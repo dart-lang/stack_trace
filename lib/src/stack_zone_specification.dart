@@ -208,7 +208,9 @@ class StackZoneSpecification {
     try {
       return f();
     } catch (e, stackTrace) {
-      _chains[stackTrace] = node;
+      if (_chains[stackTrace] == null) {
+        _chains[stackTrace] = node;
+      }
       rethrow;
     } finally {
       _currentNode = previousNode;
