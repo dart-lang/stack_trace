@@ -1,3 +1,7 @@
+## 1.9.1
+* Preserve the original chain for a trace to handle cases where an
+  error is rethrown.
+
 ## 1.9.0
 
 * Add an `errorZone` parameter to `Chain.capture()` that makes it avoid creating

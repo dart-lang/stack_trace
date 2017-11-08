@@ -208,7 +208,10 @@ class StackZoneSpecification {
     try {
       return f();
     } catch (e, stackTrace) {
-      _chains[stackTrace] = node;
+      // We can see the same stack trace multiple times if it's rethrown through
+      // guarded callbacks.  The innermost chain will have the most
+      // information so it should take precedence.
+      _chains[stackTrace] ??= node;
       rethrow;
     } finally {
       _currentNode = previousNode;
