@@ -1,4 +1,4 @@
-. 1.9.1
+## 1.9.1
 * Preserve the original chain for a trace to handle cases where an
   error is rethrown.
 
