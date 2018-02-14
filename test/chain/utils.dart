@@ -64,7 +64,7 @@ Stream controllerErrorStream([StackTrace trace]) {
 /// Runs [callback] within [asyncFn], then converts any errors raised into a
 /// [Chain] with [Chain.forTrace].
 Future<Chain> chainForTrace(asyncFn(callback()), callback()) {
-  var completer = new Completer();
+  var completer = new Completer<Chain>();
   asyncFn(() {
     // We use `new Future.value().then(...)` here as opposed to [new Future] or
     // [new Future.sync] because those methods don't pass the exception through
@@ -75,10 +75,8 @@ Future<Chain> chainForTrace(asyncFn(callback()), callback()) {
         .catchError(completer.completeError);
   });
 
-  // TODO(rnystrom): Remove this cast if catchError() gets a better type.
   return completer.future
-          .catchError((_, stackTrace) => new Chain.forTrace(stackTrace))
-      as Future<Chain>;
+      .catchError((_, stackTrace) => new Chain.forTrace(stackTrace));
 }
 
 /// Runs [callback] in a [Chain.capture] zone and returns a Future that
