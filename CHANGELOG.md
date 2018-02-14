@@ -1,4 +1,9 @@
+## 1.9.2
+
+* Fix Dart 2.0 runtime cast failure in test.
+
 ## 1.9.1
+
 * Preserve the original chain for a trace to handle cases where an
   error is rethrown.
 
