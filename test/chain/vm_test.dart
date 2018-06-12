@@ -467,14 +467,12 @@ void main() {
         }
       });
 
-      expect(chain.traces, hasLength(2));
+      expect(chain.traces, hasLength(greaterThan(1)));
 
       // Assert that we've trimmed the VM's stack chains here to avoid
       // duplication.
       expect(chain.traces.first.toString(),
           equals(new Chain.parse(trace.toString()).traces.first.toString()));
-      expect(
-          chain.traces.last.frames, contains(frameMember(startsWith('main'))));
     });
   });
 
