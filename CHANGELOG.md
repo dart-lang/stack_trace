@@ -1,3 +1,7 @@
+## 1.9.2+1
+
+* Set max SDK version to `<3.0.0`.
+
 ## 1.9.2
 
 * Fix Dart 2.0 runtime cast failure in test.
