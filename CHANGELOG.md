@@ -1,4 +1,4 @@
-## 1.9.2+1
+## 1.9.3
 
 * Set max SDK version to `<3.0.0`.
 
