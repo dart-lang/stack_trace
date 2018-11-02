@@ -1,13 +1,14 @@
 language: dart
-sudo: false
+
 dart:
   - dev
   - stable
-  - 1.23.0
+
 dart_task:
   - test: -p vm
-  - test: -p firefox
+  - test: -p chrome
   - dartanalyzer
+
 matrix:
   include:
     # Only validate formatting using the dev release
