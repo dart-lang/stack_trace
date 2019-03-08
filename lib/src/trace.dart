@@ -241,6 +241,38 @@ class Trace implements StackTrace {
   /// platform is being used.
   StackTrace get vmTrace => new VMTrace(frames);
 
+  /// Returns a V8-style formatted stack trace.
+  ///
+  /// This returns a [String] of the this [Trace] formatted using the stack
+  /// trace format used by V8 in `Error.stack`, regardless of what platform is
+  /// being used. The first line of this string will always be `'Error:\n'` as
+  /// this [Trace] doesn't know which [Exception] was thrown.
+  ///
+  /// This can be useful for submitting stack traces to error correlation
+  /// services that can parse V8 stack traces, but no Dart stack traces.
+  /// Though it might be useful to replace the first line with
+  /// [Exception.toString()] or [Error.toString()] depending what is being
+  /// reported.
+  String get v8Trace =>
+      'Error:\n' +
+      frames.map((f) {
+        // Find member
+        String member = f.member;
+        if (member == '<fn>') {
+          member = '<anonymous>';
+        }
+
+        // Find a location
+        String loc = 'unknown location';
+        if (f.isCore) {
+          loc = 'native';
+        } else if (f.line != null && f.uri != null) {
+          loc = '${f.uri}:${f.line}:${f.column ?? 0}';
+        }
+
+        return '    at $member ($loc)\n';
+      }).join('');
+
   /// Returns a terser version of [this].
   ///
   /// This is accomplished by folding together multiple stack frames from the
