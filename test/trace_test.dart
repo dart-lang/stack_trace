@@ -287,6 +287,22 @@ http://pub.dartlang.org/thing.dart 1:100  zip.<fn>.zap
             '#3      baz (dart:async:15:0)\n'));
   });
 
+  test('.v8Trace returns a v8-style trace', () {
+    final trace = new Trace.parse('''
+#1 top (dart:async/future.dart:0:2)
+#2 bottom (dart:core/uri.dart:1:100)
+#3 fooBottom (package:foo/bar.dart:0:2)
+#4 App.main (foo.dart:42:21)
+''');
+
+    expect(trace.v8Trace, equals('''Error:
+    at top (native)
+    at bottom (native)
+    at fooBottom (package:foo/bar.dart:0:2)
+    at App.main (foo.dart:42:21)
+'''));
+  });
+
   group("folding", () {
     group(".terse", () {
       test('folds core frames together bottom-up', () {
