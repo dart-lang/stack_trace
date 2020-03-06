@@ -19,7 +19,7 @@ import 'utils.dart';
 void main() {
   group('capture() with onError catches exceptions', () {
     test('thrown synchronously', () async {
-      StackTrace vmTrace;
+      late StackTrace vmTrace;
       var chain = await captureFuture(() {
         try {
           throw 'error';

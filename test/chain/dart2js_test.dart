@@ -324,7 +324,7 @@ void main() {
   test(
       'forTrace() outside of capture() returns a chain wrapping the given '
       'trace', () {
-    var trace;
+    late var trace;
     var chain = Chain.capture(() {
       try {
         throw 'error';

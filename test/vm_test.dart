@@ -18,14 +18,14 @@ String getStackTraceString() => StackTrace.current.toString();
 // The name of this (trivial) function is verified as part of the test
 StackTrace getStackTraceObject() => StackTrace.current;
 
-Frame getCaller([int level]) {
+Frame getCaller([int? level]) {
   if (level == null) return new Frame.caller();
   return new Frame.caller(level);
 }
 
 Frame nestedGetCaller(int level) => getCaller(level);
 
-Trace getCurrentTrace([int level]) => new Trace.current(level);
+Trace getCurrentTrace([int level = 0]) => new Trace.current(level);
 
 Trace nestedGetCurrentTrace(int level) => getCurrentTrace(level);
 
@@ -49,14 +49,14 @@ void main() {
     test('.from handles a stack overflow trace correctly', () {
       overflow() => overflow();
 
-      var trace;
+      late Trace? trace;
       try {
         overflow();
       } catch (_, stackTrace) {
         trace = new Trace.from(stackTrace);
       }
 
-      expect(trace.frames.first.member, equals('main.<fn>.<fn>.overflow'));
+      expect(trace!.frames.first.member, equals('main.<fn>.<fn>.overflow'));
     });
 
     group('.current()', () {

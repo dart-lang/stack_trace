@@ -98,13 +98,6 @@ class Trace implements StackTrace {
   /// If [trace] is a native [StackTrace], its data will be parsed out; if it's
   /// a [Trace], it will be returned as-is.
   factory Trace.from(StackTrace trace) {
-    // Normally explicitly validating null arguments is bad Dart style, but here
-    // the natural failure will only occur when the LazyTrace is materialized,
-    // and we want to provide an error that's more local to the actual problem.
-    if (trace == null) {
-      throw new ArgumentError("Cannot create a Trace from null.");
-    }
-
     if (trace is Trace) return trace;
     if (trace is Chain) return trace.toTrace();
     return new LazyTrace(() => new Trace.parse(trace.toString()));
@@ -230,9 +223,9 @@ class Trace implements StackTrace {
             original: trace);
 
   /// Returns a new [Trace] comprised of [frames].
-  Trace(Iterable<Frame> frames, {String original})
+  Trace(Iterable<Frame> frames, {String? original})
       : frames = new List<Frame>.unmodifiable(frames),
-        original = new StackTrace.fromString(original);
+        original = new StackTrace.fromString(original ?? '');
 
   /// Returns a VM-style [StackTrace] object.
   ///
@@ -286,7 +279,7 @@ class Trace implements StackTrace {
         // just get rid of them.
         // TODO(nweiz): Get rid of this logic some time after issue 22009 is
         // fixed.
-        if (!frame.member.contains('<async>')) return false;
+        if (!frame.member!.contains('<async>')) return false;
         return frame.line == null;
       };
     }

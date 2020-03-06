@@ -9,11 +9,11 @@ import 'frame.dart';
 /// The [member] property contains the original frame's contents.
 class UnparsedFrame implements Frame {
   final Uri uri = new Uri(path: "unparsed");
-  final int line = null;
-  final int column = null;
+  final int? line = null;
+  final int? column = null;
   final bool isCore = false;
   final String library = "unparsed";
-  final String package = null;
+  final String? package = null;
   final String location = "unparsed";
 
   final String member;

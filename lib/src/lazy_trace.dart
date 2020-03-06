@@ -13,14 +13,9 @@ typedef Trace TraceThunk();
 /// necessary.
 class LazyTrace implements Trace {
   final TraceThunk _thunk;
-  Trace _inner;
+  late final Trace _trace = _thunk();
 
   LazyTrace(this._thunk);
-
-  Trace get _trace {
-    if (_inner == null) _inner = _thunk();
-    return _inner;
-  }
 
   List<Frame> get frames => _trace.frames;
   StackTrace get original => _trace.original;
@@ -29,7 +24,4 @@ class LazyTrace implements Trace {
   Trace foldFrames(bool predicate(Frame frame), {bool terse: false}) =>
       new LazyTrace(() => _trace.foldFrames(predicate, terse: terse));
   String toString() => _trace.toString();
-
-  // Work around issue 14075.
-  set frames(_) => throw new UnimplementedError();
 }

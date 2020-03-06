@@ -47,7 +47,7 @@ class Chain implements StackTrace {
   final List<Trace> traces;
 
   /// The [StackZoneSpecification] for the current zone.
-  static StackZoneSpecification get _currentSpec => Zone.current[_specKey];
+  static StackZoneSpecification? get _currentSpec => Zone.current[_specKey];
 
   /// If [when] is `true`, runs [callback] in a [Zone] in which the current
   /// stack chain is tracked and automatically associated with (most) errors.
@@ -72,7 +72,7 @@ class Chain implements StackTrace {
   ///
   /// If [callback] returns a value, it will be returned by [capture] as well.
   static T capture<T>(T callback(),
-      {void onError(error, Chain chain),
+      {void Function(dynamic error, Chain chain)? onError,
       bool when: true,
       bool errorZone: true}) {
     if (!errorZone && onError != null) {
@@ -83,13 +83,15 @@ class Chain implements StackTrace {
     if (!when) {
       var newOnError;
       if (onError != null) {
-        newOnError = (error, stackTrace) {
+        void wrappedOnError(Object error, StackTrace? stackTrace) {
           onError(
               error,
               stackTrace == null
                   ? new Chain.current()
                   : new Chain.forTrace(stackTrace));
-        };
+        }
+
+        newOnError = wrappedOnError;
       }
 
       return runZoned(callback, onError: newOnError);
@@ -102,7 +104,12 @@ class Chain implements StackTrace {
       } catch (error, stackTrace) {
         // TODO(nweiz): Don't special-case this when issue 19566 is fixed.
         Zone.current.handleUncaughtError(error, stackTrace);
-        return null;
+
+        // If the expected return type of capture() is not nullable, this will
+        // throw a cast exception. But the only other alternative is to throw
+        // some other exception. Casting null to T at least lets existing uses
+        // where T is a nullable type continue to work.
+        return null as T;
       }
     },
         zoneSpecification: spec.toSpec(),
@@ -137,7 +144,7 @@ class Chain implements StackTrace {
   /// If this is called outside of a [capture] zone, it just returns a
   /// single-trace chain.
   factory Chain.current([int level = 0]) {
-    if (_currentSpec != null) return _currentSpec.currentChain(level + 1);
+    if (_currentSpec != null) return _currentSpec!.currentChain(level + 1);
 
     var chain = new Chain.forTrace(StackTrace.current);
     return new LazyChain(() {
@@ -160,7 +167,7 @@ class Chain implements StackTrace {
   /// If [trace] is already a [Chain], it will be returned as-is.
   factory Chain.forTrace(StackTrace trace) {
     if (trace is Chain) return trace;
-    if (_currentSpec != null) return _currentSpec.chainFor(trace);
+    if (_currentSpec != null) return _currentSpec!.chainFor(trace);
     if (trace is Trace) return new Chain([trace]);
     return new LazyChain(() => new Chain.parse(trace.toString()));
   }

@@ -40,7 +40,7 @@ void main() {
     });
 
     test('converts "<anonymous closure>" to "<fn>"', () {
-      String parsedMember(String member) =>
+      String? parsedMember(String member) =>
           new Frame.parseVM('#0 $member (foo:0:0)').member;
 
       expect(parsedMember('Foo.<anonymous closure>'), equals('Foo.<fn>'));
@@ -208,7 +208,7 @@ void main() {
     });
 
     test('converts "<anonymous>" to "<fn>"', () {
-      String parsedMember(String member) =>
+      String? parsedMember(String member) =>
           new Frame.parseV8('    at $member (foo:0:0)').member;
 
       expect(parsedMember('Foo.<anonymous>'), equals('Foo.<fn>'));
