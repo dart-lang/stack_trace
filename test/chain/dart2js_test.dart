@@ -140,7 +140,7 @@ void main() {
     test('and relays them to the parent zone', () {
       var completer = new Completer();
 
-      runZoned(() {
+      runZonedGuarded(() {
         Chain.capture(() {
           inMicrotask(() => throw 'error');
         }, onError: (error, chain) {
@@ -148,7 +148,7 @@ void main() {
           expect(chain.traces, hasLength(2));
           throw error;
         });
-      }, onError: (error, chain) {
+      }, (error, chain) {
         try {
           expect(error, equals('error'));
           expect(chain, new isInstanceOf<Chain>());
@@ -166,9 +166,9 @@ void main() {
   test('capture() without onError passes exceptions to parent zone', () {
     var completer = new Completer();
 
-    runZoned(() {
+    runZonedGuarded(() {
       Chain.capture(() => inMicrotask(() => throw 'error'));
-    }, onError: (error, chain) {
+    }, (error, chain) {
       try {
         expect(error, equals('error'));
         expect(chain, new isInstanceOf<Chain>());

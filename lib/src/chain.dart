@@ -53,7 +53,7 @@ class Chain implements StackTrace {
   /// stack chain is tracked and automatically associated with (most) errors.
   ///
   /// If [when] is `false`, this does not track stack chains. Instead, it's
-  /// identical to [runZoned], except that it wraps any errors in [new
+  /// identical to [runZonedGuarded], except that it wraps any errors in [new
   /// Chain.forTrace]—which will only wrap the trace unless there's a different
   /// [Chain.capture] active. This makes it easy for the caller to only capture
   /// stack chains in debug mode or during development.
@@ -92,7 +92,7 @@ class Chain implements StackTrace {
         };
       }
 
-      return runZoned(callback, onError: newOnError);
+      return runZonedGuarded(callback, newOnError);
     }
 
     var spec = new StackZoneSpecification(onError, errorZone: errorZone);
