@@ -145,7 +145,7 @@ class StackZoneSpecification {
   /// Looks up the chain associated with [stackTrace] and passes it either to
   /// [_onError] or [parent]'s error handler.
   void _handleUncaughtError(
-      Zone self, ZoneDelegate parent, Zone zone, error, StackTrace? stackTrace) {
+      Zone self, ZoneDelegate parent, Zone zone, error, StackTrace stackTrace) {
     if (_disabled) {
       parent.handleUncaughtError(zone, error, stackTrace);
       return;
