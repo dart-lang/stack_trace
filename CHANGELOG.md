@@ -1,4 +1,4 @@
-## 1.9.4
+## 1.9.4-dev
 
 * Added support for firefox anonymous stack traces
 
