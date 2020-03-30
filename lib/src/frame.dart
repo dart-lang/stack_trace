@@ -33,7 +33,7 @@ final _v8EvalLocation =
 // foo._bar@http://pub.dartlang.org/stuff.js:18056:12
 // anonymous/<@http://pub.dartlang.org/stuff.js line 693 > function:3:40
 // baz@http://pub.dartlang.org/buz.js:56355:55
-final _firefoxEvalLocation = new RegExp(r"(\S+)@(\S+) line (\d+) > (Function|eval):\d+:\d+");
+final _firefoxEvalLocation = new RegExp(r"(\S+)@(\S+) line (\d+) >.* (Function|eval):\d+:\d+");
 
 // .VW.call$0@http://pub.dartlang.org/stuff.dart.js:560
 // .VW.call$0("arg")@http://pub.dartlang.org/stuff.dart.js:560

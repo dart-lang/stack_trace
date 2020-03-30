@@ -27,12 +27,12 @@ final _v8Trace = new RegExp(r"\n    ?at ");
 /// though it is possible for the message to match this as well.
 final _v8TraceLine = new RegExp(r"    ?at ");
 
-/// A RegExp to match Firefox's eval and function stack traces.
-///
+/// A RegExp to match Firefox's eval and Function stack traces.
+/// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/stack
 /// These stack traces looks like:
 /// anonymous/<@http://pub.dartlang.org/stuff.js line 693 > Function:3:40
 /// anonymous/<@http://pub.dartlang.org/stuff.js line 693 > eval:3:40
-final _firefoxEvalTrace = new RegExp(r"@\S+ line \d+ > (Function|eval):\d+:\d+");
+final _firefoxEvalTrace = new RegExp(r"@\S+ line \d+ >.* (Function|eval):\d+:\d+");
 
 /// A RegExp to match Firefox and Safari's stack traces.
 ///
