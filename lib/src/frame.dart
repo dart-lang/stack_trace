@@ -33,7 +33,8 @@ final _v8EvalLocation =
 // foo._bar@http://pub.dartlang.org/stuff.js:18056:12
 // anonymous/<@http://pub.dartlang.org/stuff.js line 693 > function:3:40
 // baz@http://pub.dartlang.org/buz.js:56355:55
-final _firefoxEvalLocation = new RegExp(r"(\S+)@(\S+) line (\d+) >.* (Function|eval):\d+:\d+");
+final _firefoxEvalLocation =
+    new RegExp(r"(\S+)@(\S+) line (\d+) >.* (Function|eval):\d+:\d+");
 
 // .VW.call$0@http://pub.dartlang.org/stuff.dart.js:560
 // .VW.call$0("arg")@http://pub.dartlang.org/stuff.dart.js:560
@@ -215,17 +216,18 @@ class Frame {
   /// for example:
   /// anonymous/<@http://pub.dartlang.org/stuff.js line 693 > Function:3:40
   /// anonymous/<@http://pub.dartlang.org/stuff.js line 693 > eval:3:40
-  factory Frame._parseFirefoxEval(String frame) => _catchFormatException(frame, () {
-    final match = _firefoxEvalLocation.firstMatch(frame);
-    if (match == null) return new UnparsedFrame(frame);
-    var member = match[1].replaceAll('/<', '');
-    final uri = _uriOrPathToUri(match[2]);
-    final line = int.parse(match[3]);
-    if (member.isEmpty || member == 'anonymous') {
-      member = '<fn>';
-    }
-    return new Frame(uri, line, null, member);
-  });
+  factory Frame._parseFirefoxEval(String frame) =>
+      _catchFormatException(frame, () {
+        final match = _firefoxEvalLocation.firstMatch(frame);
+        if (match == null) return new UnparsedFrame(frame);
+        var member = match[1].replaceAll('/<', '');
+        final uri = _uriOrPathToUri(match[2]);
+        final line = int.parse(match[3]);
+        if (member.isEmpty || member == 'anonymous') {
+          member = '<fn>';
+        }
+        return new Frame(uri, line, null, member);
+      });
 
   /// Parses a string representation of a Firefox stack frame.
   factory Frame.parseFirefox(String frame) => _catchFormatException(frame, () {
