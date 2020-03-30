@@ -27,6 +27,13 @@ final _v8Trace = new RegExp(r"\n    ?at ");
 /// though it is possible for the message to match this as well.
 final _v8TraceLine = new RegExp(r"    ?at ");
 
+/// A RegExp to match Firefox's eval and function stack traces.
+///
+/// These stack traces looks like:
+/// anonymous/<@http://pub.dartlang.org/stuff.js line 693 > Function:3:40
+/// anonymous/<@http://pub.dartlang.org/stuff.js line 693 > eval:3:40
+final _firefoxEvalTrace = new RegExp(r"@\S+ line \d+ > (Function|eval):\d+:\d+");
+
 /// A RegExp to match Firefox and Safari's stack traces.
 ///
 /// Firefox and Safari have very similar stack trace formats, so we use the same
@@ -120,7 +127,7 @@ class Trace implements StackTrace {
       if (trace.isEmpty) return new Trace(<Frame>[]);
       if (trace.contains(_v8Trace)) return new Trace.parseV8(trace);
       if (trace.contains("\tat ")) return new Trace.parseJSCore(trace);
-      if (trace.contains(_firefoxSafariTrace)) {
+      if (trace.contains(_firefoxSafariTrace) || trace.contains(_firefoxEvalTrace)) {
         return new Trace.parseFirefox(trace);
       }
       if (trace.contains(chainGap)) return new Chain.parse(trace).toTrace();
