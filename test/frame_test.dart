@@ -260,7 +260,7 @@ baz@http://pub.dartlang.org/buz.js:56355:55
     });
 
     test(
-        'parses a Firefox stack trace with nested evals in anonymouse function correctly',
+        'parses a Firefox stack trace with nested evals in anonymous function correctly',
         () {
       var trace = new Trace.parse('''
         Foo._bar@http://pub.dartlang.org/stuff.js:18056:12

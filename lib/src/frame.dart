@@ -30,9 +30,8 @@ final _v8UrlLocation = new RegExp(r'^(.*):(\d+):(\d+)|native$');
 final _v8EvalLocation =
     new RegExp(r'^eval at (?:\S.*?) \((.*)\)(?:, .*?:\d+:\d+)?$');
 
-// foo._bar@http://pub.dartlang.org/stuff.js:18056:12
-// anonymous/<@http://pub.dartlang.org/stuff.js line 693 > function:3:40
-// baz@http://pub.dartlang.org/buz.js:56355:55
+// anonymous/<@http://pub.dartlang.org/stuff.js line 693 > Function:3:40
+// anonymous/<@http://pub.dartlang.org/stuff.js line 693 > eval:3:40
 final _firefoxEvalLocation =
     new RegExp(r"(\S+)@(\S+) line (\d+) >.* (Function|eval):\d+:\d+");
 
