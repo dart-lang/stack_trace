@@ -236,7 +236,7 @@ void main() {
   });
 
   group('.parseFirefox/.parseSafari', () {
-    test('parses a Firefox stack trace with anonymouse function correctly', () {
+    test('parses a Firefox stack trace with anonymous function', () {
       var trace = new Trace.parse('''
 Foo._bar@http://pub.dartlang.org/stuff.js:18056:12
 anonymous/<@http://pub.dartlang.org/stuff.js line 693 > Function:3:40
