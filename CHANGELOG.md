@@ -1,3 +1,7 @@
+## 1.9.4-dev
+
+* ability to parse chrome eval exceptions
+
 ## 1.9.3
 
 * Set max SDK version to `<3.0.0`.
