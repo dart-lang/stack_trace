@@ -236,6 +236,52 @@ void main() {
   });
 
   group('.parseFirefox/.parseSafari', () {
+    test('parses a Firefox stack trace with anonymous function', () {
+      var trace = new Trace.parse('''
+Foo._bar@http://pub.dartlang.org/stuff.js:18056:12
+anonymous/<@http://pub.dartlang.org/stuff.js line 693 > Function:3:40
+baz@http://pub.dartlang.org/buz.js:56355:55
+        ''');
+      expect(trace.frames[0].uri,
+          equals(Uri.parse("http://pub.dartlang.org/stuff.js")));
+      expect(trace.frames[0].line, equals(18056));
+      expect(trace.frames[0].column, equals(12));
+      expect(trace.frames[0].member, equals("Foo._bar"));
+      expect(trace.frames[1].uri,
+          equals(Uri.parse("http://pub.dartlang.org/stuff.js")));
+      expect(trace.frames[1].line, equals(693));
+      expect(trace.frames[1].column, isNull);
+      expect(trace.frames[1].member, equals("<fn>"));
+      expect(trace.frames[2].uri,
+          equals(Uri.parse("http://pub.dartlang.org/buz.js")));
+      expect(trace.frames[2].line, equals(56355));
+      expect(trace.frames[2].column, equals(55));
+      expect(trace.frames[2].member, equals("baz"));
+    });
+
+    test(
+        'parses a Firefox stack trace with nested evals in anonymous function correctly',
+        () {
+      var trace = new Trace.parse('''
+        Foo._bar@http://pub.dartlang.org/stuff.js:18056:12
+        anonymous@file:///C:/example.html line 7 > eval line 1 > eval:1:1
+        anonymous@file:///C:/example.html line 45 > Function:1:1 
+        ''');
+      expect(trace.frames[0].uri,
+          equals(Uri.parse("http://pub.dartlang.org/stuff.js")));
+      expect(trace.frames[0].line, equals(18056));
+      expect(trace.frames[0].column, equals(12));
+      expect(trace.frames[0].member, equals("Foo._bar"));
+      expect(trace.frames[1].uri, equals(Uri.parse("file:///C:/example.html")));
+      expect(trace.frames[1].line, equals(7));
+      expect(trace.frames[1].column, isNull);
+      expect(trace.frames[1].member, equals("<fn>"));
+      expect(trace.frames[2].uri, equals(Uri.parse("file:///C:/example.html")));
+      expect(trace.frames[2].line, equals(45));
+      expect(trace.frames[2].column, isNull);
+      expect(trace.frames[2].member, equals("<fn>"));
+    });
+
     test('parses a simple stack frame correctly', () {
       var frame = new Frame.parseFirefox(
           ".VW.call\$0@http://pub.dartlang.org/stuff.dart.js:560");
