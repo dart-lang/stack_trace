@@ -305,7 +305,7 @@ void main() {
     test(
         'called for an unregistered stack trace returns a chain wrapping that '
         'trace', () {
-      var trace;
+      StackTrace trace;
       var chain = Chain.capture(() {
         try {
           throw 'error';
@@ -324,7 +324,7 @@ void main() {
   test(
       'forTrace() outside of capture() returns a chain wrapping the given '
       'trace', () {
-    var trace;
+    StackTrace trace;
     var chain = Chain.capture(() {
       try {
         throw 'error';

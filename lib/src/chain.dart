@@ -47,7 +47,8 @@ class Chain implements StackTrace {
   final List<Trace> traces;
 
   /// The [StackZoneSpecification] for the current zone.
-  static StackZoneSpecification get _currentSpec => Zone.current[_specKey];
+  static StackZoneSpecification get _currentSpec =>
+      Zone.current[_specKey] as StackZoneSpecification;
 
   /// If [when] is `true`, runs [callback] in a [Zone] in which the current
   /// stack chain is tracked and automatically associated with (most) errors.
@@ -81,7 +82,7 @@ class Chain implements StackTrace {
     }
 
     if (!when) {
-      var newOnError;
+      void Function(Object, StackTrace) newOnError;
       if (onError != null) {
         newOnError = (error, stackTrace) {
           onError(
