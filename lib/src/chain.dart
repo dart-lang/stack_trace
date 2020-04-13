@@ -12,7 +12,7 @@ import 'trace.dart';
 import 'utils.dart';
 
 /// A function that handles errors in the zone wrapped by [Chain.capture].
-@Deprecated("Will be removed in stack_trace 2.0.0.")
+@Deprecated('Will be removed in stack_trace 2.0.0.')
 typedef ChainHandler = void Function(dynamic error, Chain chain);
 
 /// An opaque key used to track the current [StackZoneSpecification].
@@ -72,13 +72,13 @@ class Chain implements StackTrace {
   /// `false`, [onError] must be `null`.
   ///
   /// If [callback] returns a value, it will be returned by [capture] as well.
-  static T capture<T>(T callback(),
-      {void onError(error, Chain chain),
+  static T capture<T>(T Function() callback,
+      {void Function(Object error, Chain) onError,
       bool when = true,
       bool errorZone = true}) {
     if (!errorZone && onError != null) {
       throw ArgumentError.value(
-          onError, "onError", "must be null if errorZone is false");
+          onError, 'onError', 'must be null if errorZone is false');
     }
 
     if (!when) {
@@ -114,7 +114,7 @@ class Chain implements StackTrace {
   /// [callback] in a [Zone] in which chain capturing is disabled.
   ///
   /// If [callback] returns a value, it will be returned by [disable] as well.
-  static T disable<T>(T callback(), {bool when = true}) {
+  static T disable<T>(T Function() callback, {bool when = true}) {
     var zoneValues =
         when ? {_specKey: null, StackZoneSpecification.disableKey: true} : null;
 
@@ -126,8 +126,8 @@ class Chain implements StackTrace {
   /// Prior to Dart 1.7, this was necessary to ensure that stack traces for
   /// exceptions reported with [Completer.completeError] and
   /// [StreamController.addError] were tracked correctly.
-  @Deprecated("Chain.track is not necessary in Dart 1.7+.")
-  static track(futureOrStream) => futureOrStream;
+  @Deprecated('Chain.track is not necessary in Dart 1.7+.')
+  static dynamic track(futureOrStream) => futureOrStream;
 
   /// Returns the current stack chain.
   ///
@@ -211,7 +211,7 @@ class Chain implements StackTrace {
   /// If [terse] is true, this will also fold together frames from the core
   /// library or from this package, and simplify core library frames as in
   /// [Trace.terse].
-  Chain foldFrames(bool predicate(Frame frame), {bool terse = false}) {
+  Chain foldFrames(bool Function(Frame) predicate, {bool terse = false}) {
     var foldedTraces =
         traces.map((trace) => trace.foldFrames(predicate, terse: terse));
     var nonEmptyTraces = foldedTraces.where((trace) {
@@ -241,6 +241,7 @@ class Chain implements StackTrace {
   /// in the chain.
   Trace toTrace() => Trace(traces.expand((trace) => trace.frames));
 
+  @override
   String toString() {
     // Figure out the longest path so we know how much to pad.
     var longest = traces.map((trace) {

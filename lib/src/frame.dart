@@ -33,7 +33,7 @@ final _v8EvalLocation =
 // anonymous/<@http://pub.dartlang.org/stuff.js line 693 > Function:3:40
 // anonymous/<@http://pub.dartlang.org/stuff.js line 693 > eval:3:40
 final _firefoxEvalLocation =
-    RegExp(r"(\S+)@(\S+) line (\d+) >.* (Function|eval):\d+:\d+");
+    RegExp(r'(\S+)@(\S+) line (\d+) >.* (Function|eval):\d+:\d+');
 
 // .VW.call$0@http://pub.dartlang.org/stuff.dart.js:560
 // .VW.call$0("arg")@http://pub.dartlang.org/stuff.dart.js:560
@@ -65,7 +65,7 @@ final _friendlyFrame = RegExp(r'^(\S+)(?: (\d+)(?::(\d+))?)?\s+([^\d].*)$');
 /// VM.
 final _asyncBody = RegExp(r'<(<anonymous closure>|[^>]+)_async_body>');
 
-final _initialDot = RegExp(r"^\.");
+final _initialDot = RegExp(r'^\.');
 
 /// A single stack frame. Each frame points to a precise location in Dart code.
 class Frame {
@@ -100,7 +100,7 @@ class Frame {
   /// This will usually be the string form of [uri], but a relative URI will be
   /// used if possible. Data URIs will be truncated.
   String get library {
-    if (uri.scheme == 'data') return "data:...";
+    if (uri.scheme == 'data') return 'data:...';
     return path.prettyUri(uri);
   }
 
@@ -125,8 +125,8 @@ class Frame {
   /// higher than `1`, it will return higher frames.
   factory Frame.caller([int level = 1]) {
     if (level < 0) {
-      throw ArgumentError("Argument [level] must be greater than or equal "
-          "to 0.");
+      throw ArgumentError('Argument [level] must be greater than or equal '
+          'to 0.');
     }
 
     return Trace.current(level + 1).frames.first;
@@ -146,8 +146,8 @@ class Frame {
         // Get the pieces out of the regexp match. Function, URI and line should
         // always be found. The column is optional.
         var member = match[1]
-            .replaceAll(_asyncBody, "<async>")
-            .replaceAll("<anonymous closure>", "<fn>");
+            .replaceAll(_asyncBody, '<async>')
+            .replaceAll('<anonymous closure>', '<fn>');
         var uri = Uri.parse(match[2]);
 
         var lineAndColumn = match[3].split(':');
@@ -191,13 +191,13 @@ class Frame {
           return parseLocation(
               match[2],
               match[1]
-                  .replaceAll("<anonymous>", "<fn>")
-                  .replaceAll("Anonymous function", "<fn>")
-                  .replaceAll("(anonymous function)", "<fn>"));
+                  .replaceAll('<anonymous>', '<fn>')
+                  .replaceAll('Anonymous function', '<fn>')
+                  .replaceAll('(anonymous function)', '<fn>'));
         } else {
           // The second form looks like " at LOCATION", and is used for
           // anonymous functions.
-          return parseLocation(match[3], "<fn>");
+          return parseLocation(match[3], '<fn>');
         }
       });
 
@@ -244,7 +244,7 @@ class Frame {
         if (match[1] != null) {
           member = match[1];
           member +=
-              List.filled('/'.allMatches(match[2]).length, ".<fn>").join();
+              List.filled('/'.allMatches(match[2]).length, '.<fn>').join();
           if (member == '') member = '<fn>';
 
           // Some Firefox members have initial dots. We remove them for
@@ -261,11 +261,11 @@ class Frame {
       });
 
   /// Parses a string representation of a Safari 6.0 stack frame.
-  @Deprecated("Use Frame.parseSafari instead.")
+  @Deprecated('Use Frame.parseSafari instead.')
   factory Frame.parseSafari6_0(String frame) => Frame.parseFirefox(frame);
 
   /// Parses a string representation of a Safari 6.1+ stack frame.
-  @Deprecated("Use Frame.parseSafari instead.")
+  @Deprecated('Use Frame.parseSafari instead.')
   factory Frame.parseSafari6_1(String frame) => Frame.parseFirefox(frame);
 
   /// Parses a string representation of a Safari stack frame.
@@ -323,7 +323,7 @@ class Frame {
   ///
   /// If [body] throws a [FormatException], returns an [UnparsedFrame] with
   /// [text] instead.
-  static Frame _catchFormatException(String text, Frame body()) {
+  static Frame _catchFormatException(String text, Frame Function() body) {
     try {
       return body();
     } on FormatException catch (_) {
@@ -333,5 +333,6 @@ class Frame {
 
   Frame(this.uri, this.line, this.column, this.member);
 
+  @override
   String toString() => '$location in $member';
 }

@@ -38,29 +38,29 @@ void main() {
     });
   });
 
-  group("Chain.capture()", () {
-    test("with onError blocks errors", () {
+  group('Chain.capture()', () {
+    test('with onError blocks errors', () {
       Chain.capture(() {
-        return Future.error("oh no");
+        return Future.error('oh no');
       }, onError: expectAsync2((error, chain) {
-        expect(error, equals("oh no"));
+        expect(error, equals('oh no'));
         expect(chain, TypeMatcher<Chain>());
       }));
     });
 
-    test("with no onError blocks errors", () {
+    test('with no onError blocks errors', () {
       runZoned(() {
-        var future = Chain.capture(() => Future.error("oh no"), when: false);
+        var future = Chain.capture(() => Future.error('oh no'), when: false);
         future.then(expectAsync1((_) {}, count: 0));
       }, onError: expectAsync2((error, chain) {
-        expect(error, equals("oh no"));
+        expect(error, equals('oh no'));
         expect(chain, TypeMatcher<Chain>());
       }));
     });
 
     test("with errorZone: false doesn't block errors", () {
-      expect(Chain.capture(() => Future.error("oh no"), errorZone: false),
-          throwsA("oh no"));
+      expect(Chain.capture(() => Future.error('oh no'), errorZone: false),
+          throwsA('oh no'));
     });
 
     test("doesn't allow onError and errorZone: false", () {
@@ -68,17 +68,17 @@ void main() {
           throwsArgumentError);
     });
 
-    group("with when: false", () {
+    group('with when: false', () {
       test("with no onError doesn't block errors", () {
-        expect(Chain.capture(() => Future.error("oh no"), when: false),
-            throwsA("oh no"));
+        expect(Chain.capture(() => Future.error('oh no'), when: false),
+            throwsA('oh no'));
       });
 
-      test("with onError blocks errors", () {
+      test('with onError blocks errors', () {
         Chain.capture(() {
-          return Future.error("oh no");
+          return Future.error('oh no');
         }, onError: expectAsync2((error, chain) {
-          expect(error, equals("oh no"));
+          expect(error, equals('oh no'));
           expect(chain, TypeMatcher<Chain>());
         }), when: false);
       });
@@ -100,8 +100,8 @@ void main() {
     });
   });
 
-  group("Chain.disable()", () {
-    test("disables chain-tracking", () {
+  group('Chain.disable()', () {
+    test('disables chain-tracking', () {
       return Chain.disable(() {
         var completer = Completer();
         inMicrotask(() => completer.complete(Chain.current()));
@@ -112,7 +112,7 @@ void main() {
       });
     });
 
-    test("Chain.capture() re-enables chain-tracking", () {
+    test('Chain.capture() re-enables chain-tracking', () {
       return Chain.disable(() {
         return Chain.capture(() {
           var completer = Completer();
@@ -125,7 +125,7 @@ void main() {
       });
     });
 
-    test("preserves parent zones of the capture zone", () {
+    test('preserves parent zones of the capture zone', () {
       // The outer disable call turns off the test package's chain-tracking.
       return Chain.disable(() {
         return runZoned(() {
@@ -136,7 +136,7 @@ void main() {
       });
     });
 
-    test("preserves child zones of the capture zone", () {
+    test('preserves child zones of the capture zone', () {
       // The outer disable call turns off the test package's chain-tracking.
       return Chain.disable(() {
         return Chain.capture(() {
@@ -161,7 +161,7 @@ void main() {
     });
   });
 
-  test("toString() ensures that all traces are aligned", () {
+  test('toString() ensures that all traces are aligned', () {
     var chain = Chain([
       Trace.parse('short 10:11  Foo.bar\n'),
       Trace.parse('loooooooooooong 10:11  Zop.zoop')

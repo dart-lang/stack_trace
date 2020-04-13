@@ -8,13 +8,13 @@ import 'package:stack_trace/stack_trace.dart';
 import 'package:test/test.dart';
 
 /// Runs [callback] in a microtask callback.
-void inMicrotask(callback()) => scheduleMicrotask(callback);
+void inMicrotask(void Function() callback) => scheduleMicrotask(callback);
 
 /// Runs [callback] in a one-shot timer callback.
-void inOneShotTimer(callback()) => Timer.run(callback);
+void inOneShotTimer(void Function() callback) => Timer.run(callback);
 
 /// Runs [callback] once in a periodic timer callback.
-void inPeriodicTimer(callback()) {
+void inPeriodicTimer(void Function() callback) {
   var count = 0;
   Timer.periodic(Duration(milliseconds: 1), (timer) {
     count++;
@@ -25,7 +25,7 @@ void inPeriodicTimer(callback()) {
 }
 
 /// Runs [callback] within a long asynchronous Future chain.
-void inFutureChain(callback()) {
+void inFutureChain(void Function() callback) {
   Future(() {})
       .then((_) => Future(() {}))
       .then((_) => Future(() {}))
@@ -35,11 +35,11 @@ void inFutureChain(callback()) {
       .then((_) => Future(() {}));
 }
 
-void inNewFuture(callback()) {
+void inNewFuture(void Function() callback) {
   Future(callback);
 }
 
-void inSyncFuture(callback()) {
+void inSyncFuture(void Function() callback) {
   Future.sync(callback);
 }
 
@@ -63,7 +63,8 @@ Stream controllerErrorStream([StackTrace trace]) {
 
 /// Runs [callback] within [asyncFn], then converts any errors raised into a
 /// [Chain] with [Chain.forTrace].
-Future<Chain> chainForTrace(asyncFn(callback()), callback()) {
+Future<Chain> chainForTrace(
+    void Function(void Function()) asyncFn, void Function() callback) {
   var completer = Completer<Chain>();
   asyncFn(() {
     // We use `new Future.value().then(...)` here as opposed to [new Future] or
@@ -81,7 +82,7 @@ Future<Chain> chainForTrace(asyncFn(callback()), callback()) {
 /// completes to the stack chain for an error thrown by [callback].
 ///
 /// [callback] is expected to throw the string `"error"`.
-Future<Chain> captureFuture(callback()) {
+Future<Chain> captureFuture(void Function() callback) {
   var completer = Completer<Chain>();
   Chain.capture(callback, onError: (error, chain) {
     expect(error, equals('error'));

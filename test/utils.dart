@@ -17,7 +17,8 @@ Matcher frameLibrary(matcher) =>
 ///
 /// [description] should be a noun phrase that describes the relation of the
 /// output of [transformation] to its input.
-Matcher transform(transformation(value), matcher, String description) =>
+Matcher transform(
+        void Function(dynamic) transformation, matcher, String description) =>
     _TransformMatcher(transformation, wrapMatcher(matcher), description);
 
 class _TransformMatcher extends Matcher {
@@ -27,9 +28,11 @@ class _TransformMatcher extends Matcher {
 
   _TransformMatcher(this._transformation, this._matcher, this._description);
 
+  @override
   bool matches(item, Map matchState) =>
       _matcher.matches(_transformation(item), matchState);
 
+  @override
   Description describe(Description description) =>
       description.add(_description).add(' ').addDescriptionOf(_matcher);
 }

@@ -47,7 +47,7 @@ void main() {
     });
 
     test('.from handles a stack overflow trace correctly', () {
-      overflow() => overflow();
+      void overflow() => overflow();
 
       var trace;
       try {
