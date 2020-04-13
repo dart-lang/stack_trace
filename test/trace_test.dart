@@ -347,7 +347,7 @@ dart:core  bottom
       });
     });
 
-    group(".foldFrames", () {
+    group('.foldFrames', () {
       test('folds frames together bottom-up', () {
         var trace = Trace.parse('''
 #0 notFoo (foo.dart:42:21)
@@ -382,7 +382,7 @@ dart:async-patch/future.dart 9:11  fooBottom
 '''));
       });
 
-      group("with terse: true", () {
+      group('with terse: true', () {
         test('folds core frames as well', () {
           var trace = Trace.parse('''
 #0 notFoo (foo.dart:42:21)
