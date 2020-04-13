@@ -20,7 +20,7 @@ class VMTrace implements StackTrace {
     return frames.map((frame) {
       var number = "#${i++}".padRight(8);
       var member = frame.member
-          .replaceAllMapped(new RegExp(r"[^.]+\.<async>"),
+          .replaceAllMapped(RegExp(r"[^.]+\.<async>"),
               (match) => "${match[1]}.<${match[1]}_async_body>")
           .replaceAll("<fn>", "<anonymous closure>");
       var line = frame.line == null ? 0 : frame.line;

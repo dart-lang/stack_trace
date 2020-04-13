@@ -11,7 +11,7 @@ import 'trace.dart';
 import 'utils.dart';
 
 /// A function that handles errors in the zone wrapped by [Chain.capture].
-typedef void _ChainHandler(error, Chain chain);
+typedef _ChainHandler = void Function(dynamic error, Chain chain);
 
 /// A class encapsulating the zone specification for a [Chain.capture] zone.
 ///
@@ -37,7 +37,7 @@ class StackZoneSpecification {
   /// zone.
   ///
   /// If `Zone.current[disableKey]` is `true`, no stack chains will be tracked.
-  static final disableKey = new Object();
+  static final disableKey = Object();
 
   /// Whether chain-tracking is disabled in the current zone.
   bool get _disabled => Zone.current[disableKey] == true;
@@ -50,7 +50,7 @@ class StackZoneSpecification {
   ///
   /// The chain associated with a given stack trace doesn't contain a node for
   /// that stack trace.
-  final _chains = new Expando<_Node>("stack chains");
+  final _chains = Expando<_Node>("stack chains");
 
   /// The error handler for the zone.
   ///
@@ -64,12 +64,12 @@ class StackZoneSpecification {
   /// Whether this is an error zone.
   final bool _errorZone;
 
-  StackZoneSpecification(this._onError, {bool errorZone: true})
+  StackZoneSpecification(this._onError, {bool errorZone = true})
       : _errorZone = errorZone;
 
   /// Converts [this] to a real [ZoneSpecification].
   ZoneSpecification toSpec() {
-    return new ZoneSpecification(
+    return ZoneSpecification(
         handleUncaughtError: _errorZone ? _handleUncaughtError : null,
         registerCallback: _registerCallback,
         registerUnaryCallback: _registerUnaryCallback,
@@ -98,15 +98,15 @@ class StackZoneSpecification {
       // If there's no [_currentNode], we're running synchronously beneath
       // [Chain.capture] and we should fall back to the VM's stack chaining. We
       // can't use [Chain.from] here because it'll just call [chainFor] again.
-      if (trace is Trace) return new Chain([trace]);
-      return new LazyChain(() => new Chain.parse(trace.toString()));
+      if (trace is Trace) return Chain([trace]);
+      return LazyChain(() => Chain.parse(trace.toString()));
     } else {
       if (trace is! Trace) {
         var original = trace;
-        trace = new LazyTrace(() => new Trace.parse(_trimVMChain(original)));
+        trace = LazyTrace(() => Trace.parse(_trimVMChain(original)));
       }
 
-      return new _Node(trace, previous).toChain();
+      return _Node(trace, previous).toChain();
     }
   }
 
@@ -184,7 +184,7 @@ class StackZoneSpecification {
     }
 
     var asyncError = parent.errorCallback(zone, error, stackTrace);
-    return asyncError == null ? new AsyncError(error, stackTrace) : asyncError;
+    return asyncError == null ? AsyncError(error, stackTrace) : asyncError;
   }
 
   /// Creates a [_Node] with the current stack trace and linked to
@@ -194,7 +194,7 @@ class StackZoneSpecification {
   /// [_createNode] is called. If [level] is passed, the first trace will start
   /// that many frames up instead.
   _Node _createNode([int level = 0]) =>
-      new _Node(_currentTrace(level + 1), _currentNode);
+      _Node(_currentTrace(level + 1), _currentNode);
 
   // TODO(nweiz): use a more robust way of detecting and tracking errors when
   // issue 15105 is fixed.
@@ -223,13 +223,12 @@ class StackZoneSpecification {
   Trace _currentTrace([int level]) {
     level ??= 0;
     var stackTrace = StackTrace.current;
-    return new LazyTrace(() {
+    return LazyTrace(() {
       var text = _trimVMChain(stackTrace);
-      var trace = new Trace.parse(text);
+      var trace = Trace.parse(text);
       // JS includes a frame for the call to StackTrace.current, but the VM
       // doesn't, so we skip an extra frame in a JS context.
-      return new Trace(trace.frames.skip(level + (inJS ? 2 : 1)),
-          original: text);
+      return Trace(trace.frames.skip(level + (inJS ? 2 : 1)), original: text);
     });
   }
 
@@ -250,7 +249,7 @@ class _Node {
   /// The previous node in the chain.
   final _Node previous;
 
-  _Node(StackTrace trace, [this.previous]) : trace = new Trace.from(trace);
+  _Node(StackTrace trace, [this.previous]) : trace = Trace.from(trace);
 
   /// Converts this to a [Chain].
   Chain toChain() {
@@ -260,6 +259,6 @@ class _Node {
       nodes.add(node.trace);
       node = node.previous;
     }
-    return new Chain(nodes);
+    return Chain(nodes);
   }
 }

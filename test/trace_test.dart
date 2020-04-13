@@ -6,17 +6,17 @@ import 'package:path/path.dart' as path;
 import 'package:stack_trace/stack_trace.dart';
 import 'package:test/test.dart';
 
-Trace getCurrentTrace([int level]) => new Trace.current(level);
+Trace getCurrentTrace([int level]) => Trace.current(level);
 
 Trace nestedGetCurrentTrace(int level) => getCurrentTrace(level);
 
 void main() {
   // This just shouldn't crash.
-  test('a native stack trace is parseable', () => new Trace.current());
+  test('a native stack trace is parseable', () => Trace.current());
 
   group('.parse', () {
     test('.parse parses a VM stack trace correctly', () {
-      var trace = new Trace.parse(
+      var trace = Trace.parse(
           '#0      Foo._bar (file:///home/nweiz/code/stuff.dart:42:21)\n'
           '#1      zip.<anonymous closure>.zap (dart:async/future.dart:0:2)\n'
           '#2      zip.<anonymous closure>.zap (http://pub.dartlang.org/thing.'
@@ -30,7 +30,7 @@ void main() {
     });
 
     test('parses a V8 stack trace correctly', () {
-      var trace = new Trace.parse('Error\n'
+      var trace = Trace.parse('Error\n'
           '    at Foo._bar (http://pub.dartlang.org/stuff.js:42:21)\n'
           '    at http://pub.dartlang.org/stuff.js:0:2\n'
           '    at zip.<anonymous>.zap '
@@ -43,7 +43,7 @@ void main() {
       expect(trace.frames[2].uri,
           equals(Uri.parse("http://pub.dartlang.org/thing.js")));
 
-      trace = new Trace.parse("Exception: foo\n"
+      trace = Trace.parse("Exception: foo\n"
           '    at Foo._bar (http://pub.dartlang.org/stuff.js:42:21)\n'
           '    at http://pub.dartlang.org/stuff.js:0:2\n'
           '    at zip.<anonymous>.zap '
@@ -56,7 +56,7 @@ void main() {
       expect(trace.frames[2].uri,
           equals(Uri.parse("http://pub.dartlang.org/thing.js")));
 
-      trace = new Trace.parse('Exception: foo\n'
+      trace = Trace.parse('Exception: foo\n'
           '    bar\n'
           '    at Foo._bar (http://pub.dartlang.org/stuff.js:42:21)\n'
           '    at http://pub.dartlang.org/stuff.js:0:2\n'
@@ -70,7 +70,7 @@ void main() {
       expect(trace.frames[2].uri,
           equals(Uri.parse("http://pub.dartlang.org/thing.js")));
 
-      trace = new Trace.parse('Exception: foo\n'
+      trace = Trace.parse('Exception: foo\n'
           '    bar\n'
           '    at Foo._bar (http://pub.dartlang.org/stuff.js:42:21)\n'
           '    at http://pub.dartlang.org/stuff.js:0:2\n'
@@ -90,11 +90,11 @@ void main() {
     // JavaScriptCore traces are just like V8, except that it doesn't have a
     // header and it starts with a tab rather than spaces.
     test('parses a JavaScriptCore stack trace correctly', () {
-      var trace = new Trace.parse(
-          '\tat Foo._bar (http://pub.dartlang.org/stuff.js:42:21)\n'
-          '\tat http://pub.dartlang.org/stuff.js:0:2\n'
-          '\tat zip.<anonymous>.zap '
-          '(http://pub.dartlang.org/thing.js:1:100)');
+      var trace =
+          Trace.parse('\tat Foo._bar (http://pub.dartlang.org/stuff.js:42:21)\n'
+              '\tat http://pub.dartlang.org/stuff.js:0:2\n'
+              '\tat zip.<anonymous>.zap '
+              '(http://pub.dartlang.org/thing.js:1:100)');
 
       expect(trace.frames[0].uri,
           equals(Uri.parse("http://pub.dartlang.org/stuff.js")));
@@ -103,11 +103,11 @@ void main() {
       expect(trace.frames[2].uri,
           equals(Uri.parse("http://pub.dartlang.org/thing.js")));
 
-      trace = new Trace.parse(
-          '\tat Foo._bar (http://pub.dartlang.org/stuff.js:42:21)\n'
-          '\tat \n'
-          '\tat zip.<anonymous>.zap '
-          '(http://pub.dartlang.org/thing.js:1:100)');
+      trace =
+          Trace.parse('\tat Foo._bar (http://pub.dartlang.org/stuff.js:42:21)\n'
+              '\tat \n'
+              '\tat zip.<anonymous>.zap '
+              '(http://pub.dartlang.org/thing.js:1:100)');
 
       expect(trace.frames[0].uri,
           equals(Uri.parse("http://pub.dartlang.org/stuff.js")));
@@ -116,10 +116,9 @@ void main() {
     });
 
     test('parses a Firefox/Safari stack trace correctly', () {
-      var trace =
-          new Trace.parse('Foo._bar@http://pub.dartlang.org/stuff.js:42\n'
-              'zip/<@http://pub.dartlang.org/stuff.js:0\n'
-              'zip.zap(12, "@)()/<")@http://pub.dartlang.org/thing.js:1');
+      var trace = Trace.parse('Foo._bar@http://pub.dartlang.org/stuff.js:42\n'
+          'zip/<@http://pub.dartlang.org/stuff.js:0\n'
+          'zip.zap(12, "@)()/<")@http://pub.dartlang.org/thing.js:1');
 
       expect(trace.frames[0].uri,
           equals(Uri.parse("http://pub.dartlang.org/stuff.js")));
@@ -128,7 +127,7 @@ void main() {
       expect(trace.frames[2].uri,
           equals(Uri.parse("http://pub.dartlang.org/thing.js")));
 
-      trace = new Trace.parse('zip/<@http://pub.dartlang.org/stuff.js:0\n'
+      trace = Trace.parse('zip/<@http://pub.dartlang.org/stuff.js:0\n'
           'Foo._bar@http://pub.dartlang.org/stuff.js:42\n'
           'zip.zap(12, "@)()/<")@http://pub.dartlang.org/thing.js:1');
 
@@ -139,7 +138,7 @@ void main() {
       expect(trace.frames[2].uri,
           equals(Uri.parse("http://pub.dartlang.org/thing.js")));
 
-      trace = new Trace.parse(
+      trace = Trace.parse(
           'zip.zap(12, "@)()/<")@http://pub.dartlang.org/thing.js:1\n'
           'zip/<@http://pub.dartlang.org/stuff.js:0\n'
           'Foo._bar@http://pub.dartlang.org/stuff.js:42');
@@ -154,11 +153,10 @@ void main() {
 
     test('parses a Firefox/Safari stack trace containing native code correctly',
         () {
-      var trace =
-          new Trace.parse('Foo._bar@http://pub.dartlang.org/stuff.js:42\n'
-              'zip/<@http://pub.dartlang.org/stuff.js:0\n'
-              'zip.zap(12, "@)()/<")@http://pub.dartlang.org/thing.js:1\n'
-              '[native code]');
+      var trace = Trace.parse('Foo._bar@http://pub.dartlang.org/stuff.js:42\n'
+          'zip/<@http://pub.dartlang.org/stuff.js:0\n'
+          'zip.zap(12, "@)()/<")@http://pub.dartlang.org/thing.js:1\n'
+          '[native code]');
 
       expect(trace.frames[0].uri,
           equals(Uri.parse("http://pub.dartlang.org/stuff.js")));
@@ -171,7 +169,7 @@ void main() {
 
     test('parses a Firefox/Safari stack trace without a method name correctly',
         () {
-      var trace = new Trace.parse('http://pub.dartlang.org/stuff.js:42\n'
+      var trace = Trace.parse('http://pub.dartlang.org/stuff.js:42\n'
           'zip/<@http://pub.dartlang.org/stuff.js:0\n'
           'zip.zap(12, "@)()/<")@http://pub.dartlang.org/thing.js:1');
 
@@ -186,11 +184,10 @@ void main() {
 
     test('parses a Firefox/Safari stack trace with an empty line correctly',
         () {
-      var trace =
-          new Trace.parse('Foo._bar@http://pub.dartlang.org/stuff.js:42\n'
-              '\n'
-              'zip/<@http://pub.dartlang.org/stuff.js:0\n'
-              'zip.zap(12, "@)()/<")@http://pub.dartlang.org/thing.js:1');
+      var trace = Trace.parse('Foo._bar@http://pub.dartlang.org/stuff.js:42\n'
+          '\n'
+          'zip/<@http://pub.dartlang.org/stuff.js:0\n'
+          'zip.zap(12, "@)()/<")@http://pub.dartlang.org/thing.js:1');
 
       expect(trace.frames[0].uri,
           equals(Uri.parse("http://pub.dartlang.org/stuff.js")));
@@ -202,10 +199,9 @@ void main() {
 
     test('parses a Firefox/Safari stack trace with a column number correctly',
         () {
-      var trace =
-          new Trace.parse('Foo._bar@http://pub.dartlang.org/stuff.js:42:2\n'
-              'zip/<@http://pub.dartlang.org/stuff.js:0\n'
-              'zip.zap(12, "@)()/<")@http://pub.dartlang.org/thing.js:1');
+      var trace = Trace.parse('Foo._bar@http://pub.dartlang.org/stuff.js:42:2\n'
+          'zip/<@http://pub.dartlang.org/stuff.js:0\n'
+          'zip.zap(12, "@)()/<")@http://pub.dartlang.org/thing.js:1');
 
       expect(trace.frames[0].uri,
           equals(Uri.parse("http://pub.dartlang.org/stuff.js")));
@@ -218,9 +214,9 @@ void main() {
     });
 
     test('parses a package:stack_trace stack trace correctly', () {
-      var trace = new Trace.parse(
-          'http://dartlang.org/foo/bar.dart 10:11  Foo.<fn>.bar\n'
-          'http://dartlang.org/foo/baz.dart        Foo.<fn>.bar');
+      var trace =
+          Trace.parse('http://dartlang.org/foo/bar.dart 10:11  Foo.<fn>.bar\n'
+              'http://dartlang.org/foo/baz.dart        Foo.<fn>.bar');
 
       expect(trace.frames[0].uri,
           equals(Uri.parse("http://dartlang.org/foo/bar.dart")));
@@ -229,12 +225,12 @@ void main() {
     });
 
     test('parses a package:stack_trace stack chain correctly', () {
-      var trace = new Trace.parse(
-          'http://dartlang.org/foo/bar.dart 10:11  Foo.<fn>.bar\n'
-          'http://dartlang.org/foo/baz.dart        Foo.<fn>.bar\n'
-          '===== asynchronous gap ===========================\n'
-          'http://dartlang.org/foo/bang.dart 10:11  Foo.<fn>.bar\n'
-          'http://dartlang.org/foo/quux.dart        Foo.<fn>.bar');
+      var trace =
+          Trace.parse('http://dartlang.org/foo/bar.dart 10:11  Foo.<fn>.bar\n'
+              'http://dartlang.org/foo/baz.dart        Foo.<fn>.bar\n'
+              '===== asynchronous gap ===========================\n'
+              'http://dartlang.org/foo/bang.dart 10:11  Foo.<fn>.bar\n'
+              'http://dartlang.org/foo/quux.dart        Foo.<fn>.bar');
 
       expect(trace.frames[0].uri,
           equals(Uri.parse("http://dartlang.org/foo/bar.dart")));
@@ -247,19 +243,19 @@ void main() {
     });
 
     test('parses a real package:stack_trace stack trace correctly', () {
-      var traceString = new Trace.current().toString();
-      expect(new Trace.parse(traceString).toString(), equals(traceString));
+      var traceString = Trace.current().toString();
+      expect(Trace.parse(traceString).toString(), equals(traceString));
     });
 
     test('parses an empty string correctly', () {
-      var trace = new Trace.parse('');
+      var trace = Trace.parse('');
       expect(trace.frames, isEmpty);
       expect(trace.toString(), equals(''));
     });
   });
 
   test('.toString() nicely formats the stack trace', () {
-    var trace = new Trace.parse('''
+    var trace = Trace.parse('''
 #0      Foo._bar (foo/bar.dart:42:21)
 #1      zip.<anonymous closure>.zap (dart:async/future.dart:0:2)
 #2      zip.<anonymous closure>.zap (http://pub.dartlang.org/thing.dart:1:100)
@@ -274,10 +270,10 @@ http://pub.dartlang.org/thing.dart 1:100  zip.<fn>.zap
 
   test('.vmTrace returns a native-style trace', () {
     var uri = path.toUri(path.absolute('foo'));
-    var trace = new Trace([
-      new Frame(uri, 10, 20, 'Foo.<fn>'),
-      new Frame(Uri.parse('http://dartlang.org/foo.dart'), null, null, 'bar'),
-      new Frame(Uri.parse('dart:async'), 15, null, 'baz'),
+    var trace = Trace([
+      Frame(uri, 10, 20, 'Foo.<fn>'),
+      Frame(Uri.parse('http://dartlang.org/foo.dart'), null, null, 'bar'),
+      Frame(Uri.parse('dart:async'), 15, null, 'baz'),
     ]);
 
     expect(
@@ -290,7 +286,7 @@ http://pub.dartlang.org/thing.dart 1:100  zip.<fn>.zap
   group("folding", () {
     group(".terse", () {
       test('folds core frames together bottom-up', () {
-        var trace = new Trace.parse('''
+        var trace = Trace.parse('''
 #1 top (dart:async/future.dart:0:2)
 #2 bottom (dart:core/uri.dart:1:100)
 #0 notCore (foo.dart:42:21)
@@ -308,7 +304,7 @@ bar.dart 10:20  alsoNotCore
       });
 
       test('folds empty async frames', () {
-        var trace = new Trace.parse('''
+        var trace = Trace.parse('''
 #0 top (dart:async/future.dart:0:2)
 #1 empty.<<anonymous closure>_async_body> (bar.dart)
 #2 bottom (dart:async-patch/future.dart:9:11)
@@ -322,7 +318,7 @@ foo.dart 42:21  notCore
       });
 
       test('removes the bottom-most async frame', () {
-        var trace = new Trace.parse('''
+        var trace = Trace.parse('''
 #0 notCore (foo.dart:42:21)
 #1 top (dart:async/future.dart:0:2)
 #2 bottom (dart:core/uri.dart:1:100)
@@ -336,7 +332,7 @@ foo.dart 42:21  notCore
       });
 
       test("won't make a trace empty", () {
-        var trace = new Trace.parse('''
+        var trace = Trace.parse('''
 #1 top (dart:async/future.dart:0:2)
 #2 bottom (dart:core/uri.dart:1:100)
 ''');
@@ -347,13 +343,13 @@ dart:core  bottom
       });
 
       test("won't panic on an empty trace", () {
-        expect(new Trace.parse("").terse.toString(), equals(""));
+        expect(Trace.parse("").terse.toString(), equals(""));
       });
     });
 
     group(".foldFrames", () {
       test('folds frames together bottom-up', () {
-        var trace = new Trace.parse('''
+        var trace = Trace.parse('''
 #0 notFoo (foo.dart:42:21)
 #1 fooTop (bar.dart:0:2)
 #2 fooBottom (foo.dart:1:100)
@@ -373,7 +369,7 @@ dart:async-patch/future.dart 9:11  fooBottom
       });
 
       test('will never fold unparsed frames', () {
-        var trace = new Trace.parse(r'''
+        var trace = Trace.parse(r'''
 .g"cs$#:b";a#>sw{*{ul$"$xqwr`p
 %+j-?uppx<([j@#nu{{>*+$%x-={`{
 !e($b{nj)zs?cgr%!;bmw.+$j+pfj~
@@ -388,7 +384,7 @@ dart:async-patch/future.dart 9:11  fooBottom
 
       group("with terse: true", () {
         test('folds core frames as well', () {
-          var trace = new Trace.parse('''
+          var trace = Trace.parse('''
 #0 notFoo (foo.dart:42:21)
 #1 fooTop (bar.dart:0:2)
 #2 coreBottom (dart:async/future.dart:0:2)
@@ -408,7 +404,7 @@ bar.dart 10:20  alsoNotFoo
         });
 
         test('shortens folded frames', () {
-          var trace = new Trace.parse('''
+          var trace = Trace.parse('''
 #0 notFoo (foo.dart:42:21)
 #1 fooTop (bar.dart:0:2)
 #2 fooBottom (package:foo/bar.dart:0:2)
@@ -431,7 +427,7 @@ bar.dart 20:20  againNotFoo
         });
 
         test('removes the bottom-most folded frame', () {
-          var trace = new Trace.parse('''
+          var trace = Trace.parse('''
 #2 fooTop (package:foo/bar.dart:0:2)
 #3 notFoo (bar.dart:10:20)
 #5 fooBottom (foo/bar.dart:9:11)

@@ -8,7 +8,7 @@ import 'lazy_trace.dart';
 import 'trace.dart';
 
 /// A thunk for lazily constructing a [Chain].
-typedef Chain ChainThunk();
+typedef ChainThunk = Chain Function();
 
 /// A wrapper around a [ChainThunk]. This works around issue 9579 by avoiding
 /// the conversion of native [StackTrace]s to strings until it's absolutely
@@ -26,8 +26,8 @@ class LazyChain implements Chain {
 
   List<Trace> get traces => _chain.traces;
   Chain get terse => _chain.terse;
-  Chain foldFrames(bool predicate(Frame frame), {bool terse: false}) =>
-      new LazyChain(() => _chain.foldFrames(predicate, terse: terse));
-  Trace toTrace() => new LazyTrace(() => _chain.toTrace());
+  Chain foldFrames(bool predicate(Frame frame), {bool terse = false}) =>
+      LazyChain(() => _chain.foldFrames(predicate, terse: terse));
+  Trace toTrace() => LazyTrace(() => _chain.toTrace());
   String toString() => _chain.toString();
 }

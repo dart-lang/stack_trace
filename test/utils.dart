@@ -18,7 +18,7 @@ Matcher frameLibrary(matcher) =>
 /// [description] should be a noun phrase that describes the relation of the
 /// output of [transformation] to its input.
 Matcher transform(transformation(value), matcher, String description) =>
-    new _TransformMatcher(transformation, wrapMatcher(matcher), description);
+    _TransformMatcher(transformation, wrapMatcher(matcher), description);
 
 class _TransformMatcher extends Matcher {
   final Function _transformation;
