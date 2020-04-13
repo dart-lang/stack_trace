@@ -19,13 +19,13 @@ String getStackTraceString() => StackTrace.current.toString();
 StackTrace getStackTraceObject() => StackTrace.current;
 
 Frame getCaller([int level]) {
-  if (level == null) return new Frame.caller();
-  return new Frame.caller(level);
+  if (level == null) return Frame.caller();
+  return Frame.caller(level);
 }
 
 Frame nestedGetCaller(int level) => getCaller(level);
 
-Trace getCurrentTrace([int level]) => new Trace.current(level);
+Trace getCurrentTrace([int level]) => Trace.current(level);
 
 Trace nestedGetCurrentTrace(int level) => getCurrentTrace(level);
 
@@ -33,14 +33,14 @@ void main() {
   group('Trace', () {
     test('.parse parses a real stack trace correctly', () {
       var string = getStackTraceString();
-      var trace = new Trace.parse(string);
+      var trace = Trace.parse(string);
       expect(path.url.basename(trace.frames.first.uri.path),
           equals('vm_test.dart'));
       expect(trace.frames.first.member, equals('getStackTraceString'));
     });
 
     test('converts from a native stack trace correctly', () {
-      var trace = new Trace.from(getStackTraceObject());
+      var trace = Trace.from(getStackTraceObject());
       expect(path.url.basename(trace.frames.first.uri.path),
           equals('vm_test.dart'));
       expect(trace.frames.first.member, equals('getStackTraceObject'));
@@ -53,7 +53,7 @@ void main() {
       try {
         overflow();
       } catch (_, stackTrace) {
-        trace = new Trace.from(stackTrace);
+        trace = Trace.from(stackTrace);
       }
 
       expect(trace.frames.first.member, equals('main.<fn>.<fn>.overflow'));
@@ -62,12 +62,12 @@ void main() {
     group('.current()', () {
       test('with no argument returns a trace starting at the current frame',
           () {
-        var trace = new Trace.current();
+        var trace = Trace.current();
         expect(trace.frames.first.member, equals('main.<fn>.<fn>.<fn>'));
       });
 
       test('at level 0 returns a trace starting at the current frame', () {
-        var trace = new Trace.current(0);
+        var trace = Trace.current(0);
         expect(trace.frames.first.member, equals('main.<fn>.<fn>.<fn>'));
       });
 
@@ -82,7 +82,7 @@ void main() {
       });
 
       test('throws an ArgumentError for negative levels', () {
-        expect(() => new Trace.current(-1), throwsArgumentError);
+        expect(() => Trace.current(-1), throwsArgumentError);
       });
     });
   });
@@ -105,7 +105,7 @@ void main() {
     });
 
     test('throws an ArgumentError for negative levels', () {
-      expect(() => new Frame.caller(-1), throwsArgumentError);
+      expect(() => Frame.caller(-1), throwsArgumentError);
     });
   });
 }

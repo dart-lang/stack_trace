@@ -10,26 +10,26 @@ import 'package:test/test.dart';
 
 import 'utils.dart';
 
-typedef void ChainErrorCallback(stack, Chain chain);
+typedef ChainErrorCallback = void Function(dynamic stack, Chain chain);
 
 void main() {
   group('Chain.parse()', () {
     test('parses a real Chain', () {
       return captureFuture(() => inMicrotask(() => throw 'error'))
           .then((chain) {
-        expect(new Chain.parse(chain.toString()).toString(),
-            equals(chain.toString()));
+        expect(
+            Chain.parse(chain.toString()).toString(), equals(chain.toString()));
       });
     });
 
     test('parses an empty string', () {
-      var chain = new Chain.parse('');
+      var chain = Chain.parse('');
       expect(chain.traces, isEmpty);
     });
 
     test('parses a chain containing empty traces', () {
       var chain =
-          new Chain.parse('===== asynchronous gap ===========================\n'
+          Chain.parse('===== asynchronous gap ===========================\n'
               '===== asynchronous gap ===========================\n');
       expect(chain.traces, hasLength(3));
       expect(chain.traces[0].frames, isEmpty);
@@ -41,7 +41,7 @@ void main() {
   group("Chain.capture()", () {
     test("with onError blocks errors", () {
       Chain.capture(() {
-        return new Future.error("oh no");
+        return Future.error("oh no");
       }, onError: expectAsync2((error, chain) {
         expect(error, equals("oh no"));
         expect(chain, TypeMatcher<Chain>());
@@ -50,8 +50,7 @@ void main() {
 
     test("with no onError blocks errors", () {
       runZoned(() {
-        var future =
-            Chain.capture(() => new Future.error("oh no"), when: false);
+        var future = Chain.capture(() => Future.error("oh no"), when: false);
         future.then(expectAsync1((_) {}, count: 0));
       }, onError: expectAsync2((error, chain) {
         expect(error, equals("oh no"));
@@ -60,7 +59,7 @@ void main() {
     });
 
     test("with errorZone: false doesn't block errors", () {
-      expect(Chain.capture(() => new Future.error("oh no"), errorZone: false),
+      expect(Chain.capture(() => Future.error("oh no"), errorZone: false),
           throwsA("oh no"));
     });
 
@@ -71,13 +70,13 @@ void main() {
 
     group("with when: false", () {
       test("with no onError doesn't block errors", () {
-        expect(Chain.capture(() => new Future.error("oh no"), when: false),
+        expect(Chain.capture(() => Future.error("oh no"), when: false),
             throwsA("oh no"));
       });
 
       test("with onError blocks errors", () {
         Chain.capture(() {
-          return new Future.error("oh no");
+          return Future.error("oh no");
         }, onError: expectAsync2((error, chain) {
           expect(error, equals("oh no"));
           expect(chain, TypeMatcher<Chain>());
@@ -87,9 +86,9 @@ void main() {
       test("doesn't enable chain-tracking", () {
         return Chain.disable(() {
           return Chain.capture(() {
-            var completer = new Completer();
+            var completer = Completer();
             inMicrotask(() {
-              completer.complete(new Chain.current());
+              completer.complete(Chain.current());
             });
 
             return completer.future.then((chain) {
@@ -104,8 +103,8 @@ void main() {
   group("Chain.disable()", () {
     test("disables chain-tracking", () {
       return Chain.disable(() {
-        var completer = new Completer();
-        inMicrotask(() => completer.complete(new Chain.current()));
+        var completer = Completer();
+        inMicrotask(() => completer.complete(Chain.current()));
 
         return completer.future.then((chain) {
           expect(chain.traces, hasLength(1));
@@ -116,8 +115,8 @@ void main() {
     test("Chain.capture() re-enables chain-tracking", () {
       return Chain.disable(() {
         return Chain.capture(() {
-          var completer = new Completer();
-          inMicrotask(() => completer.complete(new Chain.current()));
+          var completer = Completer();
+          inMicrotask(() => completer.complete(Chain.current()));
 
           return completer.future.then((chain) {
             expect(chain.traces, hasLength(2));
@@ -151,8 +150,8 @@ void main() {
     test("with when: false doesn't disable", () {
       return Chain.capture(() {
         return Chain.disable(() {
-          var completer = new Completer();
-          inMicrotask(() => completer.complete(new Chain.current()));
+          var completer = Completer();
+          inMicrotask(() => completer.complete(Chain.current()));
 
           return completer.future.then((chain) {
             expect(chain.traces, hasLength(2));
@@ -163,9 +162,9 @@ void main() {
   });
 
   test("toString() ensures that all traces are aligned", () {
-    var chain = new Chain([
-      new Trace.parse('short 10:11  Foo.bar\n'),
-      new Trace.parse('loooooooooooong 10:11  Zop.zoop')
+    var chain = Chain([
+      Trace.parse('short 10:11  Foo.bar\n'),
+      Trace.parse('loooooooooooong 10:11  Zop.zoop')
     ]);
 
     expect(
@@ -178,13 +177,13 @@ void main() {
   var userSlashCode = p.join('user', 'code.dart');
   group('Chain.terse', () {
     test('makes each trace terse', () {
-      var chain = new Chain([
-        new Trace.parse('dart:core 10:11       Foo.bar\n'
+      var chain = Chain([
+        Trace.parse('dart:core 10:11       Foo.bar\n'
             'dart:core 10:11       Bar.baz\n'
             'user/code.dart 10:11  Bang.qux\n'
             'dart:core 10:11       Zip.zap\n'
             'dart:core 10:11       Zop.zoop'),
-        new Trace.parse('user/code.dart 10:11                        Bang.qux\n'
+        Trace.parse('user/code.dart 10:11                        Bang.qux\n'
             'dart:core 10:11                             Foo.bar\n'
             'package:stack_trace/stack_trace.dart 10:11  Bar.baz\n'
             'dart:core 10:11                             Zip.zap\n'
@@ -202,13 +201,13 @@ void main() {
     });
 
     test('eliminates internal-only traces', () {
-      var chain = new Chain([
-        new Trace.parse('user/code.dart 10:11  Foo.bar\n'
+      var chain = Chain([
+        Trace.parse('user/code.dart 10:11  Foo.bar\n'
             'dart:core 10:11       Bar.baz'),
-        new Trace.parse('dart:core 10:11                             Foo.bar\n'
+        Trace.parse('dart:core 10:11                             Foo.bar\n'
             'package:stack_trace/stack_trace.dart 10:11  Bar.baz\n'
             'dart:core 10:11                             Zip.zap'),
-        new Trace.parse('user/code.dart 10:11  Foo.bar\n'
+        Trace.parse('user/code.dart 10:11  Foo.bar\n'
             'dart:core 10:11       Bar.baz')
       ]);
 
@@ -220,11 +219,11 @@ void main() {
     });
 
     test("doesn't return an empty chain", () {
-      var chain = new Chain([
-        new Trace.parse('dart:core 10:11                             Foo.bar\n'
+      var chain = Chain([
+        Trace.parse('dart:core 10:11                             Foo.bar\n'
             'package:stack_trace/stack_trace.dart 10:11  Bar.baz\n'
             'dart:core 10:11                             Zip.zap'),
-        new Trace.parse('dart:core 10:11                             A.b\n'
+        Trace.parse('dart:core 10:11                             A.b\n'
             'package:stack_trace/stack_trace.dart 10:11  C.d\n'
             'dart:core 10:11                             E.f')
       ]);
@@ -234,10 +233,10 @@ void main() {
 
     // Regression test for #9
     test("doesn't crash on empty traces", () {
-      var chain = new Chain([
-        new Trace.parse('user/code.dart 10:11  Bang.qux'),
-        new Trace([]),
-        new Trace.parse('user/code.dart 10:11  Bang.qux')
+      var chain = Chain([
+        Trace.parse('user/code.dart 10:11  Bang.qux'),
+        Trace([]),
+        Trace.parse('user/code.dart 10:11  Bang.qux')
       ]);
 
       expect(
@@ -250,13 +249,13 @@ void main() {
 
   group('Chain.foldFrames', () {
     test('folds each trace', () {
-      var chain = new Chain([
-        new Trace.parse('a.dart 10:11  Foo.bar\n'
+      var chain = Chain([
+        Trace.parse('a.dart 10:11  Foo.bar\n'
             'a.dart 10:11  Bar.baz\n'
             'b.dart 10:11  Bang.qux\n'
             'a.dart 10:11  Zip.zap\n'
             'a.dart 10:11  Zop.zoop'),
-        new Trace.parse('a.dart 10:11  Foo.bar\n'
+        Trace.parse('a.dart 10:11  Foo.bar\n'
             'a.dart 10:11  Bar.baz\n'
             'a.dart 10:11  Bang.qux\n'
             'a.dart 10:11  Zip.zap\n'
@@ -275,13 +274,13 @@ void main() {
     });
 
     test('with terse: true, folds core frames as well', () {
-      var chain = new Chain([
-        new Trace.parse('a.dart 10:11                        Foo.bar\n'
+      var chain = Chain([
+        Trace.parse('a.dart 10:11                        Foo.bar\n'
             'dart:async-patch/future.dart 10:11  Zip.zap\n'
             'b.dart 10:11                        Bang.qux\n'
             'dart:core 10:11                     Bar.baz\n'
             'a.dart 10:11                        Zop.zoop'),
-        new Trace.parse('a.dart 10:11  Foo.bar\n'
+        Trace.parse('a.dart 10:11  Foo.bar\n'
             'a.dart 10:11  Bar.baz\n'
             'a.dart 10:11  Bang.qux\n'
             'a.dart 10:11  Zip.zap\n'
@@ -300,12 +299,12 @@ void main() {
     });
 
     test('eliminates completely-folded traces', () {
-      var chain = new Chain([
-        new Trace.parse('a.dart 10:11  Foo.bar\n'
+      var chain = Chain([
+        Trace.parse('a.dart 10:11  Foo.bar\n'
             'b.dart 10:11  Bang.qux'),
-        new Trace.parse('a.dart 10:11  Foo.bar\n'
+        Trace.parse('a.dart 10:11  Foo.bar\n'
             'a.dart 10:11  Bang.qux'),
-        new Trace.parse('a.dart 10:11  Zip.zap\n'
+        Trace.parse('a.dart 10:11  Zip.zap\n'
             'b.dart 10:11  Zop.zoop')
       ]);
 
@@ -320,8 +319,8 @@ void main() {
     });
 
     test("doesn't return an empty trace", () {
-      var chain = new Chain([
-        new Trace.parse('a.dart 10:11  Foo.bar\n'
+      var chain = Chain([
+        Trace.parse('a.dart 10:11  Foo.bar\n'
             'a.dart 10:11  Bang.qux')
       ]);
 
@@ -331,10 +330,10 @@ void main() {
   });
 
   test('Chain.toTrace eliminates asynchronous gaps', () {
-    var trace = new Chain([
-      new Trace.parse('user/code.dart 10:11  Foo.bar\n'
+    var trace = Chain([
+      Trace.parse('user/code.dart 10:11  Foo.bar\n'
           'dart:core 10:11       Bar.baz'),
-      new Trace.parse('user/code.dart 10:11  Foo.bar\n'
+      Trace.parse('user/code.dart 10:11  Foo.bar\n'
           'dart:core 10:11       Bar.baz')
     ]).toTrace();
 

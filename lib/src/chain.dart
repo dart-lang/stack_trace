@@ -13,10 +13,10 @@ import 'utils.dart';
 
 /// A function that handles errors in the zone wrapped by [Chain.capture].
 @Deprecated("Will be removed in stack_trace 2.0.0.")
-typedef void ChainHandler(error, Chain chain);
+typedef ChainHandler = void Function(dynamic error, Chain chain);
 
 /// An opaque key used to track the current [StackZoneSpecification].
-final _specKey = new Object();
+final _specKey = Object();
 
 /// A chain of stack traces.
 ///
@@ -73,10 +73,10 @@ class Chain implements StackTrace {
   /// If [callback] returns a value, it will be returned by [capture] as well.
   static T capture<T>(T callback(),
       {void onError(error, Chain chain),
-      bool when: true,
-      bool errorZone: true}) {
+      bool when = true,
+      bool errorZone = true}) {
     if (!errorZone && onError != null) {
-      throw new ArgumentError.value(
+      throw ArgumentError.value(
           onError, "onError", "must be null if errorZone is false");
     }
 
@@ -87,15 +87,15 @@ class Chain implements StackTrace {
           onError(
               error,
               stackTrace == null
-                  ? new Chain.current()
-                  : new Chain.forTrace(stackTrace));
+                  ? Chain.current()
+                  : Chain.forTrace(stackTrace));
         };
       }
 
       return runZoned(callback, onError: newOnError);
     }
 
-    var spec = new StackZoneSpecification(onError, errorZone: errorZone);
+    var spec = StackZoneSpecification(onError, errorZone: errorZone);
     return runZoned(() {
       try {
         return callback();
@@ -113,7 +113,7 @@ class Chain implements StackTrace {
   /// [callback] in a [Zone] in which chain capturing is disabled.
   ///
   /// If [callback] returns a value, it will be returned by [disable] as well.
-  static T disable<T>(T callback(), {bool when: true}) {
+  static T disable<T>(T callback(), {bool when = true}) {
     var zoneValues =
         when ? {_specKey: null, StackZoneSpecification.disableKey: true} : null;
 
@@ -139,14 +139,13 @@ class Chain implements StackTrace {
   factory Chain.current([int level = 0]) {
     if (_currentSpec != null) return _currentSpec.currentChain(level + 1);
 
-    var chain = new Chain.forTrace(StackTrace.current);
-    return new LazyChain(() {
+    var chain = Chain.forTrace(StackTrace.current);
+    return LazyChain(() {
       // JS includes a frame for the call to StackTrace.current, but the VM
       // doesn't, so we skip an extra frame in a JS context.
-      var first = new Trace(
-          chain.traces.first.frames.skip(level + (inJS ? 2 : 1)),
+      var first = Trace(chain.traces.first.frames.skip(level + (inJS ? 2 : 1)),
           original: chain.traces.first.original.toString());
-      return new Chain([first]..addAll(chain.traces.skip(1)));
+      return Chain([first]..addAll(chain.traces.skip(1)));
     });
   }
 
@@ -161,8 +160,8 @@ class Chain implements StackTrace {
   factory Chain.forTrace(StackTrace trace) {
     if (trace is Chain) return trace;
     if (_currentSpec != null) return _currentSpec.chainFor(trace);
-    if (trace is Trace) return new Chain([trace]);
-    return new LazyChain(() => new Chain.parse(trace.toString()));
+    if (trace is Trace) return Chain([trace]);
+    return LazyChain(() => Chain.parse(trace.toString()));
   }
 
   /// Parses a string representation of a stack chain.
@@ -171,19 +170,19 @@ class Chain implements StackTrace {
   /// as a full stack chain. Otherwise, it will be parsed as in [Trace.parse]
   /// and returned as a single-trace chain.
   factory Chain.parse(String chain) {
-    if (chain.isEmpty) return new Chain([]);
+    if (chain.isEmpty) return Chain([]);
     if (chain.contains(vmChainGap)) {
-      return new Chain(
-          chain.split(vmChainGap).map((trace) => new Trace.parseVM(trace)));
+      return Chain(
+          chain.split(vmChainGap).map((trace) => Trace.parseVM(trace)));
     }
-    if (!chain.contains(chainGap)) return new Chain([new Trace.parse(chain)]);
+    if (!chain.contains(chainGap)) return Chain([Trace.parse(chain)]);
 
-    return new Chain(
-        chain.split(chainGap).map((trace) => new Trace.parseFriendly(trace)));
+    return Chain(
+        chain.split(chainGap).map((trace) => Trace.parseFriendly(trace)));
   }
 
   /// Returns a new [Chain] comprised of [traces].
-  Chain(Iterable<Trace> traces) : traces = new List<Trace>.unmodifiable(traces);
+  Chain(Iterable<Trace> traces) : traces = List<Trace>.unmodifiable(traces);
 
   /// Returns a terser version of [this].
   ///
@@ -211,7 +210,7 @@ class Chain implements StackTrace {
   /// If [terse] is true, this will also fold together frames from the core
   /// library or from this package, and simplify core library frames as in
   /// [Trace.terse].
-  Chain foldFrames(bool predicate(Frame frame), {bool terse: false}) {
+  Chain foldFrames(bool predicate(Frame frame), {bool terse = false}) {
     var foldedTraces =
         traces.map((trace) => trace.foldFrames(predicate, terse: terse));
     var nonEmptyTraces = foldedTraces.where((trace) {
@@ -229,17 +228,17 @@ class Chain implements StackTrace {
     // If all the traces contain only internal processing, preserve the last
     // (top-most) one so that the chain isn't empty.
     if (nonEmptyTraces.isEmpty && foldedTraces.isNotEmpty) {
-      return new Chain([foldedTraces.last]);
+      return Chain([foldedTraces.last]);
     }
 
-    return new Chain(nonEmptyTraces);
+    return Chain(nonEmptyTraces);
   }
 
   /// Converts [this] to a [Trace].
   ///
   /// The trace version of a chain is just the concatenation of all the traces
   /// in the chain.
-  Trace toTrace() => new Trace(traces.expand((trace) => trace.frames));
+  Trace toTrace() => Trace(traces.expand((trace) => trace.frames));
 
   String toString() {
     // Figure out the longest path so we know how much to pad.

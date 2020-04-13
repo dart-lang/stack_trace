@@ -6,7 +6,7 @@ import 'frame.dart';
 import 'trace.dart';
 
 /// A thunk for lazily constructing a [Trace].
-typedef Trace TraceThunk();
+typedef TraceThunk = Trace Function();
 
 /// A wrapper around a [TraceThunk]. This works around issue 9579 by avoiding
 /// the conversion of native [StackTrace]s to strings until it's absolutely
@@ -25,11 +25,11 @@ class LazyTrace implements Trace {
   List<Frame> get frames => _trace.frames;
   StackTrace get original => _trace.original;
   StackTrace get vmTrace => _trace.vmTrace;
-  Trace get terse => new LazyTrace(() => _trace.terse);
-  Trace foldFrames(bool predicate(Frame frame), {bool terse: false}) =>
-      new LazyTrace(() => _trace.foldFrames(predicate, terse: terse));
+  Trace get terse => LazyTrace(() => _trace.terse);
+  Trace foldFrames(bool predicate(Frame frame), {bool terse = false}) =>
+      LazyTrace(() => _trace.foldFrames(predicate, terse: terse));
   String toString() => _trace.toString();
 
   // Work around issue 14075.
-  set frames(_) => throw new UnimplementedError();
+  set frames(_) => throw UnimplementedError();
 }

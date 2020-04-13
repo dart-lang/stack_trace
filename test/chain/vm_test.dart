@@ -31,8 +31,8 @@ void main() {
 
       // Because there's no chain context for a synchronous error, we fall back
       // on the VM's stack chain tracking.
-      expect(chain.toString(),
-          equals(new Chain.parse(vmTrace.toString()).toString()));
+      expect(
+          chain.toString(), equals(Chain.parse(vmTrace.toString()).toString()));
     });
 
     test('thrown in a microtask', () {
@@ -137,7 +137,7 @@ void main() {
     });
 
     test('multiple times', () {
-      var completer = new Completer();
+      var completer = Completer();
       var first = true;
 
       Chain.capture(() {
@@ -165,7 +165,7 @@ void main() {
     });
 
     test('passed to a completer', () {
-      var trace = new Trace.current();
+      var trace = Trace.current();
       return captureFuture(() {
         inMicrotask(() => completerErrorFuture(trace));
       }).then((chain) {
@@ -206,7 +206,7 @@ void main() {
     });
 
     test('passed to a stream controller', () {
-      var trace = new Trace.current();
+      var trace = Trace.current();
       return captureFuture(() {
         inMicrotask(() => controllerErrorStream(trace).listen(null));
       }).then((chain) {
@@ -232,7 +232,7 @@ void main() {
     });
 
     test('and relays them to the parent zone', () {
-      var completer = new Completer();
+      var completer = Completer();
 
       runZoned(() {
         Chain.capture(() {
@@ -260,7 +260,7 @@ void main() {
   });
 
   test('capture() without onError passes exceptions to parent zone', () {
-    var completer = new Completer();
+    var completer = Completer();
 
     runZoned(() {
       Chain.capture(() => inMicrotask(() => throw 'error'));
@@ -281,9 +281,9 @@ void main() {
 
   group('current() within capture()', () {
     test('called in a microtask', () {
-      var completer = new Completer();
+      var completer = Completer();
       Chain.capture(() {
-        inMicrotask(() => completer.complete(new Chain.current()));
+        inMicrotask(() => completer.complete(Chain.current()));
       });
 
       return completer.future.then((chain) {
@@ -295,9 +295,9 @@ void main() {
     });
 
     test('called in a one-shot timer', () {
-      var completer = new Completer();
+      var completer = Completer();
       Chain.capture(() {
-        inOneShotTimer(() => completer.complete(new Chain.current()));
+        inOneShotTimer(() => completer.complete(Chain.current()));
       });
 
       return completer.future.then((chain) {
@@ -309,9 +309,9 @@ void main() {
     });
 
     test('called in a periodic timer', () {
-      var completer = new Completer();
+      var completer = Completer();
       Chain.capture(() {
-        inPeriodicTimer(() => completer.complete(new Chain.current()));
+        inPeriodicTimer(() => completer.complete(Chain.current()));
       });
 
       return completer.future.then((chain) {
@@ -323,11 +323,11 @@ void main() {
     });
 
     test('called in a nested series of asynchronous operations', () {
-      var completer = new Completer();
+      var completer = Completer();
       Chain.capture(() {
         inPeriodicTimer(() {
           inOneShotTimer(() {
-            inMicrotask(() => completer.complete(new Chain.current()));
+            inMicrotask(() => completer.complete(Chain.current()));
           });
         });
       });
@@ -345,9 +345,9 @@ void main() {
     });
 
     test('called in a long future chain', () {
-      var completer = new Completer();
+      var completer = Completer();
       Chain.capture(() {
-        inFutureChain(() => completer.complete(new Chain.current()));
+        inFutureChain(() => completer.complete(Chain.current()));
       });
 
       return completer.future.then((chain) {
@@ -364,8 +364,8 @@ void main() {
       'trace', () {
     // The test runner runs all tests with chains enabled.
     return Chain.disable(() {
-      var completer = new Completer();
-      inMicrotask(() => completer.complete(new Chain.current()));
+      var completer = Completer();
+      inMicrotask(() => completer.complete(Chain.current()));
 
       return completer.future.then((chain) {
         // Since the chain wasn't loaded within [Chain.capture], the full stack
@@ -463,7 +463,7 @@ void main() {
           throw 'error';
         } catch (_, stackTrace) {
           trace = stackTrace;
-          return new Chain.forTrace(stackTrace);
+          return Chain.forTrace(stackTrace);
         }
       });
 
@@ -472,7 +472,7 @@ void main() {
       // Assert that we've trimmed the VM's stack chains here to avoid
       // duplication.
       expect(chain.traces.first.toString(),
-          equals(new Chain.parse(trace.toString()).traces.first.toString()));
+          equals(Chain.parse(trace.toString()).traces.first.toString()));
     });
   });
 
@@ -490,7 +490,7 @@ void main() {
         }
       });
 
-      var chain = new Chain.forTrace(trace);
+      var chain = Chain.forTrace(trace);
       expect(chain.traces,
           hasLength(vmChainGap.allMatches(trace.toString()).length + 1));
       expect(
