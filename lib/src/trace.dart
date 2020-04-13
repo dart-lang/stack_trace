@@ -28,10 +28,12 @@ final _v8Trace = new RegExp(r"\n    ?at ");
 final _v8TraceLine = new RegExp(r"    ?at ");
 
 /// A RegExp to match Firefox's eval and Function stack traces.
+///
 /// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/stack
+///
 /// These stack traces looks like:
-/// anonymous/<@http://pub.dartlang.org/stuff.js line 693 > Function:3:40
-/// anonymous/<@http://pub.dartlang.org/stuff.js line 693 > eval:3:40
+///     anonymous/<@http://pub.dartlang.org/stuff.js line 693 > Function:3:40
+///     anonymous/<@http://pub.dartlang.org/stuff.js line 693 > eval:3:40
 final _firefoxEvalTrace =
     new RegExp(r"@\S+ line \d+ >.* (Function|eval):\d+:\d+");
 
@@ -172,8 +174,8 @@ class Trace implements StackTrace {
             trace
                 .split("\n")
                 .skip(1)
-                // It's possible that an Exception's description contains a line that
-                // looks like a V8 trace line, which will screw this up.
+                // It's possible that an Exception's description contains a line
+                // that looks like a V8 trace line, which will screw this up.
                 // Unfortunately, that's impossible to detect.
                 .skipWhile((line) => !line.startsWith(_v8TraceLine))
                 .map((line) => new Frame.parseV8(line)),

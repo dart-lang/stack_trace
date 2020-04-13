@@ -259,13 +259,12 @@ baz@http://pub.dartlang.org/buz.js:56355:55
       expect(trace.frames[2].member, equals("baz"));
     });
 
-    test(
-        'parses a Firefox stack trace with nested evals in anonymous function correctly',
+    test('parses a Firefox stack trace with nested evals in anonymous function',
         () {
       var trace = new Trace.parse('''
         Foo._bar@http://pub.dartlang.org/stuff.js:18056:12
         anonymous@file:///C:/example.html line 7 > eval line 1 > eval:1:1
-        anonymous@file:///C:/example.html line 45 > Function:1:1 
+        anonymous@file:///C:/example.html line 45 > Function:1:1
         ''');
       expect(trace.frames[0].uri,
           equals(Uri.parse("http://pub.dartlang.org/stuff.js")));
