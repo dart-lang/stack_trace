@@ -659,6 +659,6 @@ baz@http://pub.dartlang.org/buz.js:56355:55
 
 void expectIsUnparsed(Frame constructor(String text), String text) {
   var frame = constructor(text);
-  expect(frame, new isInstanceOf<UnparsedFrame>());
+  expect(frame, isA<UnparsedFrame>());
   expect(frame.toString(), equals(text));
 }
