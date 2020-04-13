@@ -4,7 +4,7 @@ description: A package for manipulating stack traces and printing them readably.
 homepage: https://github.com/dart-lang/stack_trace
 
 environment:
-  sdk: '>=1.23.0 <3.0.0'
+  sdk: '>=2.0.0 <3.0.0'
 
 dependencies:
   path: ^1.2.0

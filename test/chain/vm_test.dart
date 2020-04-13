@@ -246,7 +246,7 @@ void main() {
       }, onError: (error, chain) {
         try {
           expect(error, equals('error'));
-          expect(chain, new isInstanceOf<Chain>());
+          expect(chain, TypeMatcher<Chain>());
           expect(chain.traces[1].frames,
               contains(frameMember(startsWith('inMicrotask'))));
           completer.complete();
@@ -267,7 +267,7 @@ void main() {
     }, onError: (error, chain) {
       try {
         expect(error, equals('error'));
-        expect(chain, new isInstanceOf<Chain>());
+        expect(chain, TypeMatcher<Chain>());
         expect(chain.traces[1].frames,
             contains(frameMember(startsWith('inMicrotask'))));
         completer.complete();

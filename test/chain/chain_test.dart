@@ -44,7 +44,7 @@ void main() {
         return new Future.error("oh no");
       }, onError: expectAsync2((error, chain) {
         expect(error, equals("oh no"));
-        expect(chain, new isInstanceOf<Chain>());
+        expect(chain, TypeMatcher<Chain>());
       }));
     });
 
@@ -55,7 +55,7 @@ void main() {
         future.then(expectAsync1((_) {}, count: 0));
       }, onError: expectAsync2((error, chain) {
         expect(error, equals("oh no"));
-        expect(chain, new isInstanceOf<Chain>());
+        expect(chain, TypeMatcher<Chain>());
       }));
     });
 
@@ -80,7 +80,7 @@ void main() {
           return new Future.error("oh no");
         }, onError: expectAsync2((error, chain) {
           expect(error, equals("oh no"));
-          expect(chain, new isInstanceOf<Chain>());
+          expect(chain, TypeMatcher<Chain>());
         }), when: false);
       });
 
