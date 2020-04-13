@@ -171,7 +171,7 @@ void main() {
     }, onError: (error, chain) {
       try {
         expect(error, equals('error'));
-        expect(chain, isA<Chain>());
+        expect(chain, TypeMatcher<Chain>());
         expect(chain.traces, hasLength(2));
         completer.complete();
       } catch (error, stackTrace) {
