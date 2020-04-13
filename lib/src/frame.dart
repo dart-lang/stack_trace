@@ -165,7 +165,7 @@ class Frame {
 
         // v8 location strings can be arbitrarily-nested, since it adds a layer
         // of nesting for each eval performed on that line.
-        parseLocation(location, member) {
+        Frame parseLocation(String location, String member) {
           var evalMatch = _v8EvalLocation.firstMatch(location);
           while (evalMatch != null) {
             location = evalMatch[1];
@@ -240,7 +240,7 @@ class Frame {
         // Normally this is a URI, but in a jsshell trace it can be a path.
         var uri = _uriOrPathToUri(match[3]);
 
-        var member;
+        String member;
         if (match[1] != null) {
           member = match[1];
           member +=

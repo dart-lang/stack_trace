@@ -481,7 +481,7 @@ void main() {
       'chain', () {
     // Disable the test package's chain-tracking.
     return Chain.disable(() async {
-      var trace;
+      StackTrace trace;
       await Chain.capture(() async {
         try {
           throw 'error';

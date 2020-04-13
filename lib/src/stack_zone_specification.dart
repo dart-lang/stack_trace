@@ -133,7 +133,7 @@ class StackZoneSpecification {
   /// Tracks the current stack chain so it can be set to [_currentChain] when
   /// [f] is run.
   ZoneBinaryCallback<R, T1, T2> _registerBinaryCallback<R, T1, T2>(
-      Zone self, ZoneDelegate parent, Zone zone, Function f) {
+      Zone self, ZoneDelegate parent, Zone zone, R Function(T1, T2) f) {
     if (f == null || _disabled) return parent.registerBinaryCallback(zone, f);
 
     var node = _createNode(1);

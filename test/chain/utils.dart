@@ -74,7 +74,7 @@ Future<Chain> chainForTrace(asyncFn(callback()), callback()) {
   });
 
   return completer.future
-      .catchError((_, stackTrace) => Chain.forTrace(stackTrace));
+      .catchError((_, StackTrace stackTrace) => Chain.forTrace(stackTrace));
 }
 
 /// Runs [callback] in a [Chain.capture] zone and returns a Future that
