@@ -50,7 +50,7 @@ class StackZoneSpecification {
   ///
   /// The chain associated with a given stack trace doesn't contain a node for
   /// that stack trace.
-  final _chains = Expando<_Node>("stack chains");
+  final _chains = Expando<_Node>('stack chains');
 
   /// The error handler for the zone.
   ///
@@ -113,7 +113,7 @@ class StackZoneSpecification {
   /// Tracks the current stack chain so it can be set to [_currentChain] when
   /// [f] is run.
   ZoneCallback<R> _registerCallback<R>(
-      Zone self, ZoneDelegate parent, Zone zone, R f()) {
+      Zone self, ZoneDelegate parent, Zone zone, R Function() f) {
     if (f == null || _disabled) return parent.registerCallback(zone, f);
     var node = _createNode(1);
     return parent.registerCallback(zone, () => _run(f, node));
@@ -122,7 +122,7 @@ class StackZoneSpecification {
   /// Tracks the current stack chain so it can be set to [_currentChain] when
   /// [f] is run.
   ZoneUnaryCallback<R, T> _registerUnaryCallback<R, T>(
-      Zone self, ZoneDelegate parent, Zone zone, R f(T arg)) {
+      Zone self, ZoneDelegate parent, Zone zone, R Function(T) f) {
     if (f == null || _disabled) return parent.registerUnaryCallback(zone, f);
     var node = _createNode(1);
     return parent.registerUnaryCallback(zone, (arg) {
@@ -184,7 +184,7 @@ class StackZoneSpecification {
     }
 
     var asyncError = parent.errorCallback(zone, error, stackTrace);
-    return asyncError == null ? AsyncError(error, stackTrace) : asyncError;
+    return asyncError ?? AsyncError(error, stackTrace);
   }
 
   /// Creates a [_Node] with the current stack trace and linked to
@@ -202,7 +202,7 @@ class StackZoneSpecification {
   ///
   /// If [f] throws an error, this associates [node] with that error's stack
   /// trace.
-  T _run<T>(T f(), _Node node) {
+  T _run<T>(T Function() f, _Node node) {
     var previousNode = _currentNode;
     _currentNode = node;
     try {

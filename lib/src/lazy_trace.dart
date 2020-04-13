@@ -17,17 +17,20 @@ class LazyTrace implements Trace {
 
   LazyTrace(this._thunk);
 
-  Trace get _trace {
-    if (_inner == null) _inner = _thunk();
-    return _inner;
-  }
+  Trace get _trace => _inner ??= _thunk();
 
+  @override
   List<Frame> get frames => _trace.frames;
+  @override
   StackTrace get original => _trace.original;
+  @override
   StackTrace get vmTrace => _trace.vmTrace;
+  @override
   Trace get terse => LazyTrace(() => _trace.terse);
-  Trace foldFrames(bool predicate(Frame frame), {bool terse = false}) =>
+  @override
+  Trace foldFrames(bool Function(Frame) predicate, {bool terse = false}) =>
       LazyTrace(() => _trace.foldFrames(predicate, terse: terse));
+  @override
   String toString() => _trace.toString();
 
   // Work around issue 14075.

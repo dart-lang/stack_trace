@@ -9,20 +9,20 @@ import 'package:test/test.dart';
 void main() {
   group('.parseVM', () {
     test('parses a stack frame with column correctly', () {
-      var frame = Frame.parseVM("#1      Foo._bar "
-          "(file:///home/nweiz/code/stuff.dart:42:21)");
+      var frame = Frame.parseVM('#1      Foo._bar '
+          '(file:///home/nweiz/code/stuff.dart:42:21)');
       expect(
-          frame.uri, equals(Uri.parse("file:///home/nweiz/code/stuff.dart")));
+          frame.uri, equals(Uri.parse('file:///home/nweiz/code/stuff.dart')));
       expect(frame.line, equals(42));
       expect(frame.column, equals(21));
       expect(frame.member, equals('Foo._bar'));
     });
 
     test('parses a stack frame without column correctly', () {
-      var frame = Frame.parseVM("#1      Foo._bar "
-          "(file:///home/nweiz/code/stuff.dart:24)");
+      var frame = Frame.parseVM('#1      Foo._bar '
+          '(file:///home/nweiz/code/stuff.dart:24)');
       expect(
-          frame.uri, equals(Uri.parse("file:///home/nweiz/code/stuff.dart")));
+          frame.uri, equals(Uri.parse('file:///home/nweiz/code/stuff.dart')));
       expect(frame.line, equals(24));
       expect(frame.column, null);
       expect(frame.member, equals('Foo._bar'));
@@ -30,10 +30,10 @@ void main() {
 
     // This can happen with async stack traces. See issue 22009.
     test('parses a stack frame without line or column correctly', () {
-      var frame = Frame.parseVM("#1      Foo._bar "
-          "(file:///home/nweiz/code/stuff.dart)");
+      var frame = Frame.parseVM('#1      Foo._bar '
+          '(file:///home/nweiz/code/stuff.dart)');
       expect(
-          frame.uri, equals(Uri.parse("file:///home/nweiz/code/stuff.dart")));
+          frame.uri, equals(Uri.parse('file:///home/nweiz/code/stuff.dart')));
       expect(frame.line, isNull);
       expect(frame.column, isNull);
       expect(frame.member, equals('Foo._bar'));
@@ -81,56 +81,56 @@ void main() {
     });
 
     test('parses a stack frame correctly', () {
-      var frame = Frame.parseV8("    at VW.call\$0 "
-          "(http://pub.dartlang.org/stuff.dart.js:560:28)");
+      var frame = Frame.parseV8('    at VW.call\$0 '
+          '(http://pub.dartlang.org/stuff.dart.js:560:28)');
       expect(frame.uri,
-          equals(Uri.parse("http://pub.dartlang.org/stuff.dart.js")));
+          equals(Uri.parse('http://pub.dartlang.org/stuff.dart.js')));
       expect(frame.line, equals(560));
       expect(frame.column, equals(28));
       expect(frame.member, equals('VW.call\$0'));
     });
 
     test('parses a stack frame with an absolute POSIX path correctly', () {
-      var frame = Frame.parseV8("    at VW.call\$0 "
-          "(/path/to/stuff.dart.js:560:28)");
-      expect(frame.uri, equals(Uri.parse("file:///path/to/stuff.dart.js")));
+      var frame = Frame.parseV8('    at VW.call\$0 '
+          '(/path/to/stuff.dart.js:560:28)');
+      expect(frame.uri, equals(Uri.parse('file:///path/to/stuff.dart.js')));
       expect(frame.line, equals(560));
       expect(frame.column, equals(28));
       expect(frame.member, equals('VW.call\$0'));
     });
 
     test('parses a stack frame with an absolute Windows path correctly', () {
-      var frame = Frame.parseV8("    at VW.call\$0 "
-          r"(C:\path\to\stuff.dart.js:560:28)");
-      expect(frame.uri, equals(Uri.parse("file:///C:/path/to/stuff.dart.js")));
+      var frame = Frame.parseV8('    at VW.call\$0 '
+          r'(C:\path\to\stuff.dart.js:560:28)');
+      expect(frame.uri, equals(Uri.parse('file:///C:/path/to/stuff.dart.js')));
       expect(frame.line, equals(560));
       expect(frame.column, equals(28));
       expect(frame.member, equals('VW.call\$0'));
     });
 
     test('parses a stack frame with a Windows UNC path correctly', () {
-      var frame = Frame.parseV8("    at VW.call\$0 "
-          r"(\\mount\path\to\stuff.dart.js:560:28)");
+      var frame = Frame.parseV8('    at VW.call\$0 '
+          r'(\\mount\path\to\stuff.dart.js:560:28)');
       expect(
-          frame.uri, equals(Uri.parse("file://mount/path/to/stuff.dart.js")));
+          frame.uri, equals(Uri.parse('file://mount/path/to/stuff.dart.js')));
       expect(frame.line, equals(560));
       expect(frame.column, equals(28));
       expect(frame.member, equals('VW.call\$0'));
     });
 
     test('parses a stack frame with a relative POSIX path correctly', () {
-      var frame = Frame.parseV8("    at VW.call\$0 "
-          "(path/to/stuff.dart.js:560:28)");
-      expect(frame.uri, equals(Uri.parse("path/to/stuff.dart.js")));
+      var frame = Frame.parseV8('    at VW.call\$0 '
+          '(path/to/stuff.dart.js:560:28)');
+      expect(frame.uri, equals(Uri.parse('path/to/stuff.dart.js')));
       expect(frame.line, equals(560));
       expect(frame.column, equals(28));
       expect(frame.member, equals('VW.call\$0'));
     });
 
     test('parses a stack frame with a relative Windows path correctly', () {
-      var frame = Frame.parseV8("    at VW.call\$0 "
-          r"(path\to\stuff.dart.js:560:28)");
-      expect(frame.uri, equals(Uri.parse("path/to/stuff.dart.js")));
+      var frame = Frame.parseV8('    at VW.call\$0 '
+          r'(path\to\stuff.dart.js:560:28)');
+      expect(frame.uri, equals(Uri.parse('path/to/stuff.dart.js')));
       expect(frame.line, equals(560));
       expect(frame.column, equals(28));
       expect(frame.member, equals('VW.call\$0'));
@@ -138,16 +138,16 @@ void main() {
 
     test('parses an anonymous stack frame correctly', () {
       var frame =
-          Frame.parseV8("    at http://pub.dartlang.org/stuff.dart.js:560:28");
+          Frame.parseV8('    at http://pub.dartlang.org/stuff.dart.js:560:28');
       expect(frame.uri,
-          equals(Uri.parse("http://pub.dartlang.org/stuff.dart.js")));
+          equals(Uri.parse('http://pub.dartlang.org/stuff.dart.js')));
       expect(frame.line, equals(560));
       expect(frame.column, equals(28));
       expect(frame.member, equals('<fn>'));
     });
 
     test('parses a native stack frame correctly', () {
-      var frame = Frame.parseV8("    at Object.stringify (native)");
+      var frame = Frame.parseV8('    at Object.stringify (native)');
       expect(frame.uri, Uri.parse('native'));
       expect(frame.line, isNull);
       expect(frame.column, isNull);
@@ -157,50 +157,50 @@ void main() {
     test('parses a stack frame with [as ...] correctly', () {
       // Ignore "[as ...]", since other stack trace formats don't support a
       // similar construct.
-      var frame = Frame.parseV8("    at VW.call\$0 [as call\$4] "
-          "(http://pub.dartlang.org/stuff.dart.js:560:28)");
+      var frame = Frame.parseV8('    at VW.call\$0 [as call\$4] '
+          '(http://pub.dartlang.org/stuff.dart.js:560:28)');
       expect(frame.uri,
-          equals(Uri.parse("http://pub.dartlang.org/stuff.dart.js")));
+          equals(Uri.parse('http://pub.dartlang.org/stuff.dart.js')));
       expect(frame.line, equals(560));
       expect(frame.column, equals(28));
       expect(frame.member, equals('VW.call\$0'));
     });
 
     test('parses a basic eval stack frame correctly', () {
-      var frame = Frame.parseV8("    at eval (eval at <anonymous> "
-          "(http://pub.dartlang.org/stuff.dart.js:560:28))");
+      var frame = Frame.parseV8('    at eval (eval at <anonymous> '
+          '(http://pub.dartlang.org/stuff.dart.js:560:28))');
       expect(frame.uri,
-          equals(Uri.parse("http://pub.dartlang.org/stuff.dart.js")));
+          equals(Uri.parse('http://pub.dartlang.org/stuff.dart.js')));
       expect(frame.line, equals(560));
       expect(frame.column, equals(28));
       expect(frame.member, equals('eval'));
     });
 
     test('parses an IE10 eval stack frame correctly', () {
-      var frame = Frame.parseV8("    at eval (eval at Anonymous function "
-          "(http://pub.dartlang.org/stuff.dart.js:560:28))");
+      var frame = Frame.parseV8('    at eval (eval at Anonymous function '
+          '(http://pub.dartlang.org/stuff.dart.js:560:28))');
       expect(frame.uri,
-          equals(Uri.parse("http://pub.dartlang.org/stuff.dart.js")));
+          equals(Uri.parse('http://pub.dartlang.org/stuff.dart.js')));
       expect(frame.line, equals(560));
       expect(frame.column, equals(28));
       expect(frame.member, equals('eval'));
     });
 
     test('parses an eval stack frame with inner position info correctly', () {
-      var frame = Frame.parseV8("    at eval (eval at <anonymous> "
-          "(http://pub.dartlang.org/stuff.dart.js:560:28), <anonymous>:3:28)");
+      var frame = Frame.parseV8('    at eval (eval at <anonymous> '
+          '(http://pub.dartlang.org/stuff.dart.js:560:28), <anonymous>:3:28)');
       expect(frame.uri,
-          equals(Uri.parse("http://pub.dartlang.org/stuff.dart.js")));
+          equals(Uri.parse('http://pub.dartlang.org/stuff.dart.js')));
       expect(frame.line, equals(560));
       expect(frame.column, equals(28));
       expect(frame.member, equals('eval'));
     });
 
     test('parses a nested eval stack frame correctly', () {
-      var frame = Frame.parseV8("    at eval (eval at <anonymous> "
-          "(eval at sub (http://pub.dartlang.org/stuff.dart.js:560:28)))");
+      var frame = Frame.parseV8('    at eval (eval at <anonymous> '
+          '(eval at sub (http://pub.dartlang.org/stuff.dart.js:560:28)))');
       expect(frame.uri,
-          equals(Uri.parse("http://pub.dartlang.org/stuff.dart.js")));
+          equals(Uri.parse('http://pub.dartlang.org/stuff.dart.js')));
       expect(frame.line, equals(560));
       expect(frame.column, equals(28));
       expect(frame.member, equals('eval'));
@@ -242,20 +242,20 @@ anonymous/<@http://pub.dartlang.org/stuff.js line 693 > Function:3:40
 baz@http://pub.dartlang.org/buz.js:56355:55
         ''');
       expect(trace.frames[0].uri,
-          equals(Uri.parse("http://pub.dartlang.org/stuff.js")));
+          equals(Uri.parse('http://pub.dartlang.org/stuff.js')));
       expect(trace.frames[0].line, equals(18056));
       expect(trace.frames[0].column, equals(12));
-      expect(trace.frames[0].member, equals("Foo._bar"));
+      expect(trace.frames[0].member, equals('Foo._bar'));
       expect(trace.frames[1].uri,
-          equals(Uri.parse("http://pub.dartlang.org/stuff.js")));
+          equals(Uri.parse('http://pub.dartlang.org/stuff.js')));
       expect(trace.frames[1].line, equals(693));
       expect(trace.frames[1].column, isNull);
-      expect(trace.frames[1].member, equals("<fn>"));
+      expect(trace.frames[1].member, equals('<fn>'));
       expect(trace.frames[2].uri,
-          equals(Uri.parse("http://pub.dartlang.org/buz.js")));
+          equals(Uri.parse('http://pub.dartlang.org/buz.js')));
       expect(trace.frames[2].line, equals(56355));
       expect(trace.frames[2].column, equals(55));
-      expect(trace.frames[2].member, equals("baz"));
+      expect(trace.frames[2].member, equals('baz'));
     });
 
     test('parses a Firefox stack trace with nested evals in anonymous function',
@@ -266,33 +266,33 @@ baz@http://pub.dartlang.org/buz.js:56355:55
         anonymous@file:///C:/example.html line 45 > Function:1:1
         ''');
       expect(trace.frames[0].uri,
-          equals(Uri.parse("http://pub.dartlang.org/stuff.js")));
+          equals(Uri.parse('http://pub.dartlang.org/stuff.js')));
       expect(trace.frames[0].line, equals(18056));
       expect(trace.frames[0].column, equals(12));
-      expect(trace.frames[0].member, equals("Foo._bar"));
-      expect(trace.frames[1].uri, equals(Uri.parse("file:///C:/example.html")));
+      expect(trace.frames[0].member, equals('Foo._bar'));
+      expect(trace.frames[1].uri, equals(Uri.parse('file:///C:/example.html')));
       expect(trace.frames[1].line, equals(7));
       expect(trace.frames[1].column, isNull);
-      expect(trace.frames[1].member, equals("<fn>"));
-      expect(trace.frames[2].uri, equals(Uri.parse("file:///C:/example.html")));
+      expect(trace.frames[1].member, equals('<fn>'));
+      expect(trace.frames[2].uri, equals(Uri.parse('file:///C:/example.html')));
       expect(trace.frames[2].line, equals(45));
       expect(trace.frames[2].column, isNull);
-      expect(trace.frames[2].member, equals("<fn>"));
+      expect(trace.frames[2].member, equals('<fn>'));
     });
 
     test('parses a simple stack frame correctly', () {
       var frame = Frame.parseFirefox(
-          ".VW.call\$0@http://pub.dartlang.org/stuff.dart.js:560");
+          '.VW.call\$0@http://pub.dartlang.org/stuff.dart.js:560');
       expect(frame.uri,
-          equals(Uri.parse("http://pub.dartlang.org/stuff.dart.js")));
+          equals(Uri.parse('http://pub.dartlang.org/stuff.dart.js')));
       expect(frame.line, equals(560));
       expect(frame.column, isNull);
       expect(frame.member, equals('VW.call\$0'));
     });
 
     test('parses a stack frame with an absolute POSIX path correctly', () {
-      var frame = Frame.parseFirefox(".VW.call\$0@/path/to/stuff.dart.js:560");
-      expect(frame.uri, equals(Uri.parse("file:///path/to/stuff.dart.js")));
+      var frame = Frame.parseFirefox('.VW.call\$0@/path/to/stuff.dart.js:560');
+      expect(frame.uri, equals(Uri.parse('file:///path/to/stuff.dart.js')));
       expect(frame.line, equals(560));
       expect(frame.column, isNull);
       expect(frame.member, equals('VW.call\$0'));
@@ -300,8 +300,8 @@ baz@http://pub.dartlang.org/buz.js:56355:55
 
     test('parses a stack frame with an absolute Windows path correctly', () {
       var frame =
-          Frame.parseFirefox(r".VW.call$0@C:\path\to\stuff.dart.js:560");
-      expect(frame.uri, equals(Uri.parse("file:///C:/path/to/stuff.dart.js")));
+          Frame.parseFirefox(r'.VW.call$0@C:\path\to\stuff.dart.js:560');
+      expect(frame.uri, equals(Uri.parse('file:///C:/path/to/stuff.dart.js')));
       expect(frame.line, equals(560));
       expect(frame.column, isNull);
       expect(frame.member, equals('VW.call\$0'));
@@ -309,25 +309,25 @@ baz@http://pub.dartlang.org/buz.js:56355:55
 
     test('parses a stack frame with a Windows UNC path correctly', () {
       var frame =
-          Frame.parseFirefox(r".VW.call$0@\\mount\path\to\stuff.dart.js:560");
+          Frame.parseFirefox(r'.VW.call$0@\\mount\path\to\stuff.dart.js:560');
       expect(
-          frame.uri, equals(Uri.parse("file://mount/path/to/stuff.dart.js")));
+          frame.uri, equals(Uri.parse('file://mount/path/to/stuff.dart.js')));
       expect(frame.line, equals(560));
       expect(frame.column, isNull);
       expect(frame.member, equals('VW.call\$0'));
     });
 
     test('parses a stack frame with a relative POSIX path correctly', () {
-      var frame = Frame.parseFirefox(".VW.call\$0@path/to/stuff.dart.js:560");
-      expect(frame.uri, equals(Uri.parse("path/to/stuff.dart.js")));
+      var frame = Frame.parseFirefox('.VW.call\$0@path/to/stuff.dart.js:560');
+      expect(frame.uri, equals(Uri.parse('path/to/stuff.dart.js')));
       expect(frame.line, equals(560));
       expect(frame.column, isNull);
       expect(frame.member, equals('VW.call\$0'));
     });
 
     test('parses a stack frame with a relative Windows path correctly', () {
-      var frame = Frame.parseFirefox(r".VW.call$0@path\to\stuff.dart.js:560");
-      expect(frame.uri, equals(Uri.parse("path/to/stuff.dart.js")));
+      var frame = Frame.parseFirefox(r'.VW.call$0@path\to\stuff.dart.js:560');
+      expect(frame.uri, equals(Uri.parse('path/to/stuff.dart.js')));
       expect(frame.line, equals(560));
       expect(frame.column, isNull);
       expect(frame.member, equals('VW.call\$0'));
@@ -335,68 +335,68 @@ baz@http://pub.dartlang.org/buz.js:56355:55
 
     test('parses a simple anonymous stack frame correctly', () {
       var frame =
-          Frame.parseFirefox("@http://pub.dartlang.org/stuff.dart.js:560");
+          Frame.parseFirefox('@http://pub.dartlang.org/stuff.dart.js:560');
       expect(frame.uri,
-          equals(Uri.parse("http://pub.dartlang.org/stuff.dart.js")));
+          equals(Uri.parse('http://pub.dartlang.org/stuff.dart.js')));
       expect(frame.line, equals(560));
       expect(frame.column, isNull);
-      expect(frame.member, equals("<fn>"));
+      expect(frame.member, equals('<fn>'));
     });
 
     test('parses a nested anonymous stack frame correctly', () {
       var frame = Frame.parseFirefox(
-          ".foo/<@http://pub.dartlang.org/stuff.dart.js:560");
+          '.foo/<@http://pub.dartlang.org/stuff.dart.js:560');
       expect(frame.uri,
-          equals(Uri.parse("http://pub.dartlang.org/stuff.dart.js")));
+          equals(Uri.parse('http://pub.dartlang.org/stuff.dart.js')));
       expect(frame.line, equals(560));
       expect(frame.column, isNull);
-      expect(frame.member, equals("foo.<fn>"));
+      expect(frame.member, equals('foo.<fn>'));
 
       frame =
-          Frame.parseFirefox(".foo/@http://pub.dartlang.org/stuff.dart.js:560");
+          Frame.parseFirefox('.foo/@http://pub.dartlang.org/stuff.dart.js:560');
       expect(frame.uri,
-          equals(Uri.parse("http://pub.dartlang.org/stuff.dart.js")));
+          equals(Uri.parse('http://pub.dartlang.org/stuff.dart.js')));
       expect(frame.line, equals(560));
       expect(frame.column, isNull);
-      expect(frame.member, equals("foo.<fn>"));
+      expect(frame.member, equals('foo.<fn>'));
     });
 
     test('parses a named nested anonymous stack frame correctly', () {
       var frame = Frame.parseFirefox(
-          ".foo/.name<@http://pub.dartlang.org/stuff.dart.js:560");
+          '.foo/.name<@http://pub.dartlang.org/stuff.dart.js:560');
       expect(frame.uri,
-          equals(Uri.parse("http://pub.dartlang.org/stuff.dart.js")));
+          equals(Uri.parse('http://pub.dartlang.org/stuff.dart.js')));
       expect(frame.line, equals(560));
       expect(frame.column, isNull);
-      expect(frame.member, equals("foo.<fn>"));
+      expect(frame.member, equals('foo.<fn>'));
 
       frame = Frame.parseFirefox(
-          ".foo/.name@http://pub.dartlang.org/stuff.dart.js:560");
+          '.foo/.name@http://pub.dartlang.org/stuff.dart.js:560');
       expect(frame.uri,
-          equals(Uri.parse("http://pub.dartlang.org/stuff.dart.js")));
+          equals(Uri.parse('http://pub.dartlang.org/stuff.dart.js')));
       expect(frame.line, equals(560));
       expect(frame.column, isNull);
-      expect(frame.member, equals("foo.<fn>"));
+      expect(frame.member, equals('foo.<fn>'));
     });
 
     test('parses a stack frame with parameters correctly', () {
       var frame = Frame.parseFirefox(
           '.foo(12, "@)()/<")@http://pub.dartlang.org/stuff.dart.js:560');
       expect(frame.uri,
-          equals(Uri.parse("http://pub.dartlang.org/stuff.dart.js")));
+          equals(Uri.parse('http://pub.dartlang.org/stuff.dart.js')));
       expect(frame.line, equals(560));
       expect(frame.column, isNull);
-      expect(frame.member, equals("foo"));
+      expect(frame.member, equals('foo'));
     });
 
     test('parses a nested anonymous stack frame with parameters correctly', () {
       var frame = Frame.parseFirefox('.foo(12, "@)()/<")/.fn<@'
           'http://pub.dartlang.org/stuff.dart.js:560');
       expect(frame.uri,
-          equals(Uri.parse("http://pub.dartlang.org/stuff.dart.js")));
+          equals(Uri.parse('http://pub.dartlang.org/stuff.dart.js')));
       expect(frame.line, equals(560));
       expect(frame.column, isNull);
-      expect(frame.member, equals("foo.<fn>"));
+      expect(frame.member, equals('foo.<fn>'));
     });
 
     test(
@@ -405,10 +405,10 @@ baz@http://pub.dartlang.org/buz.js:56355:55
       var frame = Frame.parseFirefox('.convertDartClosureToJS/\$function</<@'
           'http://pub.dartlang.org/stuff.dart.js:560');
       expect(frame.uri,
-          equals(Uri.parse("http://pub.dartlang.org/stuff.dart.js")));
+          equals(Uri.parse('http://pub.dartlang.org/stuff.dart.js')));
       expect(frame.line, equals(560));
       expect(frame.column, isNull);
-      expect(frame.member, equals("convertDartClosureToJS.<fn>.<fn>"));
+      expect(frame.member, equals('convertDartClosureToJS.<fn>.<fn>'));
     });
 
     test('returns an UnparsedFrame for malformed frames', () {
@@ -424,16 +424,16 @@ baz@http://pub.dartlang.org/buz.js:56355:55
 
     test('parses a simple stack frame correctly', () {
       var frame =
-          Frame.parseFirefox("foo\$bar@http://dartlang.org/foo/bar.dart:10:11");
-      expect(frame.uri, equals(Uri.parse("http://dartlang.org/foo/bar.dart")));
+          Frame.parseFirefox('foo\$bar@http://dartlang.org/foo/bar.dart:10:11');
+      expect(frame.uri, equals(Uri.parse('http://dartlang.org/foo/bar.dart')));
       expect(frame.line, equals(10));
       expect(frame.column, equals(11));
       expect(frame.member, equals('foo\$bar'));
     });
 
     test('parses an anonymous stack frame correctly', () {
-      var frame = Frame.parseFirefox("http://dartlang.org/foo/bar.dart:10:11");
-      expect(frame.uri, equals(Uri.parse("http://dartlang.org/foo/bar.dart")));
+      var frame = Frame.parseFirefox('http://dartlang.org/foo/bar.dart:10:11');
+      expect(frame.uri, equals(Uri.parse('http://dartlang.org/foo/bar.dart')));
       expect(frame.line, equals(10));
       expect(frame.column, equals(11));
       expect(frame.member, equals('<fn>'));
@@ -441,8 +441,8 @@ baz@http://pub.dartlang.org/buz.js:56355:55
 
     test('parses a stack frame with no line correctly', () {
       var frame =
-          Frame.parseFirefox("foo\$bar@http://dartlang.org/foo/bar.dart::11");
-      expect(frame.uri, equals(Uri.parse("http://dartlang.org/foo/bar.dart")));
+          Frame.parseFirefox('foo\$bar@http://dartlang.org/foo/bar.dart::11');
+      expect(frame.uri, equals(Uri.parse('http://dartlang.org/foo/bar.dart')));
       expect(frame.line, isNull);
       expect(frame.column, equals(11));
       expect(frame.member, equals('foo\$bar'));
@@ -450,8 +450,8 @@ baz@http://pub.dartlang.org/buz.js:56355:55
 
     test('parses a stack frame with no column correctly', () {
       var frame =
-          Frame.parseFirefox("foo\$bar@http://dartlang.org/foo/bar.dart:10:");
-      expect(frame.uri, equals(Uri.parse("http://dartlang.org/foo/bar.dart")));
+          Frame.parseFirefox('foo\$bar@http://dartlang.org/foo/bar.dart:10:');
+      expect(frame.uri, equals(Uri.parse('http://dartlang.org/foo/bar.dart')));
       expect(frame.line, equals(10));
       expect(frame.column, isNull);
       expect(frame.member, equals('foo\$bar'));
@@ -459,8 +459,8 @@ baz@http://pub.dartlang.org/buz.js:56355:55
 
     test('parses a stack frame with no line or column correctly', () {
       var frame =
-          Frame.parseFirefox("foo\$bar@http://dartlang.org/foo/bar.dart:10:11");
-      expect(frame.uri, equals(Uri.parse("http://dartlang.org/foo/bar.dart")));
+          Frame.parseFirefox('foo\$bar@http://dartlang.org/foo/bar.dart:10:11');
+      expect(frame.uri, equals(Uri.parse('http://dartlang.org/foo/bar.dart')));
       expect(frame.line, equals(10));
       expect(frame.column, equals(11));
       expect(frame.member, equals('foo\$bar'));
@@ -470,8 +470,8 @@ baz@http://pub.dartlang.org/buz.js:56355:55
   group('.parseFriendly', () {
     test('parses a simple stack frame correctly', () {
       var frame = Frame.parseFriendly(
-          "http://dartlang.org/foo/bar.dart 10:11  Foo.<fn>.bar");
-      expect(frame.uri, equals(Uri.parse("http://dartlang.org/foo/bar.dart")));
+          'http://dartlang.org/foo/bar.dart 10:11  Foo.<fn>.bar');
+      expect(frame.uri, equals(Uri.parse('http://dartlang.org/foo/bar.dart')));
       expect(frame.line, equals(10));
       expect(frame.column, equals(11));
       expect(frame.member, equals('Foo.<fn>.bar'));
@@ -479,8 +479,8 @@ baz@http://pub.dartlang.org/buz.js:56355:55
 
     test('parses a stack frame with no line or column correctly', () {
       var frame =
-          Frame.parseFriendly("http://dartlang.org/foo/bar.dart  Foo.<fn>.bar");
-      expect(frame.uri, equals(Uri.parse("http://dartlang.org/foo/bar.dart")));
+          Frame.parseFriendly('http://dartlang.org/foo/bar.dart  Foo.<fn>.bar');
+      expect(frame.uri, equals(Uri.parse('http://dartlang.org/foo/bar.dart')));
       expect(frame.line, isNull);
       expect(frame.column, isNull);
       expect(frame.member, equals('Foo.<fn>.bar'));
@@ -488,15 +488,15 @@ baz@http://pub.dartlang.org/buz.js:56355:55
 
     test('parses a stack frame with no column correctly', () {
       var frame = Frame.parseFriendly(
-          "http://dartlang.org/foo/bar.dart 10  Foo.<fn>.bar");
-      expect(frame.uri, equals(Uri.parse("http://dartlang.org/foo/bar.dart")));
+          'http://dartlang.org/foo/bar.dart 10  Foo.<fn>.bar');
+      expect(frame.uri, equals(Uri.parse('http://dartlang.org/foo/bar.dart')));
       expect(frame.line, equals(10));
       expect(frame.column, isNull);
       expect(frame.member, equals('Foo.<fn>.bar'));
     });
 
     test('parses a stack frame with a relative path correctly', () {
-      var frame = Frame.parseFriendly("foo/bar.dart 10:11    Foo.<fn>.bar");
+      var frame = Frame.parseFriendly('foo/bar.dart 10:11    Foo.<fn>.bar');
       expect(frame.uri,
           equals(path.toUri(path.absolute(path.join('foo', 'bar.dart')))));
       expect(frame.line, equals(10));
@@ -512,7 +512,7 @@ baz@http://pub.dartlang.org/buz.js:56355:55
     });
 
     test('parses a data url stack frame with no line or column correctly', () {
-      var frame = Frame.parseFriendly("data:...  main");
+      var frame = Frame.parseFriendly('data:...  main');
       expect(frame.uri.scheme, equals('data'));
       expect(frame.line, isNull);
       expect(frame.column, isNull);
@@ -520,7 +520,7 @@ baz@http://pub.dartlang.org/buz.js:56355:55
     });
 
     test('parses a data url stack frame correctly', () {
-      var frame = Frame.parseFriendly("data:... 10:11    main");
+      var frame = Frame.parseFriendly('data:... 10:11    main');
       expect(frame.uri.scheme, equals('data'));
       expect(frame.line, equals(10));
       expect(frame.column, equals(11));
@@ -529,7 +529,7 @@ baz@http://pub.dartlang.org/buz.js:56355:55
 
     test('parses a stack frame with spaces in the member name correctly', () {
       var frame = Frame.parseFriendly(
-          "foo/bar.dart 10:11    (anonymous function).dart.fn");
+          'foo/bar.dart 10:11    (anonymous function).dart.fn');
       expect(frame.uri,
           equals(path.toUri(path.absolute(path.join('foo', 'bar.dart')))));
       expect(frame.line, equals(10));
@@ -541,8 +541,8 @@ baz@http://pub.dartlang.org/buz.js:56355:55
         'parses a stack frame with spaces in the member name and no line or '
         'column correctly', () {
       var frame = Frame.parseFriendly(
-          "http://dartlang.org/foo/bar.dart  (anonymous function).dart.fn");
-      expect(frame.uri, equals(Uri.parse("http://dartlang.org/foo/bar.dart")));
+          'http://dartlang.org/foo/bar.dart  (anonymous function).dart.fn');
+      expect(frame.uri, equals(Uri.parse('http://dartlang.org/foo/bar.dart')));
       expect(frame.line, isNull);
       expect(frame.column, isNull);
       expect(frame.member, equals('(anonymous function).dart.fn'));
@@ -650,7 +650,7 @@ baz@http://pub.dartlang.org/buz.js:56355:55
   });
 }
 
-void expectIsUnparsed(Frame constructor(String text), String text) {
+void expectIsUnparsed(Frame Function(String) constructor, String text) {
   var frame = constructor(text);
   expect(frame, TypeMatcher<UnparsedFrame>());
   expect(frame.toString(), equals(text));

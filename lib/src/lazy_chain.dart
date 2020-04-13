@@ -19,15 +19,17 @@ class LazyChain implements Chain {
 
   LazyChain(this._thunk);
 
-  Chain get _chain {
-    if (_inner == null) _inner = _thunk();
-    return _inner;
-  }
+  Chain get _chain => _inner ??= _thunk();
 
+  @override
   List<Trace> get traces => _chain.traces;
+  @override
   Chain get terse => _chain.terse;
-  Chain foldFrames(bool predicate(Frame frame), {bool terse = false}) =>
+  @override
+  Chain foldFrames(bool Function(Frame) predicate, {bool terse = false}) =>
       LazyChain(() => _chain.foldFrames(predicate, terse: terse));
+  @override
   Trace toTrace() => LazyTrace(() => _chain.toTrace());
+  @override
   String toString() => _chain.toString();
 }
