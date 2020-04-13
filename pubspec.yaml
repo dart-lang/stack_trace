@@ -7,7 +7,6 @@ version: 1.10.0-dev
 # TODO(rnystrom): Remove this line once the above version issue is fixed.
 publish_to: none
 description: A package for manipulating stack traces and printing them readably.
-author: 'Dart Team <misc@dartlang.org>'
 homepage: https://github.com/dart-lang/stack_trace
 
 environment:
@@ -17,6 +16,7 @@ dependencies:
   path: ^1.2.0
 
 dev_dependencies:
+  pedantic: ^1.0.0
   test: '>=0.12.17 <2.0.0'
 
 dependency_overrides:

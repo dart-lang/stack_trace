@@ -1,3 +1,7 @@
+## 1.9.4-dev
+
+* Added support for firefox anonymous stack traces
+
 ## 1.9.3
 
 * Set max SDK version to `<3.0.0`.

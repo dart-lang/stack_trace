@@ -1,3 +1,8 @@
+include: package:pedantic/analysis_options.yaml
 analyzer:
   enable-experiment:
     - non-nullable
+  strong-mode:
+    implicit-casts: false
+  errors:
+    prefer_spread_collections: ignore
