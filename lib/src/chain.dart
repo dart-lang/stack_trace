@@ -73,7 +73,7 @@ class Chain implements StackTrace {
   ///
   /// If [callback] returns a value, it will be returned by [capture] as well.
   static T capture<T>(T Function() callback,
-      {void Function(Object error, Chain)? onError,
+      {void Function(dynamic error, Chain)? onError,
       bool when = true,
       bool errorZone = true}) {
     if (!errorZone && onError != null) {
@@ -82,7 +82,7 @@ class Chain implements StackTrace {
     }
 
     if (!when) {
-      void Function(Object, StackTrace) newOnError;
+      late void Function(Object, StackTrace) newOnError;
       if (onError != null) {
         void wrappedOnError(Object error, StackTrace? stackTrace) {
           onError(
@@ -102,7 +102,7 @@ class Chain implements StackTrace {
     return runZoned(() {
       try {
         return callback();
-      } catch (error, stackTrace) {
+      } on Object catch (error, stackTrace) {
         // TODO(nweiz): Don't special-case this when issue 19566 is fixed.
         Zone.current.handleUncaughtError(error, stackTrace);
 

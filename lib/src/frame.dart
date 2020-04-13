@@ -168,7 +168,7 @@ class Frame {
         Frame parseLocation(String location, String member) {
           var evalMatch = _v8EvalLocation.firstMatch(location);
           while (evalMatch != null) {
-            location = evalMatch[1];
+            location = evalMatch[1]!;
             evalMatch = _v8EvalLocation.firstMatch(location);
           }
 
@@ -189,7 +189,7 @@ class Frame {
           // lists anonymous functions within eval as "<anonymous>", while IE10
           // lists them as "Anonymous function".
           return parseLocation(
-              match[2],
+              match[2]!,
               match[1]!
                   .replaceAll('<anonymous>', '<fn>')
                   .replaceAll('Anonymous function', '<fn>')
@@ -197,7 +197,7 @@ class Frame {
         } else {
           // The second form looks like " at LOCATION", and is used for
           // anonymous functions.
-          return parseLocation(match[3], '<fn>');
+          return parseLocation(match[3]!, '<fn>');
         }
       });
 
@@ -219,9 +219,9 @@ class Frame {
       _catchFormatException(frame, () {
         final match = _firefoxEvalLocation.firstMatch(frame);
         if (match == null) return UnparsedFrame(frame);
-        var member = match[1].replaceAll('/<', '');
-        final uri = _uriOrPathToUri(match[2]);
-        final line = int.parse(match[3]);
+        var member = match[1]!.replaceAll('/<', '');
+        final uri = _uriOrPathToUri(match[2]!);
+        final line = int.parse(match[3]!);
         if (member.isEmpty || member == 'anonymous') {
           member = '<fn>';
         }
@@ -233,7 +233,7 @@ class Frame {
         var match = _firefoxSafariFrame.firstMatch(frame);
         if (match == null) return UnparsedFrame(frame);
 
-        if (match[3].contains(' line ')) {
+        if (match[3]!.contains(' line ')) {
           return Frame._parseFirefoxEval(frame);
         }
 

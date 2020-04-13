@@ -90,7 +90,7 @@ void main() {
             expect(chain.traces, hasLength(2));
             completer.complete();
           }
-        } catch (error, stackTrace) {
+        } on Object catch (error, stackTrace) {
           completer.completeError(error, stackTrace);
         }
       });
@@ -146,7 +146,7 @@ void main() {
         }, onError: (error, chain) {
           expect(error, equals('error'));
           expect(chain.traces, hasLength(2));
-          throw error;
+          throw error as Object;
         });
       }, onError: (error, chain) {
         try {
@@ -154,7 +154,7 @@ void main() {
           expect(chain, isA<Chain>());
           expect(chain.traces, hasLength(2));
           completer.complete();
-        } catch (error, stackTrace) {
+        } on Object catch (error, stackTrace) {
           completer.completeError(error, stackTrace);
         }
       });
@@ -174,7 +174,7 @@ void main() {
         expect(chain, isA<Chain>());
         expect(chain.traces, hasLength(2));
         completer.complete();
-      } catch (error, stackTrace) {
+      } on Object catch (error, stackTrace) {
         completer.completeError(error, stackTrace);
       }
     });
