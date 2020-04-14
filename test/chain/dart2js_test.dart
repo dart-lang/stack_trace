@@ -73,7 +73,7 @@ void main() {
     });
 
     test('multiple times', () {
-      var completer = new Completer();
+      var completer = Completer();
       var first = true;
 
       Chain.capture(() {
@@ -99,7 +99,7 @@ void main() {
     });
 
     test('passed to a completer', () async {
-      var trace = new Trace.current();
+      var trace = Trace.current();
       var chain = await captureFuture(() {
         inMicrotask(() => completerErrorFuture(trace));
       });
@@ -120,7 +120,7 @@ void main() {
     });
 
     test('passed to a stream controller', () async {
-      var trace = new Trace.current();
+      var trace = Trace.current();
       var chain = await captureFuture(() {
         inMicrotask(() => controllerErrorStream(trace).listen(null));
       });
@@ -138,7 +138,7 @@ void main() {
     });
 
     test('and relays them to the parent zone', () {
-      var completer = new Completer();
+      var completer = Completer();
 
       runZoned(() {
         Chain.capture(() {
@@ -151,7 +151,7 @@ void main() {
       }, onError: (error, chain) {
         try {
           expect(error, equals('error'));
-          expect(chain, new isInstanceOf<Chain>());
+          expect(chain, TypeMatcher<Chain>());
           expect(chain.traces, hasLength(2));
           completer.complete();
         } catch (error, stackTrace) {
@@ -164,14 +164,14 @@ void main() {
   });
 
   test('capture() without onError passes exceptions to parent zone', () {
-    var completer = new Completer();
+    var completer = Completer();
 
     runZoned(() {
       Chain.capture(() => inMicrotask(() => throw 'error'));
     }, onError: (error, chain) {
       try {
         expect(error, equals('error'));
-        expect(chain, new isInstanceOf<Chain>());
+        expect(chain, TypeMatcher<Chain>());
         expect(chain.traces, hasLength(2));
         completer.complete();
       } catch (error, stackTrace) {
@@ -184,9 +184,9 @@ void main() {
 
   group('current() within capture()', () {
     test('called in a microtask', () async {
-      var completer = new Completer();
+      var completer = Completer();
       Chain.capture(() {
-        inMicrotask(() => completer.complete(new Chain.current()));
+        inMicrotask(() => completer.complete(Chain.current()));
       });
 
       var chain = await completer.future;
@@ -194,9 +194,9 @@ void main() {
     });
 
     test('called in a one-shot timer', () async {
-      var completer = new Completer();
+      var completer = Completer();
       Chain.capture(() {
-        inOneShotTimer(() => completer.complete(new Chain.current()));
+        inOneShotTimer(() => completer.complete(Chain.current()));
       });
 
       var chain = await completer.future;
@@ -204,9 +204,9 @@ void main() {
     });
 
     test('called in a periodic timer', () async {
-      var completer = new Completer();
+      var completer = Completer();
       Chain.capture(() {
-        inPeriodicTimer(() => completer.complete(new Chain.current()));
+        inPeriodicTimer(() => completer.complete(Chain.current()));
       });
 
       var chain = await completer.future;
@@ -214,11 +214,11 @@ void main() {
     });
 
     test('called in a nested series of asynchronous operations', () async {
-      var completer = new Completer();
+      var completer = Completer();
       Chain.capture(() {
         inPeriodicTimer(() {
           inOneShotTimer(() {
-            inMicrotask(() => completer.complete(new Chain.current()));
+            inMicrotask(() => completer.complete(Chain.current()));
           });
         });
       });
@@ -228,9 +228,9 @@ void main() {
     });
 
     test('called in a long future chain', () async {
-      var completer = new Completer();
+      var completer = Completer();
       Chain.capture(() {
-        inFutureChain(() => completer.complete(new Chain.current()));
+        inFutureChain(() => completer.complete(Chain.current()));
       });
 
       var chain = await completer.future;
@@ -243,8 +243,8 @@ void main() {
       'trace', () {
     // The test runner runs all tests with chains enabled.
     return Chain.disable(() async {
-      var completer = new Completer();
-      inMicrotask(() => completer.complete(new Chain.current()));
+      var completer = Completer();
+      inMicrotask(() => completer.complete(Chain.current()));
 
       var chain = await completer.future;
       // Since the chain wasn't loaded within [Chain.capture], the full stack
@@ -305,37 +305,36 @@ void main() {
     test(
         'called for an unregistered stack trace returns a chain wrapping that '
         'trace', () {
-      var trace;
+      StackTrace trace;
       var chain = Chain.capture(() {
         try {
           throw 'error';
         } catch (_, stackTrace) {
           trace = stackTrace;
-          return new Chain.forTrace(stackTrace);
+          return Chain.forTrace(stackTrace);
         }
       });
 
       expect(chain.traces, hasLength(1));
-      expect(chain.traces.first.toString(),
-          equals(new Trace.from(trace).toString()));
+      expect(
+          chain.traces.first.toString(), equals(Trace.from(trace).toString()));
     });
   });
 
   test(
       'forTrace() outside of capture() returns a chain wrapping the given '
       'trace', () {
-    var trace;
+    StackTrace trace;
     var chain = Chain.capture(() {
       try {
         throw 'error';
       } catch (_, stackTrace) {
         trace = stackTrace;
-        return new Chain.forTrace(stackTrace);
+        return Chain.forTrace(stackTrace);
       }
     });
 
     expect(chain.traces, hasLength(1));
-    expect(chain.traces.first.toString(),
-        equals(new Trace.from(trace).toString()));
+    expect(chain.traces.first.toString(), equals(Trace.from(trace).toString()));
   });
 }

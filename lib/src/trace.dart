@@ -11,7 +11,7 @@ import 'unparsed_frame.dart';
 import 'utils.dart';
 import 'vm_trace.dart';
 
-final _terseRegExp = new RegExp(r"(-patch)?([/\\].*)?$");
+final _terseRegExp = RegExp(r'(-patch)?([/\\].*)?$');
 
 /// A RegExp to match V8's stack traces.
 ///
@@ -19,13 +19,22 @@ final _terseRegExp = new RegExp(r"(-patch)?([/\\].*)?$");
 /// description of the exception that occurred. That description can be multiple
 /// lines, so we just look for any line other than the first that begins with
 /// three or four spaces and "at".
-final _v8Trace = new RegExp(r"\n    ?at ");
+final _v8Trace = RegExp(r'\n    ?at ');
 
 /// A RegExp to match indidual lines of V8's stack traces.
 ///
 /// This is intended to filter out the leading exception details of the trace
 /// though it is possible for the message to match this as well.
-final _v8TraceLine = new RegExp(r"    ?at ");
+final _v8TraceLine = RegExp(r'    ?at ');
+
+/// A RegExp to match Firefox's eval and Function stack traces.
+///
+/// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/stack
+///
+/// These stack traces looks like:
+///     anonymous/<@http://pub.dartlang.org/stuff.js line 693 > Function:3:40
+///     anonymous/<@http://pub.dartlang.org/stuff.js line 693 > eval:3:40
+final _firefoxEvalTrace = RegExp(r'@\S+ line \d+ >.* (Function|eval):\d+:\d+');
 
 /// A RegExp to match Firefox's eval and Function stack traces.
 /// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/stack
@@ -48,20 +57,20 @@ final _firefoxEvalTrace =
 /// "@", and they always have both the line and column number (or just a
 /// trailing colon if no column number is available). They can also contain
 /// empty lines or lines consisting only of `[native code]`.
-final _firefoxSafariTrace = new RegExp(
-    r"^"
-    r"(" // Member description. Not present in some Safari frames.
-    r"([.0-9A-Za-z_$/<]|\(.*\))*" // Member name and arguments.
-    r"@"
-    r")?"
-    r"[^\s]*" // Frame URL.
-    r":\d*" // Line or column number. Some older frames only have a line number.
-    r"$",
+final _firefoxSafariTrace = RegExp(
+    r'^'
+    r'(' // Member description. Not present in some Safari frames.
+    r'([.0-9A-Za-z_$/<]|\(.*\))*' // Member name and arguments.
+    r'@'
+    r')?'
+    r'[^\s]*' // Frame URL.
+    r':\d*' // Line or column number. Some older frames only have a line number.
+    r'$',
     multiLine: true);
 
 /// A RegExp to match this package's stack traces.
 final _friendlyTrace =
-    new RegExp(r"^[^\s<][^\s]*( \d+(:\d+)?)?[ \t]+[^\s]+$", multiLine: true);
+    RegExp(r'^[^\s<][^\s]*( \d+(:\d+)?)?[ \t]+[^\s]+$', multiLine: true);
 
 /// A stack trace, comprised of a list of stack frames.
 class Trace implements StackTrace {
@@ -75,8 +84,8 @@ class Trace implements StackTrace {
   /// set, this folds together multiple stack frames from the Dart core
   /// libraries, so that only the core library method directly called from user
   /// code is visible (see [Trace.terse]).
-  static String format(StackTrace stackTrace, {bool terse: true}) {
-    var trace = new Trace.from(stackTrace);
+  static String format(StackTrace stackTrace, {bool terse = true}) {
+    var trace = Trace.from(stackTrace);
     if (terse) trace = trace.terse;
     return trace.toString();
   }
@@ -88,15 +97,15 @@ class Trace implements StackTrace {
   /// many frames up instead.
   factory Trace.current([int level = 0]) {
     if (level < 0) {
-      throw new ArgumentError("Argument [level] must be greater than or equal "
-          "to 0.");
+      throw ArgumentError('Argument [level] must be greater than or equal '
+          'to 0.');
     }
 
-    var trace = new Trace.from(StackTrace.current);
-    return new LazyTrace(() {
+    var trace = Trace.from(StackTrace.current);
+    return LazyTrace(() {
       // JS includes a frame for the call to StackTrace.current, but the VM
       // doesn't, so we skip an extra frame in a JS context.
-      return new Trace(trace.frames.skip(level + (inJS ? 2 : 1)),
+      return Trace(trace.frames.skip(level + (inJS ? 2 : 1)),
           original: trace.original.toString());
     });
   }
@@ -110,12 +119,12 @@ class Trace implements StackTrace {
     // the natural failure will only occur when the LazyTrace is materialized,
     // and we want to provide an error that's more local to the actual problem.
     if (trace == null) {
-      throw new ArgumentError("Cannot create a Trace from null.");
+      throw ArgumentError('Cannot create a Trace from null.');
     }
 
     if (trace is Trace) return trace;
     if (trace is Chain) return trace.toTrace();
-    return new LazyTrace(() => new Trace.parse(trace.toString()));
+    return LazyTrace(() => Trace.parse(trace.toString()));
   }
 
   /// Parses a string representation of a stack trace.
@@ -132,17 +141,17 @@ class Trace implements StackTrace {
           trace.contains(_firefoxEvalTrace)) {
         return new Trace.parseFirefox(trace);
       }
-      if (trace.contains(chainGap)) return new Chain.parse(trace).toTrace();
+      if (trace.contains(chainGap)) return Chain.parse(trace).toTrace();
       if (trace.contains(_friendlyTrace)) {
-        return new Trace.parseFriendly(trace);
+        return Trace.parseFriendly(trace);
       }
 
       // Default to parsing the stack trace as a VM trace. This is also hit on
       // IE and Safari, where the stack trace is just an empty string (issue
       // 11257).
-      return new Trace.parseVM(trace);
+      return Trace.parseVM(trace);
     } on FormatException catch (error) {
-      throw new FormatException('${error.message}\nStack trace:\n$trace');
+      throw FormatException('${error.message}\nStack trace:\n$trace');
     }
   }
 
@@ -152,15 +161,15 @@ class Trace implements StackTrace {
   static List<Frame> _parseVM(String trace) {
     // Ignore [vmChainGap]. This matches the behavior of
     // `Chain.parse().toTrace()`.
-    var lines = trace.trim().replaceAll(vmChainGap, '').split("\n");
+    var lines = trace.trim().replaceAll(vmChainGap, '').split('\n');
     var frames = lines
         .take(lines.length - 1)
-        .map((line) => new Frame.parseVM(line))
+        .map((line) => Frame.parseVM(line))
         .toList();
 
     // TODO(nweiz): Remove this when issue 23614 is fixed.
-    if (!lines.last.endsWith(".da")) {
-      frames.add(new Frame.parseVM(lines.last));
+    if (!lines.last.endsWith('.da')) {
+      frames.add(Frame.parseVM(lines.last));
     }
 
     return frames;
@@ -170,22 +179,22 @@ class Trace implements StackTrace {
   Trace.parseV8(String trace)
       : this(
             trace
-                .split("\n")
+                .split('\n')
                 .skip(1)
-                // It's possible that an Exception's description contains a line that
-                // looks like a V8 trace line, which will screw this up.
+                // It's possible that an Exception's description contains a line
+                // that looks like a V8 trace line, which will screw this up.
                 // Unfortunately, that's impossible to detect.
                 .skipWhile((line) => !line.startsWith(_v8TraceLine))
-                .map((line) => new Frame.parseV8(line)),
+                .map((line) => Frame.parseV8(line)),
             original: trace);
 
   /// Parses a string representation of a JavaScriptCore stack trace.
   Trace.parseJSCore(String trace)
       : this(
             trace
-                .split("\n")
-                .where((line) => line != "\tat ")
-                .map((line) => new Frame.parseV8(line)),
+                .split('\n')
+                .where((line) => line != '\tat ')
+                .map((line) => Frame.parseV8(line)),
             original: trace);
 
   /// Parses a string representation of an Internet Explorer stack trace.
@@ -199,27 +208,27 @@ class Trace implements StackTrace {
       : this(
             trace
                 .trim()
-                .split("\n")
+                .split('\n')
                 .where((line) => line.isNotEmpty && line != '[native code]')
-                .map((line) => new Frame.parseFirefox(line)),
+                .map((line) => Frame.parseFirefox(line)),
             original: trace);
 
   /// Parses a string representation of a Safari stack trace.
   Trace.parseSafari(String trace) : this.parseFirefox(trace);
 
   /// Parses a string representation of a Safari 6.1+ stack trace.
-  @Deprecated("Use Trace.parseSafari instead.")
+  @Deprecated('Use Trace.parseSafari instead.')
   Trace.parseSafari6_1(String trace) : this.parseSafari(trace);
 
   /// Parses a string representation of a Safari 6.0 stack trace.
-  @Deprecated("Use Trace.parseSafari instead.")
+  @Deprecated('Use Trace.parseSafari instead.')
   Trace.parseSafari6_0(String trace)
       : this(
             trace
                 .trim()
-                .split("\n")
+                .split('\n')
                 .where((line) => line != '[native code]')
-                .map((line) => new Frame.parseFirefox(line)),
+                .map((line) => Frame.parseFirefox(line)),
             original: trace);
 
   /// Parses this package's string representation of a stack trace.
@@ -232,23 +241,23 @@ class Trace implements StackTrace {
                 ? []
                 : trace
                     .trim()
-                    .split("\n")
+                    .split('\n')
                     // Filter out asynchronous gaps from [Chain]s.
                     .where((line) => !line.startsWith('====='))
-                    .map((line) => new Frame.parseFriendly(line)),
+                    .map((line) => Frame.parseFriendly(line)),
             original: trace);
 
   /// Returns a new [Trace] comprised of [frames].
   Trace(Iterable<Frame> frames, {String original})
-      : frames = new List<Frame>.unmodifiable(frames),
-        original = new StackTrace.fromString(original);
+      : frames = List<Frame>.unmodifiable(frames),
+        original = StackTrace.fromString(original);
 
   /// Returns a VM-style [StackTrace] object.
   ///
   /// The return value's [toString] method will always return a string
   /// representation in the Dart VM's stack trace format, regardless of what
   /// platform is being used.
-  StackTrace get vmTrace => new VMTrace(frames);
+  StackTrace get vmTrace => VMTrace(frames);
 
   /// Returns a terser version of [this].
   ///
@@ -279,7 +288,7 @@ class Trace implements StackTrace {
   /// If [terse] is true, this will also fold together frames from the core
   /// library or from this package, simplify core library frames, and
   /// potentially remove the outermost frame as in [Trace.terse].
-  Trace foldFrames(bool predicate(Frame frame), {bool terse: false}) {
+  Trace foldFrames(bool Function(Frame) predicate, {bool terse = false}) {
     if (terse) {
       var oldPredicate = predicate;
       predicate = (frame) {
@@ -305,8 +314,7 @@ class Trace implements StackTrace {
       if (frame is UnparsedFrame || !predicate(frame)) {
         newFrames.add(frame);
       } else if (newFrames.isEmpty || !predicate(newFrames.last)) {
-        newFrames
-            .add(new Frame(frame.uri, frame.line, frame.column, frame.member));
+        newFrames.add(Frame(frame.uri, frame.line, frame.column, frame.member));
       }
     }
 
@@ -314,7 +322,7 @@ class Trace implements StackTrace {
       newFrames = newFrames.map((frame) {
         if (frame is UnparsedFrame || !predicate(frame)) return frame;
         var library = frame.library.replaceAll(_terseRegExp, '');
-        return new Frame(Uri.parse(library), null, null, frame.member);
+        return Frame(Uri.parse(library), null, null, frame.member);
       }).toList();
 
       if (newFrames.length > 1 && predicate(newFrames.first)) {
@@ -322,10 +330,10 @@ class Trace implements StackTrace {
       }
     }
 
-    return new Trace(newFrames.reversed, original: this.original.toString());
+    return Trace(newFrames.reversed, original: original.toString());
   }
 
-  /// Returns a human-readable string representation of [this].
+  @override
   String toString() {
     // Figure out the longest path so we know how much to pad.
     var longest =
@@ -333,7 +341,7 @@ class Trace implements StackTrace {
 
     // Print out the stack trace nicely formatted.
     return frames.map((frame) {
-      if (frame is UnparsedFrame) return "$frame\n";
+      if (frame is UnparsedFrame) return '$frame\n';
       return '${frame.location.padRight(longest)}  ${frame.member}\n';
     }).join();
   }
