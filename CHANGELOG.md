@@ -1,6 +1,10 @@
-## 1.9.4-dev
+## 1.9.5-dev
 
 * ability to parse chrome eval exceptions
+
+## 1.9.4-dev
+
+* Added support for firefox anonymous stack traces
 
 ## 1.9.3
 
