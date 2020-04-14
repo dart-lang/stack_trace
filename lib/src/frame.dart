@@ -21,7 +21,7 @@ final _v8Frame =
     RegExp(r'^\s*at (?:(\S.*?)(?: \[as [^\]]+\])? \((.*)\)|(.*))$');
 
 // http://pub.dartlang.org/stuff.dart.js:560:28
-final _v8UrlLocation = new RegExp(r'^(.*?):(\d+)(?::(\d+))?|native$');
+final _v8UrlLocation = RegExp(r'^(.*?):(\d+)(?::(\d+))?|native$');
 
 // eval as function (http://pub.dartlang.org/stuff.dart.js:560:28), efn:3:28
 // eval as function (http://pub.dartlang.org/stuff.dart.js:560:28)
@@ -182,7 +182,7 @@ class Frame {
           final uri = _uriOrPathToUri(urlMatch[1]);
           final line = int.parse(urlMatch[2]);
           final column = urlMatch[3] != null ? int.parse(urlMatch[3]) : null;
-          return new Frame(uri, line, column, member);
+          return Frame(uri, line, column, member);
         }
 
         // V8 stack frames can be in two forms.

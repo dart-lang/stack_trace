@@ -126,12 +126,12 @@ class Trace implements StackTrace {
   /// of [Chain.toTrace].
   factory Trace.parse(String trace) {
     try {
-      if (trace.isEmpty) return new Trace(<Frame>[]);
-      if (trace.contains(_v8Trace)) return new Trace.parseV8(trace);
-      if (trace.contains("\tat ")) return new Trace.parseJSCore(trace);
+      if (trace.isEmpty) return Trace(<Frame>[]);
+      if (trace.contains(_v8Trace)) return Trace.parseV8(trace);
+      if (trace.contains('\tat ')) return Trace.parseJSCore(trace);
       if (trace.contains(_firefoxSafariTrace) ||
           trace.contains(_firefoxEvalTrace)) {
-        return new Trace.parseFirefox(trace);
+        return Trace.parseFirefox(trace);
       }
       if (trace.contains(chainGap)) return Chain.parse(trace).toTrace();
       if (trace.contains(_friendlyTrace)) {

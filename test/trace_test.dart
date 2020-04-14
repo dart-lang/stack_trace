@@ -16,7 +16,7 @@ void main() {
 
   group('.parse', () {
     test('.parse parses a V8 stack trace with eval statment correctly', () {
-      var trace = new Trace.parse(r'''Error
+      var trace = Trace.parse(r'''Error
     at Object.eval (eval at Foo (main.dart.js:588), <anonymous>:3:47)''');
       expect(trace.frames[0].uri, Uri.parse('main.dart.js'));
       expect(trace.frames[0].member, equals('Object.eval'));
