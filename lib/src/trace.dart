@@ -36,14 +36,6 @@ final _v8TraceLine = RegExp(r'    ?at ');
 ///     anonymous/<@http://pub.dartlang.org/stuff.js line 693 > eval:3:40
 final _firefoxEvalTrace = RegExp(r'@\S+ line \d+ >.* (Function|eval):\d+:\d+');
 
-/// A RegExp to match Firefox's eval and Function stack traces.
-/// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/stack
-/// These stack traces looks like:
-/// anonymous/<@http://pub.dartlang.org/stuff.js line 693 > Function:3:40
-/// anonymous/<@http://pub.dartlang.org/stuff.js line 693 > eval:3:40
-final _firefoxEvalTrace =
-    new RegExp(r"@\S+ line \d+ >.* (Function|eval):\d+:\d+");
-
 /// A RegExp to match Firefox and Safari's stack traces.
 ///
 /// Firefox and Safari have very similar stack trace formats, so we use the same

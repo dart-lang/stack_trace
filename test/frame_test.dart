@@ -275,11 +275,6 @@ baz@http://pub.dartlang.org/buz.js:56355:55
       expect(trace.frames[2].line, equals(45));
       expect(trace.frames[2].column, isNull);
       expect(trace.frames[2].member, equals("<fn>"));
-      expect(trace.frames[2].uri,
-          equals(Uri.parse('http://pub.dartlang.org/buz.js')));
-      expect(trace.frames[2].line, equals(56355));
-      expect(trace.frames[2].column, equals(55));
-      expect(trace.frames[2].member, equals('baz'));
     });
 
     test('parses a simple stack frame correctly', () {
