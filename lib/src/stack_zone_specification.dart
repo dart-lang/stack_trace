@@ -11,7 +11,7 @@ import 'trace.dart';
 import 'utils.dart';
 
 /// A function that handles errors in the zone wrapped by [Chain.capture].
-typedef _ChainHandler = void Function(dynamic error, Chain chain);
+typedef _ChainHandler = void Function(Object error, Chain chain);
 
 /// A class encapsulating the zone specification for a [Chain.capture] zone.
 ///
