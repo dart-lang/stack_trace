@@ -73,7 +73,7 @@ class Chain implements StackTrace {
   ///
   /// If [callback] returns a value, it will be returned by [capture] as well.
   static T capture<T>(T Function() callback,
-      {void Function(dynamic error, Chain) onError,
+      {void Function(Object error, Chain) onError,
       bool when = true,
       bool errorZone = true}) {
     if (!errorZone && onError != null) {

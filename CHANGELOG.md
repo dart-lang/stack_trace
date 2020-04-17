@@ -1,6 +1,9 @@
 ## 1.9.4-dev
 
 * Added support for firefox anonymous stack traces
+* Change the argument type to `Chain.capture` from `Function(dynamic, Chain)` to
+  `Function(Object, Chain)`. Existing functions which take `dynamic` are still
+  fine, but new uses can have a safer type.
 
 ## 1.9.3
 
