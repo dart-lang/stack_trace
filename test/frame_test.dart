@@ -224,6 +224,8 @@ void main() {
       expectIsUnparsed((text) => Frame.parseV8(text),
           '    at (dart:async/future.dart:10:15)');
       expectIsUnparsed(
+              (text) => Frame.parseV8(text), 'Foo (dart:async/future.dart:10:15)');
+      expectIsUnparsed(
           (text) => Frame.parseV8(text), '    at dart:async/future.dart');
       expectIsUnparsed(
           (text) => Frame.parseV8(text), 'dart:async/future.dart:10:15');
@@ -255,12 +257,12 @@ baz@http://pub.dartlang.org/buz.js:56355:55
     });
 
     test(
-        'parses a Firefox stack trace with nested evals in anonymous function correctly',
+        'parses a Firefox stack trace with nested evals in anonymous function',
         () {
       var trace = Trace.parse('''
         Foo._bar@http://pub.dartlang.org/stuff.js:18056:12
         anonymous@file:///C:/example.html line 7 > eval line 1 > eval:1:1
-        anonymous@file:///C:/example.html line 45 > Function:1:1 
+        anonymous@file:///C:/example.html line 45 > Function:1:1
         ''');
       expect(trace.frames[0].uri,
           equals(Uri.parse('http://pub.dartlang.org/stuff.js')));
