@@ -240,10 +240,6 @@ class Frame {
           return Frame._parseFirefoxEval(frame);
         }
 
-        if (match[3].contains(' line ')) {
-          return Frame._parseFirefoxEval(frame);
-        }
-
         // Normally this is a URI, but in a jsshell trace it can be a path.
         var uri = _uriOrPathToUri(match[3]);
 
