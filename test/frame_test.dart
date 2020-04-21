@@ -224,7 +224,7 @@ void main() {
       expectIsUnparsed((text) => Frame.parseV8(text),
           '    at (dart:async/future.dart:10:15)');
       expectIsUnparsed(
-           (text) => Frame.parseV8(text), 'Foo (dart:async/future.dart:10:15)');
+          (text) => Frame.parseV8(text), 'Foo (dart:async/future.dart:10:15)');
       expectIsUnparsed(
           (text) => Frame.parseV8(text), '    at dart:async/future.dart');
       expectIsUnparsed(
