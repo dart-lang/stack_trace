@@ -13,33 +13,33 @@ import 'unparsed_frame.dart';
 final _vmFrame = RegExp(r'^#\d+\s+(\S.*) \((.+?)((?::\d+){0,2})\)$');
 
 //     at Object.stringify (native)
-//     at VW.call$0 (http://pub.dartlang.org/stuff.dart.js:560:28)
+//     at VW.call$0 (https://example.com/stuff.dart.js:560:28)
 //     at VW.call$0 (eval as fn
-//         (http://pub.dartlang.org/stuff.dart.js:560:28), efn:3:28)
-//     at http://pub.dartlang.org/stuff.dart.js:560:28
+//         (https://example.com/stuff.dart.js:560:28), efn:3:28)
+//     at https://example.com/stuff.dart.js:560:28
 final _v8Frame =
     RegExp(r'^\s*at (?:(\S.*?)(?: \[as [^\]]+\])? \((.*)\)|(.*))$');
 
-// http://pub.dartlang.org/stuff.dart.js:560:28
+// https://example.com/stuff.dart.js:560:28
 final _v8UrlLocation = RegExp(r'^(.*):(\d+):(\d+)|native$');
 
-// eval as function (http://pub.dartlang.org/stuff.dart.js:560:28), efn:3:28
-// eval as function (http://pub.dartlang.org/stuff.dart.js:560:28)
+// eval as function (https://example.com/stuff.dart.js:560:28), efn:3:28
+// eval as function (https://example.com/stuff.dart.js:560:28)
 // eval as function (eval as otherFunction
-//     (http://pub.dartlang.org/stuff.dart.js:560:28))
+//     (https://example.com/stuff.dart.js:560:28))
 final _v8EvalLocation =
     RegExp(r'^eval at (?:\S.*?) \((.*)\)(?:, .*?:\d+:\d+)?$');
 
-// anonymous/<@http://pub.dartlang.org/stuff.js line 693 > Function:3:40
-// anonymous/<@http://pub.dartlang.org/stuff.js line 693 > eval:3:40
+// anonymous/<@https://example.com/stuff.js line 693 > Function:3:40
+// anonymous/<@https://example.com/stuff.js line 693 > eval:3:40
 final _firefoxEvalLocation =
     RegExp(r'(\S+)@(\S+) line (\d+) >.* (Function|eval):\d+:\d+');
 
-// .VW.call$0@http://pub.dartlang.org/stuff.dart.js:560
-// .VW.call$0("arg")@http://pub.dartlang.org/stuff.dart.js:560
-// .VW.call$0/name<@http://pub.dartlang.org/stuff.dart.js:560
-// .VW.call$0@http://pub.dartlang.org/stuff.dart.js:560:36
-// http://pub.dartlang.org/stuff.dart.js:560
+// .VW.call$0@https://example.com/stuff.dart.js:560
+// .VW.call$0("arg")@https://example.com/stuff.dart.js:560
+// .VW.call$0/name<@https://example.com/stuff.dart.js:560
+// .VW.call$0@https://example.com/stuff.dart.js:560:36
+// https://example.com/stuff.dart.js:560
 final _firefoxSafariFrame = RegExp(r'^'
     r'(?:' // Member description. Not present in some Safari frames.
     r'([^@(/]*)' // The actual name of the member.
@@ -57,7 +57,7 @@ final _firefoxSafariFrame = RegExp(r'^'
 
 // foo/bar.dart 10:11 Foo._bar
 // foo/bar.dart 10:11 (anonymous function).dart.fn
-// http://dartlang.org/foo/bar.dart Foo._bar
+// https://dart.dev/foo/bar.dart Foo._bar
 // data:... 10:11 Foo._bar
 final _friendlyFrame = RegExp(r'^(\S+)(?: (\d+)(?::(\d+))?)?\s+([^\d].*)$');
 
@@ -213,8 +213,8 @@ class Frame {
   /// Parses a Firefox 'eval' or 'function' stack frame.
   ///
   /// for example:
-  /// anonymous/<@http://pub.dartlang.org/stuff.js line 693 > Function:3:40
-  /// anonymous/<@http://pub.dartlang.org/stuff.js line 693 > eval:3:40
+  /// anonymous/<@https://example.com/stuff.js line 693 > Function:3:40
+  /// anonymous/<@https://example.com/stuff.js line 693 > eval:3:40
   factory Frame._parseFirefoxEval(String frame) =>
       _catchFormatException(frame, () {
         final match = _firefoxEvalLocation.firstMatch(frame);
