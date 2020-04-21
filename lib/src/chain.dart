@@ -73,7 +73,7 @@ class Chain implements StackTrace {
   ///
   /// If [callback] returns a value, it will be returned by [capture] as well.
   static T capture<T>(T Function() callback,
-      {void Function(dynamic error, Chain) onError,
+      {void Function(Object error, Chain) onError,
       bool when = true,
       bool errorZone = true}) {
     if (!errorZone && onError != null) {
@@ -195,7 +195,7 @@ class Chain implements StackTrace {
   /// [`source_map_stack_trace`][source_map_stack_trace] package can be used to
   /// convert JavaScript traces into Dart-style traces.
   ///
-  /// [source_map_stack_trace]: https://pub.dartlang.org/packages/source_map_stack_trace
+  /// [source_map_stack_trace]: https://pub.dev/packages/source_map_stack_trace
   Chain get terse => foldFrames((_) => false, terse: true);
 
   /// Returns a new [Chain] based on [this] where multiple stack frames matching

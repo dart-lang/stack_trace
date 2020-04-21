@@ -4,3 +4,7 @@ analyzer:
     implicit-casts: false
   errors:
     prefer_spread_collections: ignore
+
+linter:
+  rules:
+    - avoid_private_typedef_functions
