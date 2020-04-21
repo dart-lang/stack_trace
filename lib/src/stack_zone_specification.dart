@@ -11,7 +11,7 @@ import 'trace.dart';
 import 'utils.dart';
 
 /// A function that handles errors in the zone wrapped by [Chain.capture].
-typedef _ChainHandler = void Function(dynamic error, Chain chain);
+typedef _ChainHandler = void Function(Object error, Chain chain);
 
 /// A class encapsulating the zone specification for a [Chain.capture] zone.
 ///
@@ -144,8 +144,8 @@ class StackZoneSpecification {
 
   /// Looks up the chain associated with [stackTrace] and passes it either to
   /// [_onError] or [parent]'s error handler.
-  void _handleUncaughtError(
-      Zone self, ZoneDelegate parent, Zone zone, error, StackTrace stackTrace) {
+  void _handleUncaughtError(Zone self, ZoneDelegate parent, Zone zone,
+      Object error, StackTrace stackTrace) {
     if (_disabled) {
       parent.handleUncaughtError(zone, error, stackTrace);
       return;
@@ -163,7 +163,7 @@ class StackZoneSpecification {
       // TODO(rnystrom): Is the null-assertion correct here? It is nullable in
       // Zone. Should we check for that here?
       self.parent!.runBinary(_onError!, error, stackChain);
-    } catch (newError, newStackTrace) {
+    } on Object catch (newError, newStackTrace) {
       if (identical(newError, error)) {
         parent.handleUncaughtError(zone, error, stackChain);
       } else {

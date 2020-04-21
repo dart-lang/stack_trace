@@ -156,7 +156,7 @@ void main() {
                 contains(frameMember(startsWith('inPeriodicTimer'))));
             completer.complete();
           }
-        } catch (error, stackTrace) {
+        } on Object catch (error, stackTrace) {
           completer.completeError(error, stackTrace);
         }
       });
@@ -241,7 +241,7 @@ void main() {
           expect(error, equals('error'));
           expect(chain.traces[1].frames,
               contains(frameMember(startsWith('inMicrotask'))));
-          throw error;
+          throw error as Object;
         });
       }, onError: (error, chain) {
         try {
@@ -250,7 +250,7 @@ void main() {
           expect(chain.traces[1].frames,
               contains(frameMember(startsWith('inMicrotask'))));
           completer.complete();
-        } catch (error, stackTrace) {
+        } on Object catch (error, stackTrace) {
           completer.completeError(error, stackTrace);
         }
       });
@@ -271,7 +271,7 @@ void main() {
         expect(chain.traces[1].frames,
             contains(frameMember(startsWith('inMicrotask'))));
         completer.complete();
-      } catch (error, stackTrace) {
+      } on Object catch (error, stackTrace) {
         completer.completeError(error, stackTrace);
       }
     });
@@ -481,7 +481,7 @@ void main() {
       'chain', () {
     // Disable the test package's chain-tracking.
     return Chain.disable(() async {
-      StackTrace trace;
+      late StackTrace trace;
       await Chain.capture(() async {
         try {
           throw 'error';
