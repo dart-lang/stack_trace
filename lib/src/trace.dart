@@ -32,8 +32,8 @@ final _v8TraceLine = RegExp(r'    ?at ');
 /// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/stack
 ///
 /// These stack traces looks like:
-///     anonymous/<@http://pub.dartlang.org/stuff.js line 693 > Function:3:40
-///     anonymous/<@http://pub.dartlang.org/stuff.js line 693 > eval:3:40
+///     anonymous/<@https://example.com/stuff.js line 693 > Function:3:40
+///     anonymous/<@https://example.com/stuff.js line 693 > eval:3:40
 final _firefoxEvalTrace = RegExp(r'@\S+ line \d+ >.* (Function|eval):\d+:\d+');
 
 /// A RegExp to match Firefox and Safari's stack traces.
@@ -43,7 +43,7 @@ final _firefoxEvalTrace = RegExp(r'@\S+ line \d+ >.* (Function|eval):\d+:\d+');
 ///
 /// Firefox's trace frames start with the name of the function in which the
 /// error occurred, possibly including its parameters inside `()`. For example,
-/// `.VW.call$0("arg")@http://pub.dartlang.org/stuff.dart.js:560`.
+/// `.VW.call$0("arg")@https://example.com/stuff.dart.js:560`.
 ///
 /// Safari traces occasionally don't include the initial method name followed by
 /// "@", and they always have both the line and column number (or just a
@@ -264,7 +264,7 @@ class Trace implements StackTrace {
   /// [`source_map_stack_trace`][source_map_stack_trace] package can be used to
   /// convert JavaScript traces into Dart-style traces.
   ///
-  /// [source_map_stack_trace]: https://pub.dartlang.org/packages/source_map_stack_trace
+  /// [source_map_stack_trace]: https://pub.dev/packages/source_map_stack_trace
   ///
   /// For custom folding, see [foldFrames].
   Trace get terse => foldFrames((_) => false, terse: true);
