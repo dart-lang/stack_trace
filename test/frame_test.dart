@@ -221,8 +221,6 @@ void main() {
       expectIsUnparsed(
           (text) => Frame.parseV8(text), '    at dart:async/future.dart');
       expectIsUnparsed(
-          (text) => Frame.parseV8(text), '    at dart:async/future.dart:10');
-      expectIsUnparsed(
           (text) => Frame.parseV8(text), 'dart:async/future.dart:10:15');
     });
   });
