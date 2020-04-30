@@ -1,10 +1,7 @@
-## 1.9.5-dev
+## 1.9.4
 
-* ability to parse chrome eval exceptions
-
-## 1.9.4-dev
-
-* Added support for firefox anonymous stack traces
+* Add support for firefox anonymous stack traces.
+* Add support for chrome eval stack traces without a column.
 * Change the argument type to `Chain.capture` from `Function(dynamic, Chain)` to
   `Function(Object, Chain)`. Existing functions which take `dynamic` are still
   fine, but new uses can have a safer type.
