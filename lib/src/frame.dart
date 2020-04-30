@@ -21,8 +21,8 @@ final _v8Frame =
     RegExp(r'^\s*at (?:(\S.*?)(?: \[as [^\]]+\])? \((.*)\)|(.*))$');
 
 // https://example.com/stuff.dart.js:560:28
-// http://pub.dartlang.org/stuff.dart.js:560
-final _v8UrlLocation = RegExp(r'^(.*?):(\d+)(?::(\d+))?|native$');
+// https://example.com/stuff.dart.js:560
+final _v8UrlLocation = RegExp(r'^(.*?):(\d+)(?::(\d+))?$|native$');
 
 // eval as function (https://example.com/stuff.dart.js:560:28), efn:3:28
 // eval as function (https://example.com/stuff.dart.js:560:28)

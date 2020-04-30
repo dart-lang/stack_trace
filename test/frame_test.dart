@@ -89,6 +89,16 @@ void main() {
       expect(frame.member, equals('VW.call\$0'));
     });
 
+    test('parses a stack frame with a : in the authority', () {
+      var frame = Frame.parseV8('    at VW.call\$0 '
+          '(http://localhost:8080/stuff.dart.js:560:28)');
+      expect(
+          frame.uri, equals(Uri.parse('http://localhost:8080/stuff.dart.js')));
+      expect(frame.line, equals(560));
+      expect(frame.column, equals(28));
+      expect(frame.member, equals('VW.call\$0'));
+    });
+
     test('parses a stack frame with an absolute POSIX path correctly', () {
       var frame = Frame.parseV8('    at VW.call\$0 '
           '(/path/to/stuff.dart.js:560:28)');
