@@ -146,7 +146,7 @@ void main() {
         }, onError: (error, chain) {
           expect(error, equals('error'));
           expect(chain.traces, hasLength(2));
-          throw error as Object;
+          throw error;
         });
       }, onError: (error, chain) {
         try {
