@@ -82,7 +82,7 @@ class Chain implements StackTrace {
     }
 
     if (!when) {
-      late void Function(Object, StackTrace) newOnError;
+      void Function(Object, StackTrace)? newOnError;
       if (onError != null) {
         void wrappedOnError(Object error, StackTrace? stackTrace) {
           onError(
