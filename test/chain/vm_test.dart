@@ -241,7 +241,7 @@ void main() {
           expect(error, equals('error'));
           expect(chain.traces[1].frames,
               contains(frameMember(startsWith('inMicrotask'))));
-          throw error as Object;
+          throw error;
         });
       }, onError: (error, chain) {
         try {
