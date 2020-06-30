@@ -21,7 +21,8 @@ final _v8Frame =
     RegExp(r'^\s*at (?:(\S.*?)(?: \[as [^\]]+\])? \((.*)\)|(.*))$');
 
 // https://example.com/stuff.dart.js:560:28
-final _v8UrlLocation = RegExp(r'^(.*):(\d+):(\d+)|native$');
+// https://example.com/stuff.dart.js:560
+final _v8UrlLocation = RegExp(r'^(.*?):(\d+)(?::(\d+))?$|native$');
 
 // eval as function (https://example.com/stuff.dart.js:560:28), efn:3:28
 // eval as function (https://example.com/stuff.dart.js:560:28)
@@ -148,7 +149,9 @@ class Frame {
         var member = match[1]!
             .replaceAll(_asyncBody, '<async>')
             .replaceAll('<anonymous closure>', '<fn>');
-        var uri = Uri.parse(match[2]!);
+        var uri = match[2]!.startsWith('<data:')
+            ? Uri.dataFromString('')
+            : Uri.parse(match[2]!);
 
         var lineAndColumn = match[3]!.split(':');
         var line =
@@ -179,8 +182,10 @@ class Frame {
           var urlMatch = _v8UrlLocation.firstMatch(location);
           if (urlMatch == null) return UnparsedFrame(frame);
 
-          return Frame(_uriOrPathToUri(urlMatch[1]!), int.parse(urlMatch[2]!),
-              int.parse(urlMatch[3]!), member);
+          final uri = _uriOrPathToUri(urlMatch[1]!);
+          final line = int.parse(urlMatch[2]!);
+          final column = urlMatch[3] != null ? int.parse(urlMatch[3]) : null;
+          return Frame(uri, line, column, member);
         }
 
         // V8 stack frames can be in two forms.

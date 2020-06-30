@@ -15,6 +15,15 @@ void main() {
   test('a native stack trace is parseable', () => Trace.current());
 
   group('.parse', () {
+    test('.parse parses a V8 stack trace with eval statment correctly', () {
+      var trace = Trace.parse(r'''Error
+    at Object.eval (eval at Foo (main.dart.js:588), <anonymous>:3:47)''');
+      expect(trace.frames[0].uri, Uri.parse('main.dart.js'));
+      expect(trace.frames[0].member, equals('Object.eval'));
+      expect(trace.frames[0].line, equals(588));
+      expect(trace.frames[0].column, isNull);
+    });
+
     test('.parse parses a VM stack trace correctly', () {
       var trace = Trace.parse(
           '#0      Foo._bar (file:///home/nweiz/code/stuff.dart:42:21)\n'

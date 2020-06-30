@@ -1,6 +1,11 @@
-## 1.9.4-dev
+## 1.9.5
 
-* Added support for firefox anonymous stack traces
+* Parse the format for `data:` URIs that the Dart VM has used since `2.2.0`.
+
+## 1.9.4
+
+* Add support for firefox anonymous stack traces.
+* Add support for chrome eval stack traces without a column.
 * Change the argument type to `Chain.capture` from `Function(dynamic, Chain)` to
   `Function(Object, Chain)`. Existing functions which take `dynamic` are still
   fine, but new uses can have a safer type.

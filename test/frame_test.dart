@@ -89,6 +89,16 @@ void main() {
       expect(frame.member, equals('VW.call\$0'));
     });
 
+    test('parses a stack frame with a : in the authority', () {
+      var frame = Frame.parseV8('    at VW.call\$0 '
+          '(http://localhost:8080/stuff.dart.js:560:28)');
+      expect(
+          frame.uri, equals(Uri.parse('http://localhost:8080/stuff.dart.js')));
+      expect(frame.line, equals(560));
+      expect(frame.column, equals(28));
+      expect(frame.member, equals('VW.call\$0'));
+    });
+
     test('parses a stack frame with an absolute POSIX path correctly', () {
       var frame = Frame.parseV8('    at VW.call\$0 '
           '(/path/to/stuff.dart.js:560:28)');
@@ -220,8 +230,6 @@ void main() {
           (text) => Frame.parseV8(text), 'Foo (dart:async/future.dart:10:15)');
       expectIsUnparsed(
           (text) => Frame.parseV8(text), '    at dart:async/future.dart');
-      expectIsUnparsed(
-          (text) => Frame.parseV8(text), '    at dart:async/future.dart:10');
       expectIsUnparsed(
           (text) => Frame.parseV8(text), 'dart:async/future.dart:10:15');
     });
@@ -560,9 +568,15 @@ baz@https://pub.dev/buz.js:56355:55
           equals(path.join('foo', 'bar.dart')));
     });
 
-    test('truncates data: URIs', () {
+    test('truncates legacy data: URIs', () {
       var frame = Frame.parseVM(
           '#0 Foo (data:application/dart;charset=utf-8,blah:0:0)');
+      expect(frame.library, equals('data:...'));
+    });
+
+    test('truncates data: URIs', () {
+      var frame = Frame.parseVM(
+          '#0      main (<data:application/dart;charset=utf-8>:1:15)');
       expect(frame.library, equals('data:...'));
     });
   });
