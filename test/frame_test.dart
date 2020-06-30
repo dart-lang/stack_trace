@@ -568,9 +568,15 @@ baz@https://pub.dev/buz.js:56355:55
           equals(path.join('foo', 'bar.dart')));
     });
 
-    test('truncates data: URIs', () {
+    test('truncates legacy data: URIs', () {
       var frame = Frame.parseVM(
           '#0 Foo (data:application/dart;charset=utf-8,blah:0:0)');
+      expect(frame.library, equals('data:...'));
+    });
+
+    test('truncates data: URIs', () {
+      var frame = Frame.parseVM(
+          '#0      main (<data:application/dart;charset=utf-8>:1:15)');
       expect(frame.library, equals('data:...'));
     });
   });
