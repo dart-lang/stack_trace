@@ -149,7 +149,9 @@ class Frame {
         var member = match[1]
             .replaceAll(_asyncBody, '<async>')
             .replaceAll('<anonymous closure>', '<fn>');
-        var uri = Uri.parse(match[2]);
+        var uri = match[2].startsWith('<data:')
+            ? Uri.dataFromString('')
+            : Uri.parse(match[2]);
 
         var lineAndColumn = match[3].split(':');
         var line =

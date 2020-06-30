@@ -1,3 +1,7 @@
+## 1.9.5
+
+* Parse the format for `data:` URIs that the Dart VM has used since `2.2.0`.
+
 ## 1.9.4
 
 * Add support for firefox anonymous stack traces.
