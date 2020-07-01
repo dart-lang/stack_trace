@@ -184,7 +184,7 @@ class Frame {
 
           final uri = _uriOrPathToUri(urlMatch[1]!);
           final line = int.parse(urlMatch[2]!);
-          final column = urlMatch[3] != null ? int.parse(urlMatch[3]) : null;
+          final column = urlMatch[3] != null ? int.parse(urlMatch[3]!) : null;
           return Frame(uri, line, column, member);
         }
 
