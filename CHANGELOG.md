@@ -1,3 +1,7 @@
+## 1.10.0-nullsafety
+
+* Opt in to null safety.
+
 ## 1.9.5
 
 * Parse the format for `data:` URIs that the Dart VM has used since `2.2.0`.
