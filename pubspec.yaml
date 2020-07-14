@@ -1,19 +1,13 @@
 name: stack_trace
-# TODO(rnystrom): The version should be 2.0.0-dev, but doing so causes pub get
-# to fail since this depends on test, which has a cyclic dependency back onto
-# stack_trace. There are no versions of test that support stack_trace 2.0.0
-# yet.
-version: 1.10.0-dev
-# TODO(rnystrom): Remove this line once the above version issue is fixed.
-publish_to: none
+version: 1.10.0-nullsafety
 description: A package for manipulating stack traces and printing them readably.
 homepage: https://github.com/dart-lang/stack_trace
 
 environment:
-  sdk: '>=2.9.0-1 <3.0.0'
+  sdk: '>=2.9.0-18.0 <2.9.0'
 
 dependencies:
-  path: ^1.2.0
+  path: '>=1.8.0-nullsafety <1.8.0'
 
 dev_dependencies:
   pedantic: ^1.0.0
