@@ -15,11 +15,9 @@ typedef ChainThunk = Chain Function();
 /// necessary.
 class LazyChain implements Chain {
   final ChainThunk _thunk;
-  Chain _inner;
+  late final Chain _chain = _thunk();
 
   LazyChain(this._thunk);
-
-  Chain get _chain => _inner ??= _thunk();
 
   @override
   List<Trace> get traces => _chain.traces;

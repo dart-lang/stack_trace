@@ -19,7 +19,7 @@ import 'utils.dart';
 void main() {
   group('capture() with onError catches exceptions', () {
     test('thrown synchronously', () async {
-      StackTrace vmTrace;
+      late StackTrace vmTrace;
       var chain = await captureFuture(() {
         try {
           throw 'error';
@@ -156,7 +156,7 @@ void main() {
                 contains(frameMember(startsWith('inPeriodicTimer'))));
             completer.complete();
           }
-        } catch (error, stackTrace) {
+        } on Object catch (error, stackTrace) {
           completer.completeError(error, stackTrace);
         }
       });
@@ -246,11 +246,11 @@ void main() {
       }, onError: (error, chain) {
         try {
           expect(error, equals('error'));
-          expect(chain, TypeMatcher<Chain>());
+          expect(chain, isA<Chain>());
           expect(chain.traces[1].frames,
               contains(frameMember(startsWith('inMicrotask'))));
           completer.complete();
-        } catch (error, stackTrace) {
+        } on Object catch (error, stackTrace) {
           completer.completeError(error, stackTrace);
         }
       });
@@ -267,11 +267,11 @@ void main() {
     }, onError: (error, chain) {
       try {
         expect(error, equals('error'));
-        expect(chain, TypeMatcher<Chain>());
+        expect(chain, isA<Chain>());
         expect(chain.traces[1].frames,
             contains(frameMember(startsWith('inMicrotask'))));
         completer.complete();
-      } catch (error, stackTrace) {
+      } on Object catch (error, stackTrace) {
         completer.completeError(error, stackTrace);
       }
     });
@@ -481,7 +481,7 @@ void main() {
       'chain', () {
     // Disable the test package's chain-tracking.
     return Chain.disable(() async {
-      StackTrace trace;
+      late StackTrace trace;
       await Chain.capture(() async {
         try {
           throw 'error';

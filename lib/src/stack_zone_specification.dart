@@ -53,10 +53,10 @@ class StackZoneSpecification {
   ///
   /// If this is null, that indicates that any unhandled errors should be passed
   /// to the parent zone.
-  final void Function(Object error, Chain) _onError;
+  final void Function(Object error, Chain)? _onError;
 
   /// The most recent node of the current stack chain.
-  _Node _currentNode;
+  _Node? _currentNode;
 
   /// Whether this is an error zone.
   final bool _errorZone;
@@ -86,7 +86,7 @@ class StackZoneSpecification {
   /// The first stack trace in the returned chain will always be [trace]
   /// (converted to a [Trace] if necessary). If there is no chain associated
   /// with [trace], this just returns a single-trace chain containing [trace].
-  Chain chainFor(StackTrace trace) {
+  Chain chainFor(StackTrace? trace) {
     if (trace is Chain) return trace;
     trace ??= StackTrace.current;
 
@@ -96,11 +96,11 @@ class StackZoneSpecification {
       // [Chain.capture] and we should fall back to the VM's stack chaining. We
       // can't use [Chain.from] here because it'll just call [chainFor] again.
       if (trace is Trace) return Chain([trace]);
-      return LazyChain(() => Chain.parse(trace.toString()));
+      return LazyChain(() => Chain.parse(trace!.toString()));
     } else {
       if (trace is! Trace) {
-        var original = trace;
-        trace = LazyTrace(() => Trace.parse(_trimVMChain(original)));
+        StackTrace? original = trace;
+        trace = LazyTrace(() => Trace.parse(_trimVMChain(original!)));
       }
 
       return _Node(trace, previous).toChain();
@@ -111,7 +111,7 @@ class StackZoneSpecification {
   /// [f] is run.
   ZoneCallback<R> _registerCallback<R>(
       Zone self, ZoneDelegate parent, Zone zone, R Function() f) {
-    if (f == null || _disabled) return parent.registerCallback(zone, f);
+    if (_disabled) return parent.registerCallback(zone, f);
     var node = _createNode(1);
     return parent.registerCallback(zone, () => _run(f, node));
   }
@@ -120,7 +120,7 @@ class StackZoneSpecification {
   /// [f] is run.
   ZoneUnaryCallback<R, T> _registerUnaryCallback<R, T>(
       Zone self, ZoneDelegate parent, Zone zone, R Function(T) f) {
-    if (f == null || _disabled) return parent.registerUnaryCallback(zone, f);
+    if (_disabled) return parent.registerUnaryCallback(zone, f);
     var node = _createNode(1);
     return parent.registerUnaryCallback(zone, (arg) {
       return _run(() => f(arg), node);
@@ -131,7 +131,7 @@ class StackZoneSpecification {
   /// [f] is run.
   ZoneBinaryCallback<R, T1, T2> _registerBinaryCallback<R, T1, T2>(
       Zone self, ZoneDelegate parent, Zone zone, R Function(T1, T2) f) {
-    if (f == null || _disabled) return parent.registerBinaryCallback(zone, f);
+    if (_disabled) return parent.registerBinaryCallback(zone, f);
 
     var node = _createNode(1);
     return parent.registerBinaryCallback(zone, (arg1, arg2) {
@@ -141,8 +141,8 @@ class StackZoneSpecification {
 
   /// Looks up the chain associated with [stackTrace] and passes it either to
   /// [_onError] or [parent]'s error handler.
-  void _handleUncaughtError(
-      Zone self, ZoneDelegate parent, Zone zone, error, StackTrace stackTrace) {
+  void _handleUncaughtError(Zone self, ZoneDelegate parent, Zone zone,
+      Object error, StackTrace stackTrace) {
     if (_disabled) {
       parent.handleUncaughtError(zone, error, stackTrace);
       return;
@@ -157,8 +157,10 @@ class StackZoneSpecification {
     // TODO(nweiz): Currently this copies a lot of logic from [runZoned]. Just
     // allow [runBinary] to throw instead once issue 18134 is fixed.
     try {
-      self.parent.runBinary(_onError, error, stackChain);
-    } catch (newError, newStackTrace) {
+      // TODO(rnystrom): Is the null-assertion correct here? It is nullable in
+      // Zone. Should we check for that here?
+      self.parent!.runBinary(_onError!, error, stackChain);
+    } on Object catch (newError, newStackTrace) {
       if (identical(newError, error)) {
         parent.handleUncaughtError(zone, error, stackChain);
       } else {
@@ -169,8 +171,8 @@ class StackZoneSpecification {
 
   /// Attaches the current stack chain to [stackTrace], replacing it if
   /// necessary.
-  AsyncError _errorCallback(Zone self, ZoneDelegate parent, Zone zone,
-      Object error, StackTrace stackTrace) {
+  AsyncError? _errorCallback(Zone self, ZoneDelegate parent, Zone zone,
+      Object error, StackTrace? stackTrace) {
     if (_disabled) return parent.errorCallback(zone, error, stackTrace);
 
     // Go up two levels to get through [_CustomZone.errorCallback].
@@ -217,15 +219,15 @@ class StackZoneSpecification {
 
   /// Like [new Trace.current], but if the current stack trace has VM chaining
   /// enabled, this only returns the innermost sub-trace.
-  Trace _currentTrace([int level]) {
-    level ??= 0;
+  Trace _currentTrace([int? level]) {
     var stackTrace = StackTrace.current;
     return LazyTrace(() {
       var text = _trimVMChain(stackTrace);
       var trace = Trace.parse(text);
       // JS includes a frame for the call to StackTrace.current, but the VM
       // doesn't, so we skip an extra frame in a JS context.
-      return Trace(trace.frames.skip(level + (inJS ? 2 : 1)), original: text);
+      return Trace(trace.frames.skip((level ?? 0) + (inJS ? 2 : 1)),
+          original: text);
     });
   }
 
@@ -244,14 +246,14 @@ class _Node {
   final Trace trace;
 
   /// The previous node in the chain.
-  final _Node previous;
+  final _Node? previous;
 
   _Node(StackTrace trace, [this.previous]) : trace = Trace.from(trace);
 
   /// Converts this to a [Chain].
   Chain toChain() {
     var nodes = <Trace>[];
-    var node = this;
+    _Node? node = this;
     while (node != null) {
       nodes.add(node.trace);
       node = node.previous;

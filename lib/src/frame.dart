@@ -79,18 +79,18 @@ class Frame {
   ///
   /// This can be null, indicating that the line number is unknown or
   /// unimportant.
-  final int line;
+  final int? line;
 
   /// The column number of the code location.
   ///
   /// This can be null, indicating that the column number is unknown or
   /// unimportant.
-  final int column;
+  final int? column;
 
   /// The name of the member in which the code location occurs.
   ///
   /// Anonymous closures are represented as `<fn>` in this member string.
-  final String member;
+  final String? member;
 
   /// Whether this stack frame comes from the Dart core libraries.
   bool get isCore => uri.scheme == 'dart';
@@ -107,7 +107,7 @@ class Frame {
 
   /// Returns the name of the package this stack frame comes from, or `null` if
   /// this stack frame doesn't come from a `package:` URL.
-  String get package {
+  String? get package {
     if (uri.scheme != 'package') return null;
     return uri.path.split('/').first;
   }
@@ -146,14 +146,14 @@ class Frame {
 
         // Get the pieces out of the regexp match. Function, URI and line should
         // always be found. The column is optional.
-        var member = match[1]
+        var member = match[1]!
             .replaceAll(_asyncBody, '<async>')
             .replaceAll('<anonymous closure>', '<fn>');
-        var uri = match[2].startsWith('<data:')
+        var uri = match[2]!.startsWith('<data:')
             ? Uri.dataFromString('')
-            : Uri.parse(match[2]);
+            : Uri.parse(match[2]!);
 
-        var lineAndColumn = match[3].split(':');
+        var lineAndColumn = match[3]!.split(':');
         var line =
             lineAndColumn.length > 1 ? int.parse(lineAndColumn[1]) : null;
         var column =
@@ -171,7 +171,7 @@ class Frame {
         Frame parseLocation(String location, String member) {
           var evalMatch = _v8EvalLocation.firstMatch(location);
           while (evalMatch != null) {
-            location = evalMatch[1];
+            location = evalMatch[1]!;
             evalMatch = _v8EvalLocation.firstMatch(location);
           }
 
@@ -182,9 +182,10 @@ class Frame {
           var urlMatch = _v8UrlLocation.firstMatch(location);
           if (urlMatch == null) return UnparsedFrame(frame);
 
-          final uri = _uriOrPathToUri(urlMatch[1]);
-          final line = int.parse(urlMatch[2]);
-          final column = urlMatch[3] != null ? int.parse(urlMatch[3]) : null;
+          final uri = _uriOrPathToUri(urlMatch[1]!);
+          final line = int.parse(urlMatch[2]!);
+          final columnMatch = urlMatch[3];
+          final column = columnMatch != null ? int.parse(columnMatch) : null;
           return Frame(uri, line, column, member);
         }
 
@@ -194,15 +195,15 @@ class Frame {
           // lists anonymous functions within eval as "<anonymous>", while IE10
           // lists them as "Anonymous function".
           return parseLocation(
-              match[2],
-              match[1]
+              match[2]!,
+              match[1]!
                   .replaceAll('<anonymous>', '<fn>')
                   .replaceAll('Anonymous function', '<fn>')
                   .replaceAll('(anonymous function)', '<fn>'));
         } else {
           // The second form looks like " at LOCATION", and is used for
           // anonymous functions.
-          return parseLocation(match[3], '<fn>');
+          return parseLocation(match[3]!, '<fn>');
         }
       });
 
@@ -224,9 +225,9 @@ class Frame {
       _catchFormatException(frame, () {
         final match = _firefoxEvalLocation.firstMatch(frame);
         if (match == null) return UnparsedFrame(frame);
-        var member = match[1].replaceAll('/<', '');
-        final uri = _uriOrPathToUri(match[2]);
-        final line = int.parse(match[3]);
+        var member = match[1]!.replaceAll('/<', '');
+        final uri = _uriOrPathToUri(match[2]!);
+        final line = int.parse(match[3]!);
         if (member.isEmpty || member == 'anonymous') {
           member = '<fn>';
         }
@@ -238,18 +239,17 @@ class Frame {
         var match = _firefoxSafariFrame.firstMatch(frame);
         if (match == null) return UnparsedFrame(frame);
 
-        if (match[3].contains(' line ')) {
+        if (match[3]!.contains(' line ')) {
           return Frame._parseFirefoxEval(frame);
         }
 
         // Normally this is a URI, but in a jsshell trace it can be a path.
-        var uri = _uriOrPathToUri(match[3]);
+        var uri = _uriOrPathToUri(match[3]!);
 
-        String member;
-        if (match[1] != null) {
-          member = match[1];
+        var member = match[1];
+        if (member != null) {
           member +=
-              List.filled('/'.allMatches(match[2]).length, '.<fn>').join();
+              List.filled('/'.allMatches(match[2]!).length, '.<fn>').join();
           if (member == '') member = '<fn>';
 
           // Some Firefox members have initial dots. We remove them for
@@ -259,9 +259,9 @@ class Frame {
           member = '<fn>';
         }
 
-        var line = match[4] == '' ? null : int.parse(match[4]);
+        var line = match[4] == '' ? null : int.parse(match[4]!);
         var column =
-            match[5] == null || match[5] == '' ? null : int.parse(match[5]);
+            match[5] == null || match[5] == '' ? null : int.parse(match[5]!);
         return Frame(uri, line, column, member);
       });
 
@@ -288,15 +288,15 @@ class Frame {
         // them.
         var uri = match[1] == 'data:...'
             ? Uri.dataFromString('')
-            : Uri.parse(match[1]);
-        // If there's no scheme, this is a relative URI. We should interpret it
-        // as relative to the current working directory.
+            : Uri.parse(match[1]!);
+        // If there's no scheme, this is a relative URI. We should interpret it as
+        // relative to the current working directory.
         if (uri.scheme == '') {
           uri = path.toUri(path.absolute(path.fromUri(uri)));
         }
 
-        var line = match[2] == null ? null : int.parse(match[2]);
-        var column = match[3] == null ? null : int.parse(match[3]);
+        var line = match[2] == null ? null : int.parse(match[2]!);
+        var column = match[3] == null ? null : int.parse(match[3]!);
         return Frame(uri, line, column, match[4]);
       });
 

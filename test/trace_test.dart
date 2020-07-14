@@ -6,7 +6,7 @@ import 'package:path/path.dart' as path;
 import 'package:stack_trace/stack_trace.dart';
 import 'package:test/test.dart';
 
-Trace getCurrentTrace([int level]) => Trace.current(level);
+Trace getCurrentTrace([int level = 0]) => Trace.current(level);
 
 Trace nestedGetCurrentTrace(int level) => getCurrentTrace(level);
 
@@ -366,7 +366,7 @@ dart:core  bottom
 ''');
 
         var folded =
-            trace.foldFrames((frame) => frame.member.startsWith('foo'));
+            trace.foldFrames((frame) => frame.member!.startsWith('foo'));
         expect(folded.toString(), equals('''
 foo.dart 42:21                     notFoo
 foo.dart 1:100                     fooBottom
@@ -401,7 +401,7 @@ dart:async-patch/future.dart 9:11  fooBottom
 ''');
 
           var folded = trace.foldFrames(
-              (frame) => frame.member.startsWith('foo'),
+              (frame) => frame.member!.startsWith('foo'),
               terse: true);
           expect(folded.toString(), equals('''
 foo.dart 42:21  notFoo
@@ -422,7 +422,7 @@ bar.dart 10:20  alsoNotFoo
 ''');
 
           var folded = trace.foldFrames(
-              (frame) => frame.member.startsWith('foo'),
+              (frame) => frame.member!.startsWith('foo'),
               terse: true);
           expect(folded.toString(), equals('''
 foo.dart 42:21  notFoo
@@ -441,7 +441,7 @@ bar.dart 20:20  againNotFoo
 ''');
 
           var folded = trace.foldFrames(
-              (frame) => frame.member.startsWith('foo'),
+              (frame) => frame.member!.startsWith('foo'),
               terse: true);
           expect(folded.toString(), equals('''
 package:foo     fooTop
