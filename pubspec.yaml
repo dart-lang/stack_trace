@@ -5,7 +5,7 @@ homepage: https://github.com/dart-lang/stack_trace
 
 environment:
   # This must remain a tight constraint until nnbd is stable
-  sdk: '>=2.10.0-0 <2.10.0'
+  sdk: '>=2.10.0-0 <2.11.0'
 
 dependencies:
   path: '>=1.8.0-nullsafety <1.8.0'
