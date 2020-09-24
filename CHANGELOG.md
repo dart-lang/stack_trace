@@ -1,3 +1,7 @@
+## 1.10.0-nullsafety.2
+
+* Forward fix for a change in SDK type promotion behavior.
+
 ## 1.10.0-nullsafety.1
 
 * Allow 2.10 stable and 2.11.0 dev SDK versions.
