@@ -99,7 +99,7 @@ class StackZoneSpecification {
       return LazyChain(() => Chain.parse(trace!.toString()));
     } else {
       if (trace is! Trace) {
-        StackTrace original = trace;
+        var original = trace;
         trace = LazyTrace(() => Trace.parse(_trimVMChain(original)));
       }
 
