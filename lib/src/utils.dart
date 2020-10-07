@@ -8,7 +8,7 @@ const chainGap = '===== asynchronous gap ===========================\n';
 
 /// The line used in the string representation of VM stack chains to represent
 /// the gap between traces.
-const vmChainGap = '<asynchronous suspension>\n';
+final vmChainGap = RegExp(r'^<asynchronous suspension>\n?$', multiLine: true);
 
 // TODO(nweiz): When cross-platform imports work, use them to set this.
 /// Whether we're running in a JS context.

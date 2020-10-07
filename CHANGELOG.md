@@ -1,3 +1,8 @@
+## 1.10.0-nullsafety.4-dev
+
+* Fix bug parsing asynchronous suspension gap markers at the end of stack
+  traces.
+
 ## 1.10.0-nullsafety.3-dev
 
 ## 1.10.0-nullsafety.2
