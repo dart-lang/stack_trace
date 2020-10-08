@@ -1,3 +1,8 @@
+## 1.9.6 (backpublish)
+
+* Fix bug parsing asynchronous suspension gap markers at the end of stack
+  traces. (Also fixed separately in 1.10.0-nullsafety.3)
+
 ## 1.9.5
 
 * Parse the format for `data:` URIs that the Dart VM has used since `2.2.0`.
