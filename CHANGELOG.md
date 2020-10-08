@@ -1,5 +1,8 @@
 ## 1.10.0-nullsafety.3-dev
 
+* Fix bug parsing asynchronous suspension gap markers at the end of stack
+  traces.
+
 ## 1.10.0-nullsafety.2
 
 * Forward fix for a change in SDK type promotion behavior.
