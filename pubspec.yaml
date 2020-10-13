@@ -1,11 +1,11 @@
 name: stack_trace
-version: 1.10.0-nullsafety.3-dev
+version: 1.10.0-nullsafety.3
 description: A package for manipulating stack traces and printing them readably.
 homepage: https://github.com/dart-lang/stack_trace
 
 environment:
   # This must remain a tight constraint until nnbd is stable
-  sdk: '>=2.10.0-0 <2.11.0'
+  sdk: '>=2.11.0-0 <2.11.0'
 
 dependencies:
   path: ^1.8.0-nullsafety
