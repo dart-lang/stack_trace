@@ -1,3 +1,7 @@
+## 1.10.0-nullsafety.4
+
+* Allow the `2.10.0` stable and dev SDKs.
+
 ## 1.10.0-nullsafety.3
 
 * Fix bug parsing asynchronous suspension gap markers at the end of stack
