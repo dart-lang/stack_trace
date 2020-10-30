@@ -152,7 +152,7 @@ class Trace implements StackTrace {
         .split('\n')
         .where((line) => line.isNotEmpty);
 
-    if (lines.length <= 0) {
+    if (lines.isEmpty) {
       return [];
     }
 
