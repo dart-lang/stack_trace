@@ -1,3 +1,8 @@
+## 1.10.0-nullsafety.6-dev
+
+* Fix bug parsing asynchronous suspension gap markers at the end of stack
+  traces, when parsing with `Trace.parse` and `Chain.parse`.
+
 ## 1.10.0-nullsafety.5
 
 * Allow prerelease versions of the 2.12 sdk.
