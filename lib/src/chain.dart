@@ -153,7 +153,7 @@ class Chain implements StackTrace {
       // doesn't, so we skip an extra frame in a JS context.
       var first = Trace(chain.traces.first.frames.skip(level + (inJS ? 2 : 1)),
           original: chain.traces.first.original.toString());
-      return Chain([first]..addAll(chain.traces.skip(1)));
+      return Chain([first, ...chain.traces.skip(1)]);
     });
   }
 
