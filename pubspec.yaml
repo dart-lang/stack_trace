@@ -1,5 +1,5 @@
 name: stack_trace
-version: 1.10.0-nullsafety.5
+version: 1.10.0-nullsafety.6-dev
 description: A package for manipulating stack traces and printing them readably.
 homepage: https://github.com/dart-lang/stack_trace
 
