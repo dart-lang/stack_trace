@@ -151,6 +151,11 @@ class Trace implements StackTrace {
         .replaceAll(vmChainGap, '')
         .split('\n')
         .where((line) => line.isNotEmpty);
+
+    if (lines.isEmpty) {
+      return [];
+    }
+
     var frames = lines
         .take(lines.length - 1)
         .map((line) => Frame.parseVM(line))
