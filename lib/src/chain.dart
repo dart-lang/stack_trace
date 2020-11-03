@@ -66,10 +66,10 @@ class Chain implements StackTrace {
   /// parent Zone's `unhandledErrorHandler` will be called with the error and
   /// its chain.
   ///
-  /// If [errorZone] is `true`, the zone this creates will be an error zone,
-  /// even if [onError] isn't passed. This means that any errors that would
-  /// cross the zone boundary are considered unhandled. If [errorZone] is
-  /// `false`, [onError] must be `null`.
+  /// The zone this creates will be an error zone if either [onError] is
+  /// not `null` and [when] is false,
+  /// or if both [when] and [errorZone] are `true`.
+  ///  If [errorZone] is `false`, [onError] must be `null`.
   ///
   /// If [callback] returns a value, it will be returned by [capture] as well.
   static T capture<T>(T Function() callback,
