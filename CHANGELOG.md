@@ -1,7 +1,9 @@
-## 1.10.0-nullsafety.6-dev
+## 1.10.0-nullsafety.6
 
 * Fix bug parsing asynchronous suspension gap markers at the end of stack
   traces, when parsing with `Trace.parse` and `Chain.parse`.
+* Update SDK constraints to `>=2.12.0-0 <3.0.0` based on beta release
+  guidelines.
 
 ## 1.10.0-nullsafety.5
 
