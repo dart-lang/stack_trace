@@ -47,8 +47,8 @@ class Chain implements StackTrace {
   final List<Trace> traces;
 
   /// The [StackZoneSpecification] for the current zone.
-  static StackZoneSpecification get _currentSpec =>
-      Zone.current[_specKey] as StackZoneSpecification;
+  static StackZoneSpecification? get _currentSpec =>
+      Zone.current[_specKey] as StackZoneSpecification?;
 
   /// If [when] is `true`, runs [callback] in a [Zone] in which the current
   /// stack chain is tracked and automatically associated with (most) errors.
@@ -66,14 +66,14 @@ class Chain implements StackTrace {
   /// parent Zone's `unhandledErrorHandler` will be called with the error and
   /// its chain.
   ///
-  /// If [errorZone] is `true`, the zone this creates will be an error zone,
-  /// even if [onError] isn't passed. This means that any errors that would
-  /// cross the zone boundary are considered unhandled. If [errorZone] is
-  /// `false`, [onError] must be `null`.
+  /// The zone this creates will be an error zone if either [onError] is
+  /// not `null` and [when] is false,
+  /// or if both [when] and [errorZone] are `true`.
+  ///  If [errorZone] is `false`, [onError] must be `null`.
   ///
   /// If [callback] returns a value, it will be returned by [capture] as well.
   static T capture<T>(T Function() callback,
-      {void Function(Object error, Chain) onError,
+      {void Function(Object error, Chain)? onError,
       bool when = true,
       bool errorZone = true}) {
     if (!errorZone && onError != null) {
@@ -82,28 +82,25 @@ class Chain implements StackTrace {
     }
 
     if (!when) {
-      void Function(Object, StackTrace) newOnError;
-      if (onError != null) {
-        newOnError = (error, stackTrace) {
-          onError(
-              error,
-              stackTrace == null
-                  ? Chain.current()
-                  : Chain.forTrace(stackTrace));
-        };
-      }
-
-      return runZoned(callback, onError: newOnError);
+      if (onError == null) return runZoned(callback);
+      return runZonedGuarded(callback, (error, stackTrace) {
+        onError(error, Chain.forTrace(stackTrace));
+      }) as T;
     }
 
     var spec = StackZoneSpecification(onError, errorZone: errorZone);
     return runZoned(() {
       try {
         return callback();
-      } catch (error, stackTrace) {
+      } on Object catch (error, stackTrace) {
         // TODO(nweiz): Don't special-case this when issue 19566 is fixed.
         Zone.current.handleUncaughtError(error, stackTrace);
-        return null;
+
+        // If the expected return type of capture() is not nullable, this will
+        // throw a cast exception. But the only other alternative is to throw
+        // some other exception. Casting null to T at least lets existing uses
+        // where T is a nullable type continue to work.
+        return null as T;
       }
     },
         zoneSpecification: spec.toSpec(),
@@ -138,7 +135,7 @@ class Chain implements StackTrace {
   /// If this is called outside of a [capture] zone, it just returns a
   /// single-trace chain.
   factory Chain.current([int level = 0]) {
-    if (_currentSpec != null) return _currentSpec.currentChain(level + 1);
+    if (_currentSpec != null) return _currentSpec!.currentChain(level + 1);
 
     var chain = Chain.forTrace(StackTrace.current);
     return LazyChain(() {
@@ -146,7 +143,7 @@ class Chain implements StackTrace {
       // doesn't, so we skip an extra frame in a JS context.
       var first = Trace(chain.traces.first.frames.skip(level + (inJS ? 2 : 1)),
           original: chain.traces.first.original.toString());
-      return Chain([first]..addAll(chain.traces.skip(1)));
+      return Chain([first, ...chain.traces.skip(1)]);
     });
   }
 
@@ -160,7 +157,7 @@ class Chain implements StackTrace {
   /// If [trace] is already a [Chain], it will be returned as-is.
   factory Chain.forTrace(StackTrace trace) {
     if (trace is Chain) return trace;
-    if (_currentSpec != null) return _currentSpec.chainFor(trace);
+    if (_currentSpec != null) return _currentSpec!.chainFor(trace);
     if (trace is Trace) return Chain([trace]);
     return LazyChain(() => Chain.parse(trace.toString()));
   }

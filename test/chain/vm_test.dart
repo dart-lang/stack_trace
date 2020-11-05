@@ -19,7 +19,7 @@ import 'utils.dart';
 void main() {
   group('capture() with onError catches exceptions', () {
     test('thrown synchronously', () async {
-      StackTrace vmTrace;
+      late StackTrace vmTrace;
       var chain = await captureFuture(() {
         try {
           throw 'error';
@@ -156,7 +156,7 @@ void main() {
                 contains(frameMember(startsWith('inPeriodicTimer'))));
             completer.complete();
           }
-        } catch (error, stackTrace) {
+        } on Object catch (error, stackTrace) {
           completer.completeError(error, stackTrace);
         }
       });
@@ -234,7 +234,7 @@ void main() {
     test('and relays them to the parent zone', () {
       var completer = Completer();
 
-      runZoned(() {
+      runZonedGuarded(() {
         Chain.capture(() {
           inMicrotask(() => throw 'error');
         }, onError: (error, chain) {
@@ -243,14 +243,15 @@ void main() {
               contains(frameMember(startsWith('inMicrotask'))));
           throw error;
         });
-      }, onError: (error, chain) {
+      }, (error, chain) {
         try {
           expect(error, equals('error'));
-          expect(chain, TypeMatcher<Chain>());
-          expect(chain.traces[1].frames,
-              contains(frameMember(startsWith('inMicrotask'))));
+          expect(
+              chain,
+              isA<Chain>().having((c) => c.traces[1].frames, 'traces[1].frames',
+                  contains(frameMember(startsWith('inMicrotask')))));
           completer.complete();
-        } catch (error, stackTrace) {
+        } on Object catch (error, stackTrace) {
           completer.completeError(error, stackTrace);
         }
       });
@@ -262,16 +263,17 @@ void main() {
   test('capture() without onError passes exceptions to parent zone', () {
     var completer = Completer();
 
-    runZoned(() {
+    runZonedGuarded(() {
       Chain.capture(() => inMicrotask(() => throw 'error'));
-    }, onError: (error, chain) {
+    }, (error, chain) {
       try {
         expect(error, equals('error'));
-        expect(chain, TypeMatcher<Chain>());
-        expect(chain.traces[1].frames,
-            contains(frameMember(startsWith('inMicrotask'))));
+        expect(
+            chain,
+            isA<Chain>().having((c) => c.traces[1].frames, 'traces[1].frames',
+                contains(frameMember(startsWith('inMicrotask')))));
         completer.complete();
-      } catch (error, stackTrace) {
+      } on Object catch (error, stackTrace) {
         completer.completeError(error, stackTrace);
       }
     });
@@ -481,7 +483,7 @@ void main() {
       'chain', () {
     // Disable the test package's chain-tracking.
     return Chain.disable(() async {
-      StackTrace trace;
+      late StackTrace trace;
       await Chain.capture(() async {
         try {
           throw 'error';

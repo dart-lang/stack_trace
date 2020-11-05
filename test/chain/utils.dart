@@ -46,7 +46,7 @@ void inSyncFuture(void Function() callback) {
 /// Returns a Future that completes to an error using a completer.
 ///
 /// If [trace] is passed, it's used as the stack trace for the error.
-Future completerErrorFuture([StackTrace trace]) {
+Future completerErrorFuture([StackTrace? trace]) {
   var completer = Completer();
   completer.completeError('error', trace);
   return completer.future;
@@ -55,7 +55,7 @@ Future completerErrorFuture([StackTrace trace]) {
 /// Returns a Stream that emits an error using a controller.
 ///
 /// If [trace] is passed, it's used as the stack trace for the error.
-Stream controllerErrorStream([StackTrace trace]) {
+Stream controllerErrorStream([StackTrace? trace]) {
   var controller = StreamController();
   controller.addError('error', trace);
   return controller.stream;

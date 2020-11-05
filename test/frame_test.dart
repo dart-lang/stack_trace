@@ -40,7 +40,7 @@ void main() {
     });
 
     test('converts "<anonymous closure>" to "<fn>"', () {
-      String parsedMember(String member) =>
+      String? parsedMember(String member) =>
           Frame.parseVM('#0 $member (foo:0:0)').member;
 
       expect(parsedMember('Foo.<anonymous closure>'), equals('Foo.<fn>'));
@@ -210,7 +210,7 @@ void main() {
     });
 
     test('converts "<anonymous>" to "<fn>"', () {
-      String parsedMember(String member) =>
+      String? parsedMember(String member) =>
           Frame.parseV8('    at $member (foo:0:0)').member;
 
       expect(parsedMember('Foo.<anonymous>'), equals('Foo.<fn>'));
@@ -646,6 +646,6 @@ baz@https://pub.dev/buz.js:56355:55
 
 void expectIsUnparsed(Frame Function(String) constructor, String text) {
   var frame = constructor(text);
-  expect(frame, TypeMatcher<UnparsedFrame>());
+  expect(frame, isA<UnparsedFrame>());
   expect(frame.toString(), equals(text));
 }

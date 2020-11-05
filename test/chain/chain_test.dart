@@ -59,17 +59,17 @@ void main() {
         return Future.error('oh no');
       }, onError: expectAsync2((error, chain) {
         expect(error, equals('oh no'));
-        expect(chain, TypeMatcher<Chain>());
+        expect(chain, isA<Chain>());
       }));
     });
 
     test('with no onError blocks errors', () {
-      runZoned(() {
+      runZonedGuarded(() {
         var future = Chain.capture(() => Future.error('oh no'), when: false);
         future.then(expectAsync1((_) {}, count: 0));
-      }, onError: expectAsync2((error, chain) {
+      }, expectAsync2((error, chain) {
         expect(error, equals('oh no'));
-        expect(chain, TypeMatcher<Chain>());
+        expect(chain, isA<Chain>());
       }));
     });
 
@@ -94,7 +94,7 @@ void main() {
           return Future.error('oh no');
         }, onError: expectAsync2((error, chain) {
           expect(error, equals('oh no'));
-          expect(chain, TypeMatcher<Chain>());
+          expect(chain, isA<Chain>());
         }), when: false);
       });
 

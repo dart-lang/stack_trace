@@ -13,11 +13,9 @@ typedef TraceThunk = Trace Function();
 /// necessary.
 class LazyTrace implements Trace {
   final TraceThunk _thunk;
-  Trace _inner;
+  late final Trace _trace = _thunk();
 
   LazyTrace(this._thunk);
-
-  Trace get _trace => _inner ??= _thunk();
 
   @override
   List<Frame> get frames => _trace.frames;

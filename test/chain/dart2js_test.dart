@@ -90,7 +90,7 @@ void main() {
             expect(chain.traces, hasLength(2));
             completer.complete();
           }
-        } catch (error, stackTrace) {
+        } on Object catch (error, stackTrace) {
           completer.completeError(error, stackTrace);
         }
       });
@@ -140,7 +140,7 @@ void main() {
     test('and relays them to the parent zone', () {
       var completer = Completer();
 
-      runZoned(() {
+      runZonedGuarded(() {
         Chain.capture(() {
           inMicrotask(() => throw 'error');
         }, onError: (error, chain) {
@@ -148,13 +148,13 @@ void main() {
           expect(chain.traces, hasLength(2));
           throw error;
         });
-      }, onError: (error, chain) {
+      }, (error, chain) {
         try {
           expect(error, equals('error'));
-          expect(chain, TypeMatcher<Chain>());
-          expect(chain.traces, hasLength(2));
+          expect(chain,
+              isA<Chain>().having((c) => c.traces, 'traces', hasLength(2)));
           completer.complete();
-        } catch (error, stackTrace) {
+        } on Object catch (error, stackTrace) {
           completer.completeError(error, stackTrace);
         }
       });
@@ -166,15 +166,15 @@ void main() {
   test('capture() without onError passes exceptions to parent zone', () {
     var completer = Completer();
 
-    runZoned(() {
+    runZonedGuarded(() {
       Chain.capture(() => inMicrotask(() => throw 'error'));
-    }, onError: (error, chain) {
+    }, (error, chain) {
       try {
         expect(error, equals('error'));
-        expect(chain, TypeMatcher<Chain>());
-        expect(chain.traces, hasLength(2));
+        expect(chain,
+            isA<Chain>().having((c) => c.traces, 'traces', hasLength(2)));
         completer.complete();
-      } catch (error, stackTrace) {
+      } on Object catch (error, stackTrace) {
         completer.completeError(error, stackTrace);
       }
     });
@@ -305,7 +305,7 @@ void main() {
     test(
         'called for an unregistered stack trace returns a chain wrapping that '
         'trace', () {
-      StackTrace trace;
+      late StackTrace trace;
       var chain = Chain.capture(() {
         try {
           throw 'error';
@@ -324,7 +324,7 @@ void main() {
   test(
       'forTrace() outside of capture() returns a chain wrapping the given '
       'trace', () {
-    StackTrace trace;
+    late StackTrace trace;
     var chain = Chain.capture(() {
       try {
         throw 'error';
