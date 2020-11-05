@@ -36,6 +36,21 @@ void main() {
       expect(chain.traces[1].frames, isEmpty);
       expect(chain.traces[2].frames, isEmpty);
     });
+
+    test('parses a chain with VM gaps', () {
+      final chain =
+          Chain.parse('#1      MyClass.run (package:my_lib.dart:134:5)\n'
+              '<asynchronous suspension>\n'
+              '#2      main (file:///my_app.dart:9:3)\n'
+              '<asynchronous suspension>\n');
+      expect(chain.traces, hasLength(2));
+      expect(chain.traces[0].frames, hasLength(1));
+      expect(chain.traces[0].frames[0].toString(),
+          equals('package:my_lib.dart 134:5 in MyClass.run'));
+      expect(chain.traces[1].frames, hasLength(1));
+      expect(chain.traces[1].frames[0].toString(),
+          equals('/my_app.dart 9:3 in main'));
+    });
   });
 
   group('Chain.capture()', () {

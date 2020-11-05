@@ -153,7 +153,16 @@ class Trace implements StackTrace {
   static List<Frame> _parseVM(String trace) {
     // Ignore [vmChainGap]. This matches the behavior of
     // `Chain.parse().toTrace()`.
-    var lines = trace.trim().replaceAll(vmChainGap, '').split('\n');
+    var lines = trace
+        .trim()
+        .replaceAll(vmChainGap, '')
+        .split('\n')
+        .where((line) => line.isNotEmpty);
+
+    if (lines.isEmpty) {
+      return [];
+    }
+
     var frames = lines
         .take(lines.length - 1)
         .map((line) => Frame.parseVM(line))

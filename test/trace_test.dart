@@ -249,6 +249,25 @@ void main() {
           equals(Uri.parse('https://dart.dev/foo/quux.dart')));
     });
 
+    test('parses a package:stack_trace stack chain with end gap correctly', () {
+      var trace =
+          Trace.parse('https://dart.dev/foo/bar.dart 10:11  Foo.<fn>.bar\n'
+              'https://dart.dev/foo/baz.dart        Foo.<fn>.bar\n'
+              'https://dart.dev/foo/bang.dart 10:11  Foo.<fn>.bar\n'
+              'https://dart.dev/foo/quux.dart        Foo.<fn>.bar'
+              '===== asynchronous gap ===========================\n');
+
+      expect(trace.frames.length, 4);
+      expect(trace.frames[0].uri,
+          equals(Uri.parse('https://dart.dev/foo/bar.dart')));
+      expect(trace.frames[1].uri,
+          equals(Uri.parse('https://dart.dev/foo/baz.dart')));
+      expect(trace.frames[2].uri,
+          equals(Uri.parse('https://dart.dev/foo/bang.dart')));
+      expect(trace.frames[3].uri,
+          equals(Uri.parse('https://dart.dev/foo/quux.dart')));
+    });
+
     test('parses a real package:stack_trace stack trace correctly', () {
       var traceString = Trace.current().toString();
       expect(Trace.parse(traceString).toString(), equals(traceString));
@@ -258,6 +277,28 @@ void main() {
       var trace = Trace.parse('');
       expect(trace.frames, isEmpty);
       expect(trace.toString(), equals(''));
+    });
+
+    test('parses trace with async gap correctly', () {
+      var trace = Trace.parse('#0      bop (file:///pull.dart:42:23)\n'
+          '<asynchronous suspension>\n'
+          '#1      twist (dart:the/future.dart:0:2)\n'
+          '#2      main (dart:my/file.dart:4:6)\n');
+
+      expect(trace.frames.length, 3);
+      expect(trace.frames[0].uri, equals(Uri.parse('file:///pull.dart')));
+      expect(trace.frames[1].uri, equals(Uri.parse('dart:the/future.dart')));
+      expect(trace.frames[2].uri, equals(Uri.parse('dart:my/file.dart')));
+    });
+
+    test('parses trace with async gap at end correctly', () {
+      var trace = Trace.parse('#0      bop (file:///pull.dart:42:23)\n'
+          '#1      twist (dart:the/future.dart:0:2)\n'
+          '<asynchronous suspension>\n');
+
+      expect(trace.frames.length, 2);
+      expect(trace.frames[0].uri, equals(Uri.parse('file:///pull.dart')));
+      expect(trace.frames[1].uri, equals(Uri.parse('dart:the/future.dart')));
     });
   });
 

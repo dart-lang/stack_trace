@@ -173,8 +173,10 @@ class Chain implements StackTrace {
   factory Chain.parse(String chain) {
     if (chain.isEmpty) return Chain([]);
     if (chain.contains(vmChainGap)) {
-      return Chain(
-          chain.split(vmChainGap).map((trace) => Trace.parseVM(trace)));
+      return Chain(chain
+          .split(vmChainGap)
+          .where((line) => line.isNotEmpty)
+          .map((trace) => Trace.parseVM(trace)));
     }
     if (!chain.contains(chainGap)) return Chain([Trace.parse(chain)]);
 
