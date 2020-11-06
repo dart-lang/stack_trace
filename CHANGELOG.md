@@ -1,3 +1,5 @@
+## 1.10.0-nullsafety.7-dev
+
 ## 1.10.0-nullsafety.6
 
 * Fix bug parsing asynchronous suspension gap markers at the end of stack
@@ -29,6 +31,14 @@
 ## 1.10.0-nullsafety
 
 * Opt in to null safety.
+
+## 1.9.6 (backpublish)
+
+* Fix bug parsing asynchronous suspension gap markers at the end of stack
+  traces. (Also fixed separately in 1.10.0-nullsafety.3)
+* Fix bug parsing asynchronous suspension gap markers at the end of stack
+  traces, when parsing with `Trace.parse` and `Chain.parse`. (Also fixed
+  separately in 1.10.0-nullsafety.6)
 
 ## 1.9.5
 
