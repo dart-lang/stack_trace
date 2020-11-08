@@ -78,7 +78,7 @@ class Chain implements StackTrace {
       {void Function(Object error, Chain)? onError,
       bool when = true,
       bool errorZone = true,
-      Map<Object, Object>? zoneValues}) {
+      Map<Object?, Object?>? zoneValues}) {
     if (!errorZone && onError != null) {
       throw ArgumentError.value(
           onError, 'onError', 'must be null if errorZone is false');
