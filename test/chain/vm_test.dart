@@ -492,9 +492,13 @@ void main() {
         }
       });
 
-      var chain = Chain.forTrace(trace);
-      expect(chain.traces,
-          hasLength(vmChainGap.allMatches(trace.toString()).length + 1));
+      final chain = Chain.forTrace(trace);
+      final traceStr = trace.toString();
+      final gaps = vmChainGap.allMatches(traceStr);
+      // If the trace ends on a gap, there's no sub-trace following the gap.
+      final expectedLength =
+          (gaps.last.end == traceStr.length) ? gaps.length : gaps.length + 1;
+      expect(chain.traces, hasLength(expectedLength));
       expect(
           chain.traces.first.frames, contains(frameMember(startsWith('main'))));
     });
