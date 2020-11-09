@@ -1,5 +1,8 @@
 ## 1.10.0-nullsafety.7-dev
 
+* Fix broken test, `test/chain/vm_test.dart`, which incorrectly handles
+  asynchronous suspension gap markers at the end of stack traces.
+
 ## 1.10.0-nullsafety.6
 
 * Fix bug parsing asynchronous suspension gap markers at the end of stack
