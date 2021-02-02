@@ -151,7 +151,22 @@ class Trace implements StackTrace {
         .replaceAll(vmChainGap, '')
         .split('\n')
         .where((line) => line.isNotEmpty);
-    return [for (var line in lines) Frame.parseVM(line)];
+
+    if (lines.isEmpty) {
+      return [];
+    }
+
+    var frames = lines
+        .take(lines.length - 1)
+        .map((line) => Frame.parseVM(line))
+        .toList();
+
+    // TODO(nweiz): Remove this when issue 23614 is fixed.
+    if (!lines.last.endsWith('.da')) {
+      frames.add(Frame.parseVM(lines.last));
+    }
+
+    return frames;
   }
 
   /// Parses a string representation of a Chrome/V8 stack trace.
