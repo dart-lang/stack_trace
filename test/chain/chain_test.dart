@@ -69,7 +69,6 @@ void main() {
         future.then(expectAsync1((_) {}, count: 0));
       }, expectAsync2((error, chain) {
         expect(error, equals('oh no'));
-        expect(chain, isA<Chain>());
       }));
     });
 
