@@ -60,13 +60,15 @@ void main() {
       }, onError: expectAsync2((error, chain) {
         expect(error, equals('oh no'));
         expect(chain, isA<Chain>());
-      }));
+      })).then(expectAsync1((_) {}, count: 0),
+          onError: expectAsync2((_, __) {}, count: 0));
     });
 
     test('with no onError blocks errors', () {
       runZonedGuarded(() {
-        var future = Chain.capture(() => Future.error('oh no'), when: false);
-        future.then(expectAsync1((_) {}, count: 0));
+        Chain.capture(() => Future.error('oh no')).then(
+            expectAsync1((_) {}, count: 0),
+            onError: expectAsync2((_, __) {}, count: 0));
       }, expectAsync2((error, chain) {
         expect(error, equals('oh no'));
         expect(chain, isA<Chain>());
