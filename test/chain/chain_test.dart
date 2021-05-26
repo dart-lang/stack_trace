@@ -71,6 +71,7 @@ void main() {
             onError: expectAsync2((_, __) {}, count: 0));
       }, expectAsync2((error, chain) {
         expect(error, equals('oh no'));
+        expect(chain, isA<Chain>());
       }));
     });
 
