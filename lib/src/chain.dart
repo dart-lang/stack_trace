@@ -75,7 +75,8 @@ class Chain implements StackTrace {
   static T capture<T>(T Function() callback,
       {void Function(Object error, Chain)? onError,
       bool when = true,
-      bool errorZone = true}) {
+      bool errorZone = true,
+        Map<Object?, Object?>? zoneValues}) {
     if (!errorZone && onError != null) {
       throw ArgumentError.value(
           onError, 'onError', 'must be null if errorZone is false');
@@ -104,7 +105,11 @@ class Chain implements StackTrace {
       }
     },
         zoneSpecification: spec.toSpec(),
-        zoneValues: {_specKey: spec, StackZoneSpecification.disableKey: false});
+        zoneValues: {
+          ...?zoneValues,
+          _specKey: spec,
+          StackZoneSpecification.disableKey: false
+    });
   }
 
   /// If [when] is `true` and this is called within a [Chain.capture] zone, runs
