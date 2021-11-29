@@ -1,4 +1,10 @@
-## 1.10.0-nullsafety.7-dev
+## 1.10.1-dev
+
+## 1.10.0
+
+* Stable release for null safety.
+* Fix broken test, `test/chain/vm_test.dart`, which incorrectly handles
+  asynchronous suspension gap markers at the end of stack traces.
 
 ## 1.10.0-nullsafety.6
 
