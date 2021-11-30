@@ -1,4 +1,5 @@
 ## 1.10.1-dev
+* Added the option for custom `zoneValues` on `Chain.capture` 
 
 ## 1.10.0
 
