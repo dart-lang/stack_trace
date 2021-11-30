@@ -72,6 +72,8 @@ class Chain implements StackTrace {
   ///  If [errorZone] is `false`, [onError] must be `null`.
   ///
   /// If [callback] returns a value, it will be returned by [capture] as well.
+  /// 
+  /// [zoneValues] is added to the [runZoned] calls.
   static T capture<T>(T Function() callback,
       {void Function(Object error, Chain)? onError,
       bool when = true,
@@ -83,10 +85,10 @@ class Chain implements StackTrace {
     }
 
     if (!when) {
-      if (onError == null) return runZoned(callback);
+      if (onError == null) return runZoned(callback, zoneValues: zoneValues);
       return runZonedGuarded(callback, (error, stackTrace) {
         onError(error, Chain.forTrace(stackTrace));
-      }) as T;
+      }, zoneValues: zoneValues) as T;
     }
 
     var spec = StackZoneSpecification(onError, errorZone: errorZone);
