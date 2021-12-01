@@ -72,13 +72,13 @@ class Chain implements StackTrace {
   ///  If [errorZone] is `false`, [onError] must be `null`.
   ///
   /// If [callback] returns a value, it will be returned by [capture] as well.
-  /// 
+  ///
   /// [zoneValues] is added to the [runZoned] calls.
   static T capture<T>(T Function() callback,
       {void Function(Object error, Chain)? onError,
       bool when = true,
       bool errorZone = true,
-        Map<Object?, Object?>? zoneValues}) {
+      Map<Object?, Object?>? zoneValues}) {
     if (!errorZone && onError != null) {
       throw ArgumentError.value(
           onError, 'onError', 'must be null if errorZone is false');
@@ -105,12 +105,10 @@ class Chain implements StackTrace {
         // where T is a nullable type continue to work.
         return null as T;
       }
-    },
-        zoneSpecification: spec.toSpec(),
-        zoneValues: {
-          ...?zoneValues,
-          _specKey: spec,
-          StackZoneSpecification.disableKey: false
+    }, zoneSpecification: spec.toSpec(), zoneValues: {
+      ...?zoneValues,
+      _specKey: spec,
+      StackZoneSpecification.disableKey: false
     });
   }
 
