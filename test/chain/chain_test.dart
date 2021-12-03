@@ -117,6 +117,12 @@ void main() {
     });
   });
 
+  test('Chain.capture() with custom zoneValues', () {
+    return Chain.capture(() {
+      expect(Zone.current[#enabled], true);
+    }, zoneValues: {#enabled: true});
+  });
+
   group('Chain.disable()', () {
     test('disables chain-tracking', () {
       return Chain.disable(() {

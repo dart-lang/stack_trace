@@ -1,4 +1,6 @@
-## 1.10.1-dev
+## 1.11.0-dev
+* Added the param `zoneValues` to `Chain.capture` to be able to use 
+  custom zone values with the `runZoned` internal calls 
 
 ## 1.10.0
 
