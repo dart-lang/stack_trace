@@ -96,7 +96,8 @@ class Chain implements StackTrace {
       try {
         return callback();
       } on Object catch (error, stackTrace) {
-        // TODO(nweiz): Don't special-case this when issue 19566 is fixed.
+        // Forward synchronous errors through the async error path to match the
+        // behavior of `runZonedGuarded`.
         Zone.current.handleUncaughtError(error, stackTrace);
 
         // If the expected return type of capture() is not nullable, this will
