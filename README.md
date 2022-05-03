@@ -1,3 +1,7 @@
+[![Dart CI](https://github.com/dart-lang/stack_trace/actions/workflows/test-package.yml/badge.svg)](https://github.com/dart-lang/stack_trace/actions/workflows/test-package.yml)
+[![pub package](https://img.shields.io/pub/v/stack_trace.svg)](https://pub.dev/packages/stack_trace)
+[![package publisher](https://img.shields.io/pub/publisher/stack_trace.svg)](https://pub.dev/packages/stack_trace/publisher)
+
 This library provides the ability to parse, inspect, and manipulate stack traces
 produced by the underlying Dart implementation. It also provides functions to
 produce string representations of stack traces in a more readable format than
