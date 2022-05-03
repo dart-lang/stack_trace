@@ -459,7 +459,7 @@ void main() {
 
     test('called for an unregistered stack trace uses the current chain',
         () async {
-      var trace;
+      late StackTrace trace;
       var chain = await Chain.capture(() async {
         try {
           throw 'error';

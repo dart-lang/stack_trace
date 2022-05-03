@@ -1,6 +1,9 @@
 ## 1.11.0-dev
-* Added the param `zoneValues` to `Chain.capture` to be able to use 
-  custom zone values with the `runZoned` internal calls 
+
+* Added the param `zoneValues` to `Chain.capture` to be able to use custom zone
+  values with the `runZoned` internal calls 
+* Populate the pubspec `repository` field.
+* Switch to `package:lints`.
 
 ## 1.10.0
 
