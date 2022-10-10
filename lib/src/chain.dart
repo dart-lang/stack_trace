@@ -28,7 +28,7 @@ final _specKey = Object();
 ///
 /// Stack chains can be automatically tracked using [Chain.capture]. This sets
 /// up a new [Zone] in which the current stack chain is tracked and can be
-/// accessed using [new Chain.current]. Any errors that would be top-leveled in
+/// accessed using [Chain.current]. Any errors that would be top-leveled in
 /// the zone can be handled, along with their associated chains, with the
 /// `onError` callback. For example:
 ///
@@ -54,8 +54,8 @@ class Chain implements StackTrace {
   /// stack chain is tracked and automatically associated with (most) errors.
   ///
   /// If [when] is `false`, this does not track stack chains. Instead, it's
-  /// identical to [runZoned], except that it wraps any errors in [new
-  /// Chain.forTrace]—which will only wrap the trace unless there's a different
+  /// identical to [runZoned], except that it wraps any errors in
+  /// [Chain.forTrace]—which will only wrap the trace unless there's a different
   /// [Chain.capture] active. This makes it easy for the caller to only capture
   /// stack chains in debug mode or during development.
   ///
@@ -130,7 +130,7 @@ class Chain implements StackTrace {
   /// exceptions reported with [Completer.completeError] and
   /// [StreamController.addError] were tracked correctly.
   @Deprecated('Chain.track is not necessary in Dart 1.7+.')
-  static dynamic track(futureOrStream) => futureOrStream;
+  static dynamic track(Object? futureOrStream) => futureOrStream;
 
   /// Returns the current stack chain.
   ///
@@ -179,12 +179,11 @@ class Chain implements StackTrace {
       return Chain(chain
           .split(vmChainGap)
           .where((line) => line.isNotEmpty)
-          .map((trace) => Trace.parseVM(trace)));
+          .map(Trace.parseVM));
     }
     if (!chain.contains(chainGap)) return Chain([Trace.parse(chain)]);
 
-    return Chain(
-        chain.split(chainGap).map((trace) => Trace.parseFriendly(trace)));
+    return Chain(chain.split(chainGap).map(Trace.parseFriendly));
   }
 
   /// Returns a new [Chain] comprised of [traces].

@@ -289,8 +289,8 @@ class Frame {
         var uri = match[1] == 'data:...'
             ? Uri.dataFromString('')
             : Uri.parse(match[1]!);
-        // If there's no scheme, this is a relative URI. We should interpret it as
-        // relative to the current working directory.
+        // If there's no scheme, this is a relative URI. We should interpret it
+        // as relative to the current working directory.
         if (uri.scheme == '') {
           uri = path.toUri(path.absolute(path.fromUri(uri)));
         }

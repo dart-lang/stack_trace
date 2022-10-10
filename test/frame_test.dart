@@ -71,13 +71,11 @@ void main() {
 
   group('.parseV8', () {
     test('returns an UnparsedFrame for malformed frames', () {
-      expectIsUnparsed((text) => Frame.parseV8(text), '');
-      expectIsUnparsed((text) => Frame.parseV8(text), '#1');
-      expectIsUnparsed((text) => Frame.parseV8(text), '#1      Foo');
-      expectIsUnparsed((text) => Frame.parseV8(text),
-          '#1      (dart:async/future.dart:10:15)');
-      expectIsUnparsed(
-          (text) => Frame.parseV8(text), 'Foo (dart:async/future.dart:10:15)');
+      expectIsUnparsed(Frame.parseV8, '');
+      expectIsUnparsed(Frame.parseV8, '#1');
+      expectIsUnparsed(Frame.parseV8, '#1      Foo');
+      expectIsUnparsed(Frame.parseV8, '#1      (dart:async/future.dart:10:15)');
+      expectIsUnparsed(Frame.parseV8, 'Foo (dart:async/future.dart:10:15)');
     });
 
     test('parses a stack frame correctly', () {
@@ -219,19 +217,14 @@ void main() {
     });
 
     test('returns an UnparsedFrame for malformed frames', () {
-      expectIsUnparsed((text) => Frame.parseV8(text), '');
-      expectIsUnparsed((text) => Frame.parseV8(text), '    at');
-      expectIsUnparsed((text) => Frame.parseV8(text), '    at Foo');
-      expectIsUnparsed(
-          (text) => Frame.parseV8(text), '    at Foo (dart:async/future.dart)');
-      expectIsUnparsed((text) => Frame.parseV8(text),
-          '    at (dart:async/future.dart:10:15)');
-      expectIsUnparsed(
-          (text) => Frame.parseV8(text), 'Foo (dart:async/future.dart:10:15)');
-      expectIsUnparsed(
-          (text) => Frame.parseV8(text), '    at dart:async/future.dart');
-      expectIsUnparsed(
-          (text) => Frame.parseV8(text), 'dart:async/future.dart:10:15');
+      expectIsUnparsed(Frame.parseV8, '');
+      expectIsUnparsed(Frame.parseV8, '    at');
+      expectIsUnparsed(Frame.parseV8, '    at Foo');
+      expectIsUnparsed(Frame.parseV8, '    at Foo (dart:async/future.dart)');
+      expectIsUnparsed(Frame.parseV8, '    at (dart:async/future.dart:10:15)');
+      expectIsUnparsed(Frame.parseV8, 'Foo (dart:async/future.dart:10:15)');
+      expectIsUnparsed(Frame.parseV8, '    at dart:async/future.dart');
+      expectIsUnparsed(Frame.parseV8, 'dart:async/future.dart:10:15');
     });
   });
 
@@ -381,8 +374,9 @@ baz@https://pub.dev/buz.js:56355:55
     });
 
     test('parses a nested anonymous stack frame with parameters correctly', () {
-      var frame = Frame.parseFirefox('.foo(12, "@)()/<")/.fn<@'
-          'https://example.com/stuff.dart.js:560');
+      var frame = Frame.parseFirefox(
+        '.foo(12, "@)()/<")/.fn<@https://example.com/stuff.dart.js:560',
+      );
       expect(frame.uri, equals(Uri.parse('https://example.com/stuff.dart.js')));
       expect(frame.line, equals(560));
       expect(frame.column, isNull);
@@ -401,14 +395,11 @@ baz@https://pub.dev/buz.js:56355:55
     });
 
     test('returns an UnparsedFrame for malformed frames', () {
-      expectIsUnparsed((text) => Frame.parseFirefox(text), '');
-      expectIsUnparsed((text) => Frame.parseFirefox(text), '.foo');
-      expectIsUnparsed(
-          (text) => Frame.parseFirefox(text), '.foo@dart:async/future.dart');
-      expectIsUnparsed((text) => Frame.parseFirefox(text),
-          '.foo(@dart:async/future.dart:10');
-      expectIsUnparsed(
-          (text) => Frame.parseFirefox(text), '@dart:async/future.dart');
+      expectIsUnparsed(Frame.parseFirefox, '');
+      expectIsUnparsed(Frame.parseFirefox, '.foo');
+      expectIsUnparsed(Frame.parseFirefox, '.foo@dart:async/future.dart');
+      expectIsUnparsed(Frame.parseFirefox, '.foo(@dart:async/future.dart:10');
+      expectIsUnparsed(Frame.parseFirefox, '@dart:async/future.dart');
     });
 
     test('parses a simple stack frame correctly', () {
@@ -494,10 +485,9 @@ baz@https://pub.dev/buz.js:56355:55
     });
 
     test('returns an UnparsedFrame for malformed frames', () {
-      expectIsUnparsed((text) => Frame.parseFriendly(text), '');
-      expectIsUnparsed((text) => Frame.parseFriendly(text), 'foo/bar.dart');
-      expectIsUnparsed(
-          (text) => Frame.parseFriendly(text), 'foo/bar.dart 10:11');
+      expectIsUnparsed(Frame.parseFriendly, '');
+      expectIsUnparsed(Frame.parseFriendly, 'foo/bar.dart');
+      expectIsUnparsed(Frame.parseFriendly, 'foo/bar.dart 10:11');
     });
 
     test('parses a data url stack frame with no line or column correctly', () {

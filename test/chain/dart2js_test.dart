@@ -113,7 +113,7 @@ void main() {
 
     test('passed to a completer with no stack trace', () async {
       var chain = await captureFuture(() {
-        inMicrotask(() => completerErrorFuture());
+        inMicrotask(completerErrorFuture);
       });
 
       expect(chain.traces, hasLength(2));
