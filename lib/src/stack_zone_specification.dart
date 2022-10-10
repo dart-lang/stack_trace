@@ -217,7 +217,7 @@ class StackZoneSpecification {
     }
   }
 
-  /// Like [new Trace.current], but if the current stack trace has VM chaining
+  /// Like [Trace.current], but if the current stack trace has VM chaining
   /// enabled, this only returns the innermost sub-trace.
   Trace _currentTrace([int? level]) {
     var stackTrace = StackTrace.current;

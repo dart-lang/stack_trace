@@ -8,10 +8,9 @@
 
 import 'dart:async';
 
-import 'package:test/test.dart';
-
-import 'package:stack_trace/stack_trace.dart';
 import 'package:stack_trace/src/utils.dart';
+import 'package:stack_trace/stack_trace.dart';
+import 'package:test/test.dart';
 
 import '../utils.dart';
 import 'utils.dart';
@@ -189,7 +188,7 @@ void main() {
 
     test('passed to a completer with no stack trace', () {
       return captureFuture(() {
-        inMicrotask(() => completerErrorFuture());
+        inMicrotask(completerErrorFuture);
       }).then((chain) {
         expect(chain.traces, hasLength(2));
 

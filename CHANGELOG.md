@@ -1,9 +1,9 @@
-## 1.11.0-dev
+## 1.11.0
 
-* Added the param `zoneValues` to `Chain.capture` to be able to use custom zone
-  values with the `runZoned` internal calls 
+* Added the parameter `zoneValues` to `Chain.capture` to be able to use custom
+  zone values with the `runZoned` internal calls.
 * Populate the pubspec `repository` field.
-* Switch to `package:lints`.
+* Require Dart 2.18 or greater
 
 ## 1.10.0
 

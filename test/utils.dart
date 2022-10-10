@@ -5,11 +5,11 @@
 import 'package:test/test.dart';
 
 /// Returns a matcher that runs [matcher] against a [Frame]'s `member` field.
-Matcher frameMember(matcher) =>
+Matcher frameMember(Object? matcher) =>
     transform((frame) => frame.member, matcher, 'member');
 
 /// Returns a matcher that runs [matcher] against a [Frame]'s `library` field.
-Matcher frameLibrary(matcher) =>
+Matcher frameLibrary(Object? matcher) =>
     transform((frame) => frame.library, matcher, 'library');
 
 /// Returns a matcher that runs [transformation] on its input, then matches
@@ -17,8 +17,8 @@ Matcher frameLibrary(matcher) =>
 ///
 /// [description] should be a noun phrase that describes the relation of the
 /// output of [transformation] to its input.
-Matcher transform(
-        void Function(dynamic) transformation, matcher, String description) =>
+Matcher transform(void Function(dynamic) transformation, Object? matcher,
+        String description) =>
     _TransformMatcher(transformation, wrapMatcher(matcher), description);
 
 class _TransformMatcher extends Matcher {
@@ -29,7 +29,7 @@ class _TransformMatcher extends Matcher {
   _TransformMatcher(this._transformation, this._matcher, this._description);
 
   @override
-  bool matches(item, Map matchState) =>
+  bool matches(Object? item, Map<dynamic, dynamic> matchState) =>
       _matcher.matches(_transformation(item), matchState);
 
   @override

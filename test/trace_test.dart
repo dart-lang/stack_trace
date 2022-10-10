@@ -12,7 +12,7 @@ Trace nestedGetCurrentTrace(int level) => getCurrentTrace(level);
 
 void main() {
   // This just shouldn't crash.
-  test('a native stack trace is parseable', () => Trace.current());
+  test('a native stack trace is parseable', Trace.current);
 
   group('.parse', () {
     test('.parse parses a V8 stack trace with eval statment correctly', () {
@@ -26,10 +26,10 @@ void main() {
 
     test('.parse parses a VM stack trace correctly', () {
       var trace = Trace.parse(
-          '#0      Foo._bar (file:///home/nweiz/code/stuff.dart:42:21)\n'
-          '#1      zip.<anonymous closure>.zap (dart:async/future.dart:0:2)\n'
-          '#2      zip.<anonymous closure>.zap (https://pub.dev/thing.'
-          'dart:1:100)');
+        '#0      Foo._bar (file:///home/nweiz/code/stuff.dart:42:21)\n'
+        '#1      zip.<anonymous closure>.zap (dart:async/future.dart:0:2)\n'
+        '#2      zip.<anonymous closure>.zap (https://pub.dev/thing.dart:1:100)',
+      );
 
       expect(trace.frames[0].uri,
           equals(Uri.parse('file:///home/nweiz/code/stuff.dart')));
@@ -250,12 +250,12 @@ void main() {
     });
 
     test('parses a package:stack_trace stack chain with end gap correctly', () {
-      var trace =
-          Trace.parse('https://dart.dev/foo/bar.dart 10:11  Foo.<fn>.bar\n'
-              'https://dart.dev/foo/baz.dart        Foo.<fn>.bar\n'
-              'https://dart.dev/foo/bang.dart 10:11  Foo.<fn>.bar\n'
-              'https://dart.dev/foo/quux.dart        Foo.<fn>.bar'
-              '===== asynchronous gap ===========================\n');
+      var trace = Trace.parse(
+        'https://dart.dev/foo/bar.dart 10:11  Foo.<fn>.bar\n'
+        'https://dart.dev/foo/baz.dart        Foo.<fn>.bar\n'
+        'https://dart.dev/foo/bang.dart 10:11  Foo.<fn>.bar\n'
+        'https://dart.dev/foo/quux.dart        Foo.<fn>.bar===== asynchronous gap ===========================\n',
+      );
 
       expect(trace.frames.length, 4);
       expect(trace.frames[0].uri,

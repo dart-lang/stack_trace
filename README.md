@@ -80,35 +80,25 @@ Here's an example of some code that doesn't capture its stack chains:
 import 'dart:async';
 
 void main() {
-  scheduleAsync();
+  _scheduleAsync();
 }
 
-void scheduleAsync() {
-  return new Future.delayed(new Duration(seconds: 1))
-      .then((_) => runAsync());
+void _scheduleAsync() {
+  Future.delayed(Duration(seconds: 1)).then((_) => _runAsync());
 }
 
-void runAsync() {
+void _runAsync() {
   throw 'oh no!';
 }
 ```
 
 If we run this, it prints the following:
 
-    Uncaught Error: oh no!
-    Stack Trace: 
-    #0      runAsync (file:///usr/local/google-old/home/goog/dart/dart/test.dart:13:3)
-    #1      scheduleAsync.<anonymous closure> (file:///usr/local/google-old/home/goog/dart/dart/test.dart:9:28)
-    #2      _rootRunUnary (dart:async/zone.dart:717)
-    #3      _RootZone.runUnary (dart:async/zone.dart:854)
-    #4      _Future._propagateToListeners.handleValueCallback (dart:async/future_impl.dart:488)
-    #5      _Future._propagateToListeners (dart:async/future_impl.dart:571)
-    #6      _Future._complete (dart:async/future_impl.dart:317)
-    #7      _SyncCompleter.complete (dart:async/future_impl.dart:44)
-    #8      Future.Future.delayed.<anonymous closure> (dart:async/future.dart:219)
-    #9      _createTimer.<anonymous closure> (dart:async-patch/timer_patch.dart:11)
-    #10     _handleTimeout (dart:io/timer_impl.dart:292)
-    #11     _RawReceivePortImpl._handleMessage (dart:isolate-patch/isolate_patch.dart:115)
+    Unhandled exception:
+    oh no!
+    #0      _runAsync (file:///Users/kevmoo/github/stack_trace/example/example.dart:12:3)
+    #1      _scheduleAsync.<anonymous closure> (file:///Users/kevmoo/github/stack_trace/example/example.dart:8:52)
+    <asynchronous suspension>
 
 Notice how there's no mention of `main` in that stack trace. All we know is that
 the error was in `runAsync`; we don't know why `runAsync` was called.
@@ -121,72 +111,42 @@ import 'dart:async';
 import 'package:stack_trace/stack_trace.dart';
 
 void main() {
-  Chain.capture(() {
-    scheduleAsync();
-  });
+  Chain.capture(_scheduleAsync);
 }
 
-void scheduleAsync() {
-  new Future.delayed(new Duration(seconds: 1))
-      .then((_) => runAsync());
+void _scheduleAsync() {
+  Future.delayed(Duration(seconds: 1)).then((_) => _runAsync());
 }
 
-void runAsync() {
+void _runAsync() {
   throw 'oh no!';
 }
 ```
 
 Now if we run it, it prints this:
 
-    Uncaught Error: oh no!
-    Stack Trace: 
-    test.dart 17:3                                                runAsync
-    test.dart 13:28                                               scheduleAsync.<fn>
-    package:stack_trace/src/stack_zone_specification.dart 129:26  registerUnaryCallback.<fn>.<fn>
-    package:stack_trace/src/stack_zone_specification.dart 174:15  StackZoneSpecification._run
-    package:stack_trace/src/stack_zone_specification.dart 177:7   StackZoneSpecification._run
-    package:stack_trace/src/stack_zone_specification.dart 175:7   StackZoneSpecification._run
-    package:stack_trace/src/stack_zone_specification.dart 129:18  registerUnaryCallback.<fn>
-    dart:async/zone.dart 717                                      _rootRunUnary
-    dart:async/zone.dart 449                                      _ZoneDelegate.runUnary
-    dart:async/zone.dart 654                                      _CustomizedZone.runUnary
-    dart:async/future_impl.dart 488                               _Future._propagateToListeners.handleValueCallback
-    dart:async/future_impl.dart 571                               _Future._propagateToListeners
-    dart:async/future_impl.dart 317                               _Future._complete
-    dart:async/future_impl.dart 44                                _SyncCompleter.complete
-    dart:async/future.dart 219                                    Future.Future.delayed.<fn>
-    package:stack_trace/src/stack_zone_specification.dart 174:15  StackZoneSpecification._run
-    package:stack_trace/src/stack_zone_specification.dart 119:52  registerCallback.<fn>
-    dart:async/zone.dart 706                                      _rootRun
-    dart:async/zone.dart 440                                      _ZoneDelegate.run
-    dart:async/zone.dart 650                                      _CustomizedZone.run
-    dart:async/zone.dart 561                                      _BaseZone.runGuarded
-    dart:async/zone.dart 586                                      _BaseZone.bindCallback.<fn>
-    package:stack_trace/src/stack_zone_specification.dart 174:15  StackZoneSpecification._run
-    package:stack_trace/src/stack_zone_specification.dart 119:52  registerCallback.<fn>
-    dart:async/zone.dart 710                                      _rootRun
-    dart:async/zone.dart 440                                      _ZoneDelegate.run
-    dart:async/zone.dart 650                                      _CustomizedZone.run
-    dart:async/zone.dart 561                                      _BaseZone.runGuarded
-    dart:async/zone.dart 586                                      _BaseZone.bindCallback.<fn>
-    dart:async-patch/timer_patch.dart 11                          _createTimer.<fn>
-    dart:io/timer_impl.dart 292                                   _handleTimeout
-    dart:isolate-patch/isolate_patch.dart 115                     _RawReceivePortImpl._handleMessage
+    Unhandled exception:
+    oh no!
+    example/example.dart 14:3                                     _runAsync
+    example/example.dart 10:52                                    _scheduleAsync.<fn>
+    package:stack_trace/src/stack_zone_specification.dart 126:26  StackZoneSpecification._registerUnaryCallback.<fn>.<fn>
+    package:stack_trace/src/stack_zone_specification.dart 208:15  StackZoneSpecification._run
+    package:stack_trace/src/stack_zone_specification.dart 126:14  StackZoneSpecification._registerUnaryCallback.<fn>
+    dart:async/zone.dart 1406:47                                  _rootRunUnary
+    dart:async/zone.dart 1307:19                                  _CustomZone.runUnary
     ===== asynchronous gap ===========================
-    dart:async/zone.dart 476                                      _ZoneDelegate.registerUnaryCallback
-    dart:async/zone.dart 666                                      _CustomizedZone.registerUnaryCallback
-    dart:async/future_impl.dart 164                               _Future._Future._then
-    dart:async/future_impl.dart 187                               _Future.then
-    test.dart 13:12                                               scheduleAsync
-    test.dart 7:18                                                main.<fn>
-    dart:async/zone.dart 710                                      _rootRun
-    dart:async/zone.dart 440                                      _ZoneDelegate.run
-    dart:async/zone.dart 650                                      _CustomizedZone.run
-    dart:async/zone.dart 944                                      runZoned
-    package:stack_trace/src/chain.dart 93:20                      Chain.capture
-    test.dart 6:16                                                main
-    dart:isolate-patch/isolate_patch.dart 216                     _startIsolate.isolateStartHandler
-    dart:isolate-patch/isolate_patch.dart 115                     _RawReceivePortImpl._handleMessage
+    dart:async/zone.dart 1328:19                                  _CustomZone.registerUnaryCallback
+    dart:async/future_impl.dart 315:23                            Future.then
+    example/example.dart 10:40                                    _scheduleAsync
+    package:stack_trace/src/chain.dart 97:24                      Chain.capture.<fn>
+    dart:async/zone.dart 1398:13                                  _rootRun
+    dart:async/zone.dart 1300:19                                  _CustomZone.run
+    dart:async/zone.dart 1803:10                                  _runZoned
+    dart:async/zone.dart 1746:10                                  runZoned
+    package:stack_trace/src/chain.dart 95:12                      Chain.capture
+    example/example.dart 6:9                                      main
+    dart:isolate-patch/isolate_patch.dart 297:19                  _delayEntrypointInvocation.<fn>
+    dart:isolate-patch/isolate_patch.dart 192:12                  _RawReceivePortImpl._handleMessage
 
 That's a lot of text! If you look closely, though, you can see that `main` is
 listed in the first trace in the chain.

@@ -27,7 +27,7 @@ class LazyChain implements Chain {
   Chain foldFrames(bool Function(Frame) predicate, {bool terse = false}) =>
       LazyChain(() => _chain.foldFrames(predicate, terse: terse));
   @override
-  Trace toTrace() => LazyTrace(() => _chain.toTrace());
+  Trace toTrace() => LazyTrace(_chain.toTrace);
   @override
   String toString() => _chain.toString();
 }

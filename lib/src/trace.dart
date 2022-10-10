@@ -156,10 +156,7 @@ class Trace implements StackTrace {
       return [];
     }
 
-    var frames = lines
-        .take(lines.length - 1)
-        .map((line) => Frame.parseVM(line))
-        .toList();
+    var frames = lines.take(lines.length - 1).map(Frame.parseVM).toList();
 
     // TODO(nweiz): Remove this when issue 23614 is fixed.
     if (!lines.last.endsWith('.da')) {
@@ -179,7 +176,7 @@ class Trace implements StackTrace {
                 // that looks like a V8 trace line, which will screw this up.
                 // Unfortunately, that's impossible to detect.
                 .skipWhile((line) => !line.startsWith(_v8TraceLine))
-                .map((line) => Frame.parseV8(line)),
+                .map(Frame.parseV8),
             original: trace);
 
   /// Parses a string representation of a JavaScriptCore stack trace.
@@ -188,7 +185,7 @@ class Trace implements StackTrace {
             trace
                 .split('\n')
                 .where((line) => line != '\tat ')
-                .map((line) => Frame.parseV8(line)),
+                .map(Frame.parseV8),
             original: trace);
 
   /// Parses a string representation of an Internet Explorer stack trace.
@@ -204,7 +201,7 @@ class Trace implements StackTrace {
                 .trim()
                 .split('\n')
                 .where((line) => line.isNotEmpty && line != '[native code]')
-                .map((line) => Frame.parseFirefox(line)),
+                .map(Frame.parseFirefox),
             original: trace);
 
   /// Parses a string representation of a Safari stack trace.
@@ -222,7 +219,7 @@ class Trace implements StackTrace {
                 .trim()
                 .split('\n')
                 .where((line) => line != '[native code]')
-                .map((line) => Frame.parseFirefox(line)),
+                .map(Frame.parseFirefox),
             original: trace);
 
   /// Parses this package's string representation of a stack trace.
@@ -238,7 +235,7 @@ class Trace implements StackTrace {
                     .split('\n')
                     // Filter out asynchronous gaps from [Chain]s.
                     .where((line) => !line.startsWith('====='))
-                    .map((line) => Frame.parseFriendly(line)),
+                    .map(Frame.parseFriendly),
             original: trace);
 
   /// Returns a new [Trace] comprised of [frames].
