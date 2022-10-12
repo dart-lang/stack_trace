@@ -200,8 +200,8 @@ class Chain implements StackTrace {
   /// package can be used to convert JavaScript traces into Dart-style traces.
   Chain get terse => foldFrames((_) => false, terse: true);
 
-  /// Returns a new [Chain] based on this chain where multiple stack frames matching
-  /// [predicate] are folded together.
+  /// Returns a new [Chain] based on this chain where multiple stack frames
+  /// matching [predicate] are folded together.
   ///
   /// This means that whenever there are multiple frames in a row that match
   /// [predicate], only the last one is kept. In addition, traces that are
