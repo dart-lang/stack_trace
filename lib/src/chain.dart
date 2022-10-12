@@ -189,7 +189,7 @@ class Chain implements StackTrace {
   /// Returns a new [Chain] comprised of [traces].
   Chain(Iterable<Trace> traces) : traces = List<Trace>.unmodifiable(traces);
 
-  /// Returns a terser version of `this`.
+  /// Returns a terser version of this chain.
   ///
   /// This calls [Trace.terse] on every trace in [traces], and discards any
   /// trace that contain only internal frames.
