@@ -48,8 +48,13 @@ void main() {
       expect(chain.traces[0].frames[0].toString(),
           equals('package:my_lib.dart 134:5 in MyClass.run'));
       expect(chain.traces[1].frames, hasLength(1));
-      expect(chain.traces[1].frames[0].toString(),
-          equals('/my_app.dart 9:3 in main'));
+      expect(
+        chain.traces[1].frames[0].toString(),
+        anyOf(
+          equals('/my_app.dart 9:3 in main'), // VM
+          equals('file:///my_app.dart 9:3 in main'), // Browser
+        ),
+      );
     });
   });
 
