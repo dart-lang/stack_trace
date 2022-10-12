@@ -12,4 +12,4 @@ final vmChainGap = RegExp(r'^<asynchronous suspension>\n?$', multiLine: true);
 
 // TODO(nweiz): When cross-platform imports work, use them to set this.
 /// Whether we're running in a JS context.
-final bool inJS = 0.0 is int;
+const bool inJS = 0.0 is int;

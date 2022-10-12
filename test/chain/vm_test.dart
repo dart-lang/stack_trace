@@ -282,7 +282,7 @@ void main() {
 
   group('current() within capture()', () {
     test('called in a microtask', () {
-      var completer = Completer();
+      var completer = Completer<Chain>();
       Chain.capture(() {
         inMicrotask(() => completer.complete(Chain.current()));
       });
@@ -296,7 +296,7 @@ void main() {
     });
 
     test('called in a one-shot timer', () {
-      var completer = Completer();
+      var completer = Completer<Chain>();
       Chain.capture(() {
         inOneShotTimer(() => completer.complete(Chain.current()));
       });
@@ -310,7 +310,7 @@ void main() {
     });
 
     test('called in a periodic timer', () {
-      var completer = Completer();
+      var completer = Completer<Chain>();
       Chain.capture(() {
         inPeriodicTimer(() => completer.complete(Chain.current()));
       });
@@ -324,7 +324,7 @@ void main() {
     });
 
     test('called in a nested series of asynchronous operations', () {
-      var completer = Completer();
+      var completer = Completer<Chain>();
       Chain.capture(() {
         inPeriodicTimer(() {
           inOneShotTimer(() {
@@ -346,7 +346,7 @@ void main() {
     });
 
     test('called in a long future chain', () {
-      var completer = Completer();
+      var completer = Completer<Chain>();
       Chain.capture(() {
         inFutureChain(() => completer.complete(Chain.current()));
       });
@@ -365,7 +365,7 @@ void main() {
       'trace', () {
     // The test runner runs all tests with chains enabled.
     return Chain.disable(() {
-      var completer = Completer();
+      var completer = Completer<Chain>();
       inMicrotask(() => completer.complete(Chain.current()));
 
       return completer.future.then((chain) {

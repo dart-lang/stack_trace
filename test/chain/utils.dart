@@ -16,7 +16,7 @@ void inOneShotTimer(void Function() callback) => Timer.run(callback);
 /// Runs [callback] once in a periodic timer callback.
 void inPeriodicTimer(void Function() callback) {
   var count = 0;
-  Timer.periodic(Duration(milliseconds: 1), (timer) {
+  Timer.periodic(const Duration(milliseconds: 1), (timer) {
     count++;
     if (count != 5) return;
     timer.cancel();

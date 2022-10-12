@@ -184,7 +184,7 @@ void main() {
 
   group('current() within capture()', () {
     test('called in a microtask', () async {
-      var completer = Completer();
+      var completer = Completer<Chain>();
       Chain.capture(() {
         inMicrotask(() => completer.complete(Chain.current()));
       });
@@ -194,7 +194,7 @@ void main() {
     });
 
     test('called in a one-shot timer', () async {
-      var completer = Completer();
+      var completer = Completer<Chain>();
       Chain.capture(() {
         inOneShotTimer(() => completer.complete(Chain.current()));
       });
@@ -204,7 +204,7 @@ void main() {
     });
 
     test('called in a periodic timer', () async {
-      var completer = Completer();
+      var completer = Completer<Chain>();
       Chain.capture(() {
         inPeriodicTimer(() => completer.complete(Chain.current()));
       });
@@ -214,7 +214,7 @@ void main() {
     });
 
     test('called in a nested series of asynchronous operations', () async {
-      var completer = Completer();
+      var completer = Completer<Chain>();
       Chain.capture(() {
         inPeriodicTimer(() {
           inOneShotTimer(() {
@@ -228,7 +228,7 @@ void main() {
     });
 
     test('called in a long future chain', () async {
-      var completer = Completer();
+      var completer = Completer<Chain>();
       Chain.capture(() {
         inFutureChain(() => completer.complete(Chain.current()));
       });
@@ -239,11 +239,11 @@ void main() {
   });
 
   test(
-      'current() outside of capture() returns a chain wrapping the current '
-      'trace', () {
-    // The test runner runs all tests with chains enabled.
-    return Chain.disable(() async {
-      var completer = Completer();
+    'current() outside of capture() returns a chain wrapping the current trace',
+    () =>
+        // The test runner runs all tests with chains enabled.
+        Chain.disable(() async {
+      var completer = Completer<Chain>();
       inMicrotask(() => completer.complete(Chain.current()));
 
       var chain = await completer.future;
@@ -251,14 +251,13 @@ void main() {
       // chain isn't available and it just returns the current stack when
       // called.
       expect(chain.traces, hasLength(1));
-    });
-  });
+    }),
+  );
 
   group('forTrace() within capture()', () {
     test('called for a stack trace from a microtask', () async {
-      var chain = await Chain.capture(() {
-        return chainForTrace(inMicrotask, () => throw 'error');
-      });
+      var chain = await Chain.capture(
+          () => chainForTrace(inMicrotask, () => throw 'error'));
 
       // Because [chainForTrace] has to set up a future chain to capture the
       // stack trace while still showing it to the zone specification, it adds
@@ -267,17 +266,15 @@ void main() {
     });
 
     test('called for a stack trace from a one-shot timer', () async {
-      var chain = await Chain.capture(() {
-        return chainForTrace(inOneShotTimer, () => throw 'error');
-      });
+      var chain = await Chain.capture(
+          () => chainForTrace(inOneShotTimer, () => throw 'error'));
 
       expect(chain.traces, hasLength(3));
     });
 
     test('called for a stack trace from a periodic timer', () async {
-      var chain = await Chain.capture(() {
-        return chainForTrace(inPeriodicTimer, () => throw 'error');
-      });
+      var chain = await Chain.capture(
+          () => chainForTrace(inPeriodicTimer, () => throw 'error'));
 
       expect(chain.traces, hasLength(3));
     });
@@ -285,19 +282,16 @@ void main() {
     test(
         'called for a stack trace from a nested series of asynchronous '
         'operations', () async {
-      var chain = await Chain.capture(() {
-        return chainForTrace((callback) {
-          inPeriodicTimer(() => inOneShotTimer(() => inMicrotask(callback)));
-        }, () => throw 'error');
-      });
+      var chain = await Chain.capture(() => chainForTrace((callback) {
+            inPeriodicTimer(() => inOneShotTimer(() => inMicrotask(callback)));
+          }, () => throw 'error'));
 
       expect(chain.traces, hasLength(5));
     });
 
     test('called for a stack trace from a long future chain', () async {
-      var chain = await Chain.capture(() {
-        return chainForTrace(inFutureChain, () => throw 'error');
-      });
+      var chain = await Chain.capture(
+          () => chainForTrace(inFutureChain, () => throw 'error'));
 
       expect(chain.traces, hasLength(3));
     });

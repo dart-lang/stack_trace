@@ -21,7 +21,7 @@ final _specKey = Object();
 /// A chain of stack traces.
 ///
 /// A stack chain is a collection of one or more stack traces that collectively
-/// represent the path from [main] through nested function calls to a particular
+/// represent the path from `main` through nested function calls to a particular
 /// code location, usually where an error was thrown. Multiple stack traces are
 /// necessary when using asynchronous functions, since the program's stack is
 /// reset before each asynchronous callback is run.
@@ -189,21 +189,19 @@ class Chain implements StackTrace {
   /// Returns a new [Chain] comprised of [traces].
   Chain(Iterable<Trace> traces) : traces = List<Trace>.unmodifiable(traces);
 
-  /// Returns a terser version of [this].
+  /// Returns a terser version of this chain.
   ///
   /// This calls [Trace.terse] on every trace in [traces], and discards any
   /// trace that contain only internal frames.
   ///
   /// This won't do anything with a raw JavaScript trace, since there's no way
   /// to determine which frames come from which Dart libraries. However, the
-  /// [`source_map_stack_trace`][source_map_stack_trace] package can be used to
-  /// convert JavaScript traces into Dart-style traces.
-  ///
-  /// [source_map_stack_trace]: https://pub.dev/packages/source_map_stack_trace
+  /// [`source_map_stack_trace`](https://pub.dev/packages/source_map_stack_trace)
+  /// package can be used to convert JavaScript traces into Dart-style traces.
   Chain get terse => foldFrames((_) => false, terse: true);
 
-  /// Returns a new [Chain] based on [this] where multiple stack frames matching
-  /// [predicate] are folded together.
+  /// Returns a new [Chain] based on this chain where multiple stack frames
+  /// matching [predicate] are folded together.
   ///
   /// This means that whenever there are multiple frames in a row that match
   /// [predicate], only the last one is kept. In addition, traces that are
@@ -239,7 +237,7 @@ class Chain implements StackTrace {
     return Chain(nonEmptyTraces);
   }
 
-  /// Converts [this] to a [Trace].
+  /// Converts this chain to a [Trace].
   ///
   /// The trace version of a chain is just the concatenation of all the traces
   /// in the chain.
@@ -248,18 +246,19 @@ class Chain implements StackTrace {
   @override
   String toString() {
     // Figure out the longest path so we know how much to pad.
-    var longest = traces.map((trace) {
-      return trace.frames
-          .map((frame) => frame.location.length)
-          .fold(0, math.max);
-    }).fold(0, math.max);
+    var longest = traces
+        .map((trace) => trace.frames
+            .map((frame) => frame.location.length)
+            .fold(0, math.max))
+        .fold(0, math.max);
 
     // Don't call out to [Trace.toString] here because that doesn't ensure that
     // padding is consistent across all traces.
-    return traces.map((trace) {
-      return trace.frames.map((frame) {
-        return '${frame.location.padRight(longest)}  ${frame.member}\n';
-      }).join();
-    }).join(chainGap);
+    return traces
+        .map((trace) => trace.frames
+            .map((frame) =>
+                '${frame.location.padRight(longest)}  ${frame.member}\n')
+            .join())
+        .join(chainGap);
   }
 }

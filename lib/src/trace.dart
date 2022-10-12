@@ -94,12 +94,13 @@ class Trace implements StackTrace {
     }
 
     var trace = Trace.from(StackTrace.current);
-    return LazyTrace(() {
-      // JS includes a frame for the call to StackTrace.current, but the VM
-      // doesn't, so we skip an extra frame in a JS context.
-      return Trace(trace.frames.skip(level + (inJS ? 2 : 1)),
-          original: trace.original.toString());
-    });
+    return LazyTrace(
+      () =>
+          // JS includes a frame for the call to StackTrace.current, but the VM
+          // doesn't, so we skip an extra frame in a JS context.
+          Trace(trace.frames.skip(level + (inJS ? 2 : 1)),
+              original: trace.original.toString()),
+    );
   }
 
   /// Returns a new stack trace containing the same data as [trace].
@@ -250,7 +251,7 @@ class Trace implements StackTrace {
   /// platform is being used.
   StackTrace get vmTrace => VMTrace(frames);
 
-  /// Returns a terser version of [this].
+  /// Returns a terser version of this trace.
   ///
   /// This is accomplished by folding together multiple stack frames from the
   /// core library or from this package, as in [foldFrames]. Remaining core
@@ -260,15 +261,13 @@ class Trace implements StackTrace {
   ///
   /// This won't do anything with a raw JavaScript trace, since there's no way
   /// to determine which frames come from which Dart libraries. However, the
-  /// [`source_map_stack_trace`][source_map_stack_trace] package can be used to
-  /// convert JavaScript traces into Dart-style traces.
-  ///
-  /// [source_map_stack_trace]: https://pub.dev/packages/source_map_stack_trace
+  /// [`source_map_stack_trace`][https://pub.dev/packages/source_map_stack_trace]
+  /// package can be used to convert JavaScript traces into Dart-style traces.
   ///
   /// For custom folding, see [foldFrames].
   Trace get terse => foldFrames((_) => false, terse: true);
 
-  /// Returns a new [Trace] based on [this] where multiple stack frames matching
+  /// Returns a new [Trace] based on `this` where multiple stack frames matching
   /// [predicate] are folded together.
   ///
   /// This means that whenever there are multiple frames in a row that match

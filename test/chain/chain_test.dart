@@ -103,7 +103,7 @@ void main() {
       test("doesn't enable chain-tracking", () {
         return Chain.disable(() {
           return Chain.capture(() {
-            var completer = Completer();
+            var completer = Completer<Chain>();
             inMicrotask(() {
               completer.complete(Chain.current());
             });
@@ -126,7 +126,7 @@ void main() {
   group('Chain.disable()', () {
     test('disables chain-tracking', () {
       return Chain.disable(() {
-        var completer = Completer();
+        var completer = Completer<Chain>();
         inMicrotask(() => completer.complete(Chain.current()));
 
         return completer.future.then((chain) {
@@ -138,7 +138,7 @@ void main() {
     test('Chain.capture() re-enables chain-tracking', () {
       return Chain.disable(() {
         return Chain.capture(() {
-          var completer = Completer();
+          var completer = Completer<Chain>();
           inMicrotask(() => completer.complete(Chain.current()));
 
           return completer.future.then((chain) {
@@ -173,7 +173,7 @@ void main() {
     test("with when: false doesn't disable", () {
       return Chain.capture(() {
         return Chain.disable(() {
-          var completer = Completer();
+          var completer = Completer<Chain>();
           inMicrotask(() => completer.complete(Chain.current()));
 
           return completer.future.then((chain) {

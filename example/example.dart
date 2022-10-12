@@ -7,7 +7,7 @@ void main() {
 }
 
 void _scheduleAsync() {
-  Future.delayed(Duration(seconds: 1)).then((_) => _runAsync());
+  Future.delayed(const Duration(seconds: 1)).then((_) => _runAsync());
 }
 
 void _runAsync() {

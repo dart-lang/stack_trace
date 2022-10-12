@@ -67,7 +67,7 @@ void main() {
       });
 
       test('at level 0 returns a trace starting at the current frame', () {
-        var trace = Trace.current(0);
+        var trace = Trace.current();
         expect(trace.frames.first.member, equals('main.<fn>.<fn>.<fn>'));
       });
 

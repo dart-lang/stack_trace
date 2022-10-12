@@ -64,15 +64,13 @@ class StackZoneSpecification {
   StackZoneSpecification(this._onError, {bool errorZone = true})
       : _errorZone = errorZone;
 
-  /// Converts [this] to a real [ZoneSpecification].
-  ZoneSpecification toSpec() {
-    return ZoneSpecification(
-        handleUncaughtError: _errorZone ? _handleUncaughtError : null,
-        registerCallback: _registerCallback,
-        registerUnaryCallback: _registerUnaryCallback,
-        registerBinaryCallback: _registerBinaryCallback,
-        errorCallback: _errorCallback);
-  }
+  /// Converts this specification to a real [ZoneSpecification].
+  ZoneSpecification toSpec() => ZoneSpecification(
+      handleUncaughtError: _errorZone ? _handleUncaughtError : null,
+      registerCallback: _registerCallback,
+      registerUnaryCallback: _registerUnaryCallback,
+      registerBinaryCallback: _registerBinaryCallback,
+      errorCallback: _errorCallback);
 
   /// Returns the current stack chain.
   ///
@@ -107,7 +105,7 @@ class StackZoneSpecification {
     }
   }
 
-  /// Tracks the current stack chain so it can be set to [_currentChain] when
+  /// Tracks the current stack chain so it can be set to [_currentNode] when
   /// [f] is run.
   ZoneCallback<R> _registerCallback<R>(
       Zone self, ZoneDelegate parent, Zone zone, R Function() f) {
@@ -116,27 +114,25 @@ class StackZoneSpecification {
     return parent.registerCallback(zone, () => _run(f, node));
   }
 
-  /// Tracks the current stack chain so it can be set to [_currentChain] when
+  /// Tracks the current stack chain so it can be set to [_currentNode] when
   /// [f] is run.
   ZoneUnaryCallback<R, T> _registerUnaryCallback<R, T>(
       Zone self, ZoneDelegate parent, Zone zone, R Function(T) f) {
     if (_disabled) return parent.registerUnaryCallback(zone, f);
     var node = _createNode(1);
-    return parent.registerUnaryCallback(zone, (arg) {
-      return _run(() => f(arg), node);
-    });
+    return parent.registerUnaryCallback(
+        zone, (arg) => _run(() => f(arg), node));
   }
 
-  /// Tracks the current stack chain so it can be set to [_currentChain] when
+  /// Tracks the current stack chain so it can be set to [_currentNode] when
   /// [f] is run.
   ZoneBinaryCallback<R, T1, T2> _registerBinaryCallback<R, T1, T2>(
       Zone self, ZoneDelegate parent, Zone zone, R Function(T1, T2) f) {
     if (_disabled) return parent.registerBinaryCallback(zone, f);
 
     var node = _createNode(1);
-    return parent.registerBinaryCallback(zone, (arg1, arg2) {
-      return _run(() => f(arg1, arg2), node);
-    });
+    return parent.registerBinaryCallback(
+        zone, (arg1, arg2) => _run(() => f(arg1, arg2), node));
   }
 
   /// Looks up the chain associated with [stackTrace] and passes it either to
