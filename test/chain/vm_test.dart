@@ -34,9 +34,9 @@ void main() {
           chain.toString(), equals(Chain.parse(vmTrace.toString()).toString()));
     });
 
-    test('thrown in a microtask', () {
-      return captureFuture(() => inMicrotask(() => throw 'error'))
-          .then((chain) {
+    test(
+      'thrown in a microtask',
+      () => captureFuture(() => inMicrotask(() => throw 'error')).then((chain) {
         // Since there was only one asynchronous operation, there should be only
         // two traces in the chain.
         expect(chain.traces, hasLength(2));
@@ -49,49 +49,53 @@ void main() {
         // was scheduled.
         expect(chain.traces[1].frames,
             contains(frameMember(startsWith('inMicrotask'))));
-      });
-    });
+      }),
+    );
 
-    test('thrown in a one-shot timer', () {
-      return captureFuture(() => inOneShotTimer(() => throw 'error'))
-          .then((chain) {
-        expect(chain.traces, hasLength(2));
-        expect(chain.traces[0].frames.first, frameMember(startsWith('main')));
-        expect(chain.traces[1].frames,
-            contains(frameMember(startsWith('inOneShotTimer'))));
-      });
-    });
+    test(
+        'thrown in a one-shot timer',
+        () => captureFuture(() => inOneShotTimer(() => throw 'error'))
+                .then((chain) {
+              expect(chain.traces, hasLength(2));
+              expect(chain.traces[0].frames.first,
+                  frameMember(startsWith('main')));
+              expect(chain.traces[1].frames,
+                  contains(frameMember(startsWith('inOneShotTimer'))));
+            }));
 
-    test('thrown in a periodic timer', () {
-      return captureFuture(() => inPeriodicTimer(() => throw 'error'))
-          .then((chain) {
-        expect(chain.traces, hasLength(2));
-        expect(chain.traces[0].frames.first, frameMember(startsWith('main')));
-        expect(chain.traces[1].frames,
-            contains(frameMember(startsWith('inPeriodicTimer'))));
-      });
-    });
+    test(
+        'thrown in a periodic timer',
+        () => captureFuture(() => inPeriodicTimer(() => throw 'error'))
+                .then((chain) {
+              expect(chain.traces, hasLength(2));
+              expect(chain.traces[0].frames.first,
+                  frameMember(startsWith('main')));
+              expect(chain.traces[1].frames,
+                  contains(frameMember(startsWith('inPeriodicTimer'))));
+            }));
 
-    test('thrown in a nested series of asynchronous operations', () {
-      return captureFuture(() {
-        inPeriodicTimer(() {
-          inOneShotTimer(() => inMicrotask(() => throw 'error'));
-        });
-      }).then((chain) {
-        expect(chain.traces, hasLength(4));
-        expect(chain.traces[0].frames.first, frameMember(startsWith('main')));
-        expect(chain.traces[1].frames,
-            contains(frameMember(startsWith('inMicrotask'))));
-        expect(chain.traces[2].frames,
-            contains(frameMember(startsWith('inOneShotTimer'))));
-        expect(chain.traces[3].frames,
-            contains(frameMember(startsWith('inPeriodicTimer'))));
-      });
-    });
+    test(
+        'thrown in a nested series of asynchronous operations',
+        () => captureFuture(() {
+              inPeriodicTimer(() {
+                inOneShotTimer(() => inMicrotask(() => throw 'error'));
+              });
+            }).then((chain) {
+              expect(chain.traces, hasLength(4));
+              expect(chain.traces[0].frames.first,
+                  frameMember(startsWith('main')));
+              expect(chain.traces[1].frames,
+                  contains(frameMember(startsWith('inMicrotask'))));
+              expect(chain.traces[2].frames,
+                  contains(frameMember(startsWith('inOneShotTimer'))));
+              expect(chain.traces[3].frames,
+                  contains(frameMember(startsWith('inPeriodicTimer'))));
+            }));
 
-    test('thrown in a long future chain', () {
-      return captureFuture(() => inFutureChain(() => throw 'error'))
-          .then((chain) {
+    test(
+      'thrown in a long future chain',
+      () =>
+          captureFuture(() => inFutureChain(() => throw 'error')).then((chain) {
         // Despite many asynchronous operations, there's only one level of
         // nested calls, so there should be only two traces in the chain. This
         // is important; programmers expect stack trace memory consumption to be
@@ -101,12 +105,12 @@ void main() {
         expect(chain.traces[0].frames.first, frameMember(startsWith('main')));
         expect(chain.traces[1].frames,
             contains(frameMember(startsWith('inFutureChain'))));
-      });
-    });
+      }),
+    );
 
-    test('thrown in new Future()', () {
-      return captureFuture(() => inNewFuture(() => throw 'error'))
-          .then((chain) {
+    test(
+      'thrown in new Future()',
+      () => captureFuture(() => inNewFuture(() => throw 'error')).then((chain) {
         expect(chain.traces, hasLength(3));
         expect(chain.traces[0].frames.first, frameMember(startsWith('main')));
 
@@ -119,11 +123,12 @@ void main() {
 
         expect(chain.traces[2].frames,
             contains(frameMember(startsWith('inNewFuture'))));
-      });
-    });
+      }),
+    );
 
-    test('thrown in new Future.sync()', () {
-      return captureFuture(() {
+    test(
+      'thrown in new Future.sync()',
+      () => captureFuture(() {
         inMicrotask(() => inSyncFuture(() => throw 'error'));
       }).then((chain) {
         expect(chain.traces, hasLength(3));
@@ -132,8 +137,8 @@ void main() {
             contains(frameMember(startsWith('inSyncFuture'))));
         expect(chain.traces[2].frames,
             contains(frameMember(startsWith('inMicrotask'))));
-      });
-    });
+      }),
+    );
 
     test('multiple times', () {
       var completer = Completer();
@@ -186,8 +191,9 @@ void main() {
       });
     });
 
-    test('passed to a completer with no stack trace', () {
-      return captureFuture(() {
+    test(
+      'passed to a completer with no stack trace',
+      () => captureFuture(() {
         inMicrotask(completerErrorFuture);
       }).then((chain) {
         expect(chain.traces, hasLength(2));
@@ -201,8 +207,8 @@ void main() {
         // microtask was scheduled.
         expect(chain.traces[1].frames,
             contains(frameMember(startsWith('inMicrotask'))));
-      });
-    });
+      }),
+    );
 
     test('passed to a stream controller', () {
       var trace = Trace.current();
@@ -218,17 +224,17 @@ void main() {
       });
     });
 
-    test('passed to a stream controller with no stack trace', () {
-      return captureFuture(() {
-        inMicrotask(() => controllerErrorStream().listen(null));
-      }).then((chain) {
-        expect(chain.traces, hasLength(2));
-        expect(chain.traces[0].frames,
-            contains(frameMember(startsWith('controllerErrorStream'))));
-        expect(chain.traces[1].frames,
-            contains(frameMember(startsWith('inMicrotask'))));
-      });
-    });
+    test(
+        'passed to a stream controller with no stack trace',
+        () => captureFuture(() {
+              inMicrotask(() => controllerErrorStream().listen(null));
+            }).then((chain) {
+              expect(chain.traces, hasLength(2));
+              expect(chain.traces[0].frames,
+                  contains(frameMember(startsWith('controllerErrorStream'))));
+              expect(chain.traces[1].frames,
+                  contains(frameMember(startsWith('inMicrotask'))));
+            }));
 
     test('and relays them to the parent zone', () {
       var completer = Completer();
@@ -282,7 +288,7 @@ void main() {
 
   group('current() within capture()', () {
     test('called in a microtask', () {
-      var completer = Completer();
+      var completer = Completer<Chain>();
       Chain.capture(() {
         inMicrotask(() => completer.complete(Chain.current()));
       });
@@ -296,7 +302,7 @@ void main() {
     });
 
     test('called in a one-shot timer', () {
-      var completer = Completer();
+      var completer = Completer<Chain>();
       Chain.capture(() {
         inOneShotTimer(() => completer.complete(Chain.current()));
       });
@@ -310,7 +316,7 @@ void main() {
     });
 
     test('called in a periodic timer', () {
-      var completer = Completer();
+      var completer = Completer<Chain>();
       Chain.capture(() {
         inPeriodicTimer(() => completer.complete(Chain.current()));
       });
@@ -324,7 +330,7 @@ void main() {
     });
 
     test('called in a nested series of asynchronous operations', () {
-      var completer = Completer();
+      var completer = Completer<Chain>();
       Chain.capture(() {
         inPeriodicTimer(() {
           inOneShotTimer(() {
@@ -346,7 +352,7 @@ void main() {
     });
 
     test('called in a long future chain', () {
-      var completer = Completer();
+      var completer = Completer<Chain>();
       Chain.capture(() {
         inFutureChain(() => completer.complete(Chain.current()));
       });
@@ -361,11 +367,11 @@ void main() {
   });
 
   test(
-      'current() outside of capture() returns a chain wrapping the current '
-      'trace', () {
-    // The test runner runs all tests with chains enabled.
-    return Chain.disable(() {
-      var completer = Completer();
+    'current() outside of capture() returns a chain wrapping the current trace',
+    () =>
+        // The test runner runs all tests with chains enabled.
+        Chain.disable(() {
+      var completer = Completer<Chain>();
       inMicrotask(() => completer.complete(Chain.current()));
 
       return completer.future.then((chain) {
@@ -376,14 +382,14 @@ void main() {
         expect(
             chain.traces.first.frames.first, frameMember(startsWith('main')));
       });
-    });
-  });
+    }),
+  );
 
   group('forTrace() within capture()', () {
-    test('called for a stack trace from a microtask', () {
-      return Chain.capture(() {
-        return chainForTrace(inMicrotask, () => throw 'error');
-      }).then((chain) {
+    test(
+      'called for a stack trace from a microtask',
+      () => Chain.capture(() => chainForTrace(inMicrotask, () => throw 'error'))
+          .then((chain) {
         // Because [chainForTrace] has to set up a future chain to capture the
         // stack trace while still showing it to the zone specification, it adds
         // an additional level of async nesting and so an additional trace.
@@ -393,68 +399,70 @@ void main() {
             contains(frameMember(startsWith('chainForTrace'))));
         expect(chain.traces[2].frames,
             contains(frameMember(startsWith('inMicrotask'))));
-      });
-    });
+      }),
+    );
 
-    test('called for a stack trace from a one-shot timer', () {
-      return Chain.capture(() {
-        return chainForTrace(inOneShotTimer, () => throw 'error');
-      }).then((chain) {
-        expect(chain.traces, hasLength(3));
-        expect(chain.traces[0].frames.first, frameMember(startsWith('main')));
-        expect(chain.traces[1].frames,
-            contains(frameMember(startsWith('chainForTrace'))));
-        expect(chain.traces[2].frames,
-            contains(frameMember(startsWith('inOneShotTimer'))));
-      });
-    });
+    test(
+        'called for a stack trace from a one-shot timer',
+        () => Chain.capture(
+                    () => chainForTrace(inOneShotTimer, () => throw 'error'))
+                .then((chain) {
+              expect(chain.traces, hasLength(3));
+              expect(chain.traces[0].frames.first,
+                  frameMember(startsWith('main')));
+              expect(chain.traces[1].frames,
+                  contains(frameMember(startsWith('chainForTrace'))));
+              expect(chain.traces[2].frames,
+                  contains(frameMember(startsWith('inOneShotTimer'))));
+            }));
 
-    test('called for a stack trace from a periodic timer', () {
-      return Chain.capture(() {
-        return chainForTrace(inPeriodicTimer, () => throw 'error');
-      }).then((chain) {
-        expect(chain.traces, hasLength(3));
-        expect(chain.traces[0].frames.first, frameMember(startsWith('main')));
-        expect(chain.traces[1].frames,
-            contains(frameMember(startsWith('chainForTrace'))));
-        expect(chain.traces[2].frames,
-            contains(frameMember(startsWith('inPeriodicTimer'))));
-      });
-    });
+    test(
+        'called for a stack trace from a periodic timer',
+        () => Chain.capture(
+                    () => chainForTrace(inPeriodicTimer, () => throw 'error'))
+                .then((chain) {
+              expect(chain.traces, hasLength(3));
+              expect(chain.traces[0].frames.first,
+                  frameMember(startsWith('main')));
+              expect(chain.traces[1].frames,
+                  contains(frameMember(startsWith('chainForTrace'))));
+              expect(chain.traces[2].frames,
+                  contains(frameMember(startsWith('inPeriodicTimer'))));
+            }));
 
     test(
         'called for a stack trace from a nested series of asynchronous '
-        'operations', () {
-      return Chain.capture(() {
-        return chainForTrace((callback) {
-          inPeriodicTimer(() => inOneShotTimer(() => inMicrotask(callback)));
-        }, () => throw 'error');
-      }).then((chain) {
-        expect(chain.traces, hasLength(5));
-        expect(chain.traces[0].frames.first, frameMember(startsWith('main')));
-        expect(chain.traces[1].frames,
-            contains(frameMember(startsWith('chainForTrace'))));
-        expect(chain.traces[2].frames,
-            contains(frameMember(startsWith('inMicrotask'))));
-        expect(chain.traces[3].frames,
-            contains(frameMember(startsWith('inOneShotTimer'))));
-        expect(chain.traces[4].frames,
-            contains(frameMember(startsWith('inPeriodicTimer'))));
-      });
-    });
+        'operations',
+        () => Chain.capture(() => chainForTrace((callback) {
+                  inPeriodicTimer(
+                      () => inOneShotTimer(() => inMicrotask(callback)));
+                }, () => throw 'error')).then((chain) {
+              expect(chain.traces, hasLength(5));
+              expect(chain.traces[0].frames.first,
+                  frameMember(startsWith('main')));
+              expect(chain.traces[1].frames,
+                  contains(frameMember(startsWith('chainForTrace'))));
+              expect(chain.traces[2].frames,
+                  contains(frameMember(startsWith('inMicrotask'))));
+              expect(chain.traces[3].frames,
+                  contains(frameMember(startsWith('inOneShotTimer'))));
+              expect(chain.traces[4].frames,
+                  contains(frameMember(startsWith('inPeriodicTimer'))));
+            }));
 
-    test('called for a stack trace from a long future chain', () {
-      return Chain.capture(() {
-        return chainForTrace(inFutureChain, () => throw 'error');
-      }).then((chain) {
-        expect(chain.traces, hasLength(3));
-        expect(chain.traces[0].frames.first, frameMember(startsWith('main')));
-        expect(chain.traces[1].frames,
-            contains(frameMember(startsWith('chainForTrace'))));
-        expect(chain.traces[2].frames,
-            contains(frameMember(startsWith('inFutureChain'))));
-      });
-    });
+    test(
+        'called for a stack trace from a long future chain',
+        () => Chain.capture(
+                    () => chainForTrace(inFutureChain, () => throw 'error'))
+                .then((chain) {
+              expect(chain.traces, hasLength(3));
+              expect(chain.traces[0].frames.first,
+                  frameMember(startsWith('main')));
+              expect(chain.traces[1].frames,
+                  contains(frameMember(startsWith('chainForTrace'))));
+              expect(chain.traces[2].frames,
+                  contains(frameMember(startsWith('inFutureChain'))));
+            }));
 
     test('called for an unregistered stack trace uses the current chain',
         () async {
@@ -478,10 +486,11 @@ void main() {
   });
 
   test(
-      'forTrace() outside of capture() returns a chain describing the VM stack '
-      'chain', () {
-    // Disable the test package's chain-tracking.
-    return Chain.disable(() async {
+    'forTrace() outside of capture() returns a chain describing the VM stack '
+    'chain',
+    () =>
+        // Disable the test package's chain-tracking.
+        Chain.disable(() async {
       late StackTrace trace;
       await Chain.capture(() async {
         try {
@@ -500,6 +509,6 @@ void main() {
       expect(chain.traces, hasLength(expectedLength));
       expect(
           chain.traces.first.frames, contains(frameMember(startsWith('main'))));
-    });
-  });
+    }),
+  );
 }

@@ -14,13 +14,13 @@ typedef ChainErrorCallback = void Function(dynamic stack, Chain chain);
 
 void main() {
   group('Chain.parse()', () {
-    test('parses a real Chain', () {
-      return captureFuture(() => inMicrotask(() => throw 'error'))
-          .then((chain) {
-        expect(
-            Chain.parse(chain.toString()).toString(), equals(chain.toString()));
-      });
-    });
+    test(
+        'parses a real Chain',
+        () =>
+            captureFuture(() => inMicrotask(() => throw 'error')).then((chain) {
+              expect(Chain.parse(chain.toString()).toString(),
+                  equals(chain.toString()));
+            }));
 
     test('parses an empty string', () {
       var chain = Chain.parse('');
@@ -55,9 +55,8 @@ void main() {
 
   group('Chain.capture()', () {
     test('with onError blocks errors', () {
-      Chain.capture(() {
-        return Future.error('oh no');
-      }, onError: expectAsync2((error, chain) {
+      Chain.capture(() => Future.error('oh no'),
+          onError: expectAsync2((error, chain) {
         expect(error, equals('oh no'));
         expect(chain, isA<Chain>());
       })).then(expectAsync1((_) {}, count: 0),
@@ -92,96 +91,87 @@ void main() {
       });
 
       test('with onError blocks errors', () {
-        Chain.capture(() {
-          return Future.error('oh no');
-        }, onError: expectAsync2((error, chain) {
+        Chain.capture(() => Future.error('oh no'),
+            onError: expectAsync2((error, chain) {
           expect(error, equals('oh no'));
           expect(chain, isA<Chain>());
         }), when: false);
       });
 
-      test("doesn't enable chain-tracking", () {
-        return Chain.disable(() {
-          return Chain.capture(() {
-            var completer = Completer();
-            inMicrotask(() {
-              completer.complete(Chain.current());
-            });
+      test(
+          "doesn't enable chain-tracking",
+          () => Chain.disable(() => Chain.capture(() {
+                var completer = Completer<Chain>();
+                inMicrotask(() {
+                  completer.complete(Chain.current());
+                });
 
-            return completer.future.then((chain) {
-              expect(chain.traces, hasLength(1));
-            });
-          }, when: false);
-        });
-      });
+                return completer.future.then((chain) {
+                  expect(chain.traces, hasLength(1));
+                });
+              }, when: false)));
     });
   });
 
-  test('Chain.capture() with custom zoneValues', () {
-    return Chain.capture(() {
-      expect(Zone.current[#enabled], true);
-    }, zoneValues: {#enabled: true});
-  });
+  test(
+      'Chain.capture() with custom zoneValues',
+      () => Chain.capture(() {
+            expect(Zone.current[#enabled], true);
+          }, zoneValues: {#enabled: true}));
 
   group('Chain.disable()', () {
-    test('disables chain-tracking', () {
-      return Chain.disable(() {
-        var completer = Completer();
-        inMicrotask(() => completer.complete(Chain.current()));
+    test(
+        'disables chain-tracking',
+        () => Chain.disable(() {
+              var completer = Completer<Chain>();
+              inMicrotask(() => completer.complete(Chain.current()));
 
-        return completer.future.then((chain) {
-          expect(chain.traces, hasLength(1));
-        });
-      });
-    });
+              return completer.future.then((chain) {
+                expect(chain.traces, hasLength(1));
+              });
+            }));
 
-    test('Chain.capture() re-enables chain-tracking', () {
-      return Chain.disable(() {
-        return Chain.capture(() {
-          var completer = Completer();
-          inMicrotask(() => completer.complete(Chain.current()));
+    test(
+        'Chain.capture() re-enables chain-tracking',
+        () => Chain.disable(() => Chain.capture(() {
+              var completer = Completer<Chain>();
+              inMicrotask(() => completer.complete(Chain.current()));
 
-          return completer.future.then((chain) {
-            expect(chain.traces, hasLength(2));
-          });
-        });
-      });
-    });
+              return completer.future.then((chain) {
+                expect(chain.traces, hasLength(2));
+              });
+            })));
 
-    test('preserves parent zones of the capture zone', () {
-      // The outer disable call turns off the test package's chain-tracking.
-      return Chain.disable(() {
-        return runZoned(() {
-          return Chain.capture(() {
-            expect(Chain.disable(() => Zone.current[#enabled]), isTrue);
-          });
-        }, zoneValues: {#enabled: true});
-      });
-    });
+    test(
+      'preserves parent zones of the capture zone',
+      () =>
+          // The outer disable call turns off the test package's chain-tracking.
+          Chain.disable(() => runZoned(
+              () => Chain.capture(() {
+                    expect(Chain.disable(() => Zone.current[#enabled]), isTrue);
+                  }),
+              zoneValues: {#enabled: true})),
+    );
 
-    test('preserves child zones of the capture zone', () {
-      // The outer disable call turns off the test package's chain-tracking.
-      return Chain.disable(() {
-        return Chain.capture(() {
-          return runZoned(() {
-            expect(Chain.disable(() => Zone.current[#enabled]), isTrue);
-          }, zoneValues: {#enabled: true});
-        });
-      });
-    });
+    test(
+      'preserves child zones of the capture zone',
+      () =>
+          // The outer disable call turns off the test package's chain-tracking.
+          Chain.disable(() => Chain.capture(() => runZoned(() {
+                expect(Chain.disable(() => Zone.current[#enabled]), isTrue);
+              }, zoneValues: {#enabled: true}))),
+    );
 
-    test("with when: false doesn't disable", () {
-      return Chain.capture(() {
-        return Chain.disable(() {
-          var completer = Completer();
-          inMicrotask(() => completer.complete(Chain.current()));
+    test(
+        "with when: false doesn't disable",
+        () => Chain.capture(() => Chain.disable(() {
+              var completer = Completer<Chain>();
+              inMicrotask(() => completer.complete(Chain.current()));
 
-          return completer.future.then((chain) {
-            expect(chain.traces, hasLength(2));
-          });
-        }, when: false);
-      });
-    });
+              return completer.future.then((chain) {
+                expect(chain.traces, hasLength(2));
+              });
+            }, when: false)));
   });
 
   test('toString() ensures that all traces are aligned', () {
