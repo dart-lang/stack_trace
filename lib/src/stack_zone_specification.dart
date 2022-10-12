@@ -64,7 +64,7 @@ class StackZoneSpecification {
   StackZoneSpecification(this._onError, {bool errorZone = true})
       : _errorZone = errorZone;
 
-  /// Converts `this` to a real [ZoneSpecification].
+  /// Converts this specification to a real [ZoneSpecification].
   ZoneSpecification toSpec() => ZoneSpecification(
       handleUncaughtError: _errorZone ? _handleUncaughtError : null,
       registerCallback: _registerCallback,
