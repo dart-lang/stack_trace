@@ -251,7 +251,7 @@ class Trace implements StackTrace {
   /// platform is being used.
   StackTrace get vmTrace => VMTrace(frames);
 
-  /// Returns a terser version of `this`.
+  /// Returns a terser version of this trace.
   ///
   /// This is accomplished by folding together multiple stack frames from the
   /// core library or from this package, as in [foldFrames]. Remaining core
