@@ -237,7 +237,7 @@ class Chain implements StackTrace {
     return Chain(nonEmptyTraces);
   }
 
-  /// Converts `this` to a [Trace].
+  /// Converts this chain to a [Trace].
   ///
   /// The trace version of a chain is just the concatenation of all the traces
   /// in the chain.
