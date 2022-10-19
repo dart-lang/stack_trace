@@ -320,7 +320,7 @@
 
 * Remove a workaround for [issue 17083][].
 
-[issue 17083]: http://code.google.com/p/dart/issues/detail?id=17083
+[issue 17083]: https://github.com/dart-lang/sdk/issues/17083
 
 ## 1.0.1
 
