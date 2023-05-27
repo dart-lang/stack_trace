@@ -332,7 +332,12 @@ class Trace implements StackTrace {
     // Print out the stack trace nicely formatted.
     return frames.map((frame) {
       if (frame is UnparsedFrame) return '$frame\n';
-      return '${frame.location.padRight(longest)}  ${frame.member}\n';
+
+      // split the frame
+      final frameSplit = frame.toString().split(" ");
+      // extract the components of the frame and then concatenate with :
+      final frameLocation = frameSplit[0]+":"+frameSplit[1];
+      return '${frameLocation.padRight(longest)} ${frame.member}\n';
     }).join();
   }
 }
