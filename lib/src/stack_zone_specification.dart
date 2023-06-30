@@ -117,7 +117,10 @@ class StackZoneSpecification {
   /// Tracks the current stack chain so it can be set to [_currentNode] when
   /// [f] is run.
   ZoneUnaryCallback<R, T> _registerUnaryCallback<R, T>(
-      Zone self, ZoneDelegate parent, Zone zone, R Function(T) f) {
+      Zone self,
+      ZoneDelegate parent,
+      Zone zone,
+      @pragma('vm:awaiter-link') R Function(T) f) {
     if (_disabled) return parent.registerUnaryCallback(zone, f);
     var node = _createNode(1);
     return parent.registerUnaryCallback(
