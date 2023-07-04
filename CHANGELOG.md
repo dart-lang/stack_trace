@@ -1,3 +1,8 @@
+## 1.11.1
+
+* Make use of `@pragma('vm:awaiter-link')` to make package work better with
+  Dart VM's builtin awaiter stack unwinding. No other changes.
+
 ## 1.11.0
 
 * Added the parameter `zoneValues` to `Chain.capture` to be able to use custom
