@@ -12,12 +12,14 @@ import 'utils.dart';
 
 void main() {
   group('Chain.parse()', () {
-    test('parses a real Chain', () {
-      return captureFuture(() => inMicrotask(() => throw StateError('error')))
-          .then((chain) {
-        expect(
-            Chain.parse(chain.toString()).toString(), equals(chain.toString()));
-      });
+    test('parses a real Chain', () async {
+      // ignore: only_throw_errors
+      final chain = await captureFuture(() => inMicrotask(() => throw 'error'));
+
+      expect(
+        Chain.parse(chain.toString()).toString(),
+        equals(chain.toString()),
+      );
     });
 
     test('parses an empty string', () {
