@@ -7,6 +7,7 @@
 /// platform to platform. No similar file exists for dart2js since the specific
 /// method names there are implementation details.
 @TestOn('vm')
+library;
 
 import 'package:path/path.dart' as path;
 import 'package:stack_trace/stack_trace.dart';

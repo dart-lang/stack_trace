@@ -10,16 +10,16 @@ import 'package:test/test.dart';
 
 import 'utils.dart';
 
-typedef ChainErrorCallback = void Function(dynamic stack, Chain chain);
-
 void main() {
   group('Chain.parse()', () {
-    test('parses a real Chain', () {
-      return captureFuture(() => inMicrotask(() => throw 'error'))
-          .then((chain) {
-        expect(
-            Chain.parse(chain.toString()).toString(), equals(chain.toString()));
-      });
+    test('parses a real Chain', () async {
+      // ignore: only_throw_errors
+      final chain = await captureFuture(() => inMicrotask(() => throw 'error'));
+
+      expect(
+        Chain.parse(chain.toString()).toString(),
+        equals(chain.toString()),
+      );
     });
 
     test('parses an empty string', () {
@@ -61,7 +61,7 @@ void main() {
   group('Chain.capture()', () {
     test('with onError blocks errors', () {
       Chain.capture(() {
-        return Future.error('oh no');
+        return Future<void>.error('oh no');
       }, onError: expectAsync2((error, chain) {
         expect(error, equals('oh no'));
         expect(chain, isA<Chain>());
@@ -71,7 +71,7 @@ void main() {
 
     test('with no onError blocks errors', () {
       runZonedGuarded(() {
-        Chain.capture(() => Future.error('oh no')).then(
+        Chain.capture(() => Future<void>.error('oh no')).then(
             expectAsync1((_) {}, count: 0),
             onError: expectAsync2((_, __) {}, count: 0));
       }, expectAsync2((error, chain) {
@@ -81,7 +81,7 @@ void main() {
     });
 
     test("with errorZone: false doesn't block errors", () {
-      expect(Chain.capture(() => Future.error('oh no'), errorZone: false),
+      expect(Chain.capture(() => Future<void>.error('oh no'), errorZone: false),
           throwsA('oh no'));
     });
 
@@ -92,13 +92,13 @@ void main() {
 
     group('with when: false', () {
       test("with no onError doesn't block errors", () {
-        expect(Chain.capture(() => Future.error('oh no'), when: false),
+        expect(Chain.capture(() => Future<void>.error('oh no'), when: false),
             throwsA('oh no'));
       });
 
       test('with onError blocks errors', () {
         Chain.capture(() {
-          return Future.error('oh no');
+          return Future<void>.error('oh no');
         }, onError: expectAsync2((error, chain) {
           expect(error, equals('oh no'));
           expect(chain, isA<Chain>());

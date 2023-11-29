@@ -2,9 +2,12 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+// ignore_for_file: only_throw_errors
+
 // VM chain tests can rely on stronger guarantees about the contents of the
 // stack traces than dart2js.
 @TestOn('dart-vm')
+library;
 
 import 'dart:async';
 
@@ -136,7 +139,7 @@ void main() {
     });
 
     test('multiple times', () {
-      var completer = Completer();
+      var completer = Completer<void>();
       var first = true;
 
       Chain.capture(() {
@@ -231,7 +234,7 @@ void main() {
     });
 
     test('and relays them to the parent zone', () {
-      var completer = Completer();
+      var completer = Completer<void>();
 
       runZonedGuarded(() {
         Chain.capture(() {
@@ -260,7 +263,7 @@ void main() {
   });
 
   test('capture() without onError passes exceptions to parent zone', () {
-    var completer = Completer();
+    var completer = Completer<void>();
 
     runZonedGuarded(() {
       Chain.capture(() => inMicrotask(() => throw 'error'));

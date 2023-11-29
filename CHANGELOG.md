@@ -1,3 +1,7 @@
+## 1.11.2-wip
+
+* Require Dart 3.1 or greater
+
 ## 1.11.1
 
 * Make use of `@pragma('vm:awaiter-link')` to make package work better with

@@ -7,9 +7,9 @@ void main() {
 }
 
 void _scheduleAsync() {
-  Future.delayed(const Duration(seconds: 1)).then((_) => _runAsync());
+  Future<void>.delayed(const Duration(seconds: 1)).then((_) => _runAsync());
 }
 
 void _runAsync() {
-  throw 'oh no!';
+  throw StateError('oh no!');
 }
