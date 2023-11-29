@@ -6,10 +6,6 @@ import 'package:path/path.dart' as path;
 import 'package:stack_trace/stack_trace.dart';
 import 'package:test/test.dart';
 
-Trace getCurrentTrace([int level = 0]) => Trace.current(level);
-
-Trace nestedGetCurrentTrace(int level) => getCurrentTrace(level);
-
 void main() {
   // This just shouldn't crash.
   test('a native stack trace is parseable', Trace.current);

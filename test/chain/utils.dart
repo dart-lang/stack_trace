@@ -47,7 +47,7 @@ void inSyncFuture(void Function() callback) {
 ///
 /// If [trace] is passed, it's used as the stack trace for the error.
 Future<void> completerErrorFuture([StackTrace? trace]) {
-  var completer = Completer();
+  var completer = Completer<void>();
   completer.completeError('error', trace);
   return completer.future;
 }
@@ -56,7 +56,7 @@ Future<void> completerErrorFuture([StackTrace? trace]) {
 ///
 /// If [trace] is passed, it's used as the stack trace for the error.
 Stream<void> controllerErrorStream([StackTrace? trace]) {
-  var controller = StreamController();
+  var controller = StreamController<void>();
   controller.addError('error', trace);
   return controller.stream;
 }
@@ -71,7 +71,9 @@ Future<Chain> chainForTrace(
     // [new Future.sync] because those methods don't pass the exception through
     // the zone specification before propagating it, so there's no chance to
     // attach a chain to its stack trace. See issue 15105.
-    Future.value().then((_) => callback()).catchError(completer.completeError);
+    Future<void>.value()
+        .then((_) => callback())
+        .catchError(completer.completeError);
   });
 
   return completer.future
