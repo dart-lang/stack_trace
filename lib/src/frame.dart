@@ -12,17 +12,34 @@ import 'unparsed_frame.dart';
 // #1      Foo._bar (file:///home/nweiz/code/stuff.dart)
 final _vmFrame = RegExp(r'^#\d+\s+(\S.*) \((.+?)((?::\d+){0,2})\)$');
 
+// JS examples:
+//
 //     at Object.stringify (native)
 //     at VW.call$0 (https://example.com/stuff.dart.js:560:28)
 //     at VW.call$0 (eval as fn
 //         (https://example.com/stuff.dart.js:560:28), efn:3:28)
 //     at https://example.com/stuff.dart.js:560:28
+//
+// Wasm examples:
+//
+//     at Error._throwWithCurrentStackTrace (wasm://wasm/0006d966:wasm-function[119]:0xbb13)
+//     at g (wasm://wasm/0006d966:wasm-function[796]:0x143b4)
 final _v8Frame =
     RegExp(r'^\s*at (?:(\S.*?)(?: \[as [^\]]+\])? \((.*)\)|(.*))$');
 
 // https://example.com/stuff.dart.js:560:28
 // https://example.com/stuff.dart.js:560
-final _v8UrlLocation = RegExp(r'^(.*?):(\d+)(?::(\d+))?$|native$');
+//
+// Group 1: URI, required
+// Group 2: line number, required
+// Group 3: column number, optional
+final _v8JsUrlLocation = RegExp(r'^(.*?):(\d+)(?::(\d+))?$|native$');
+
+// wasm://wasm/0006d966:wasm-function[796]:0x143b4
+//
+// Captures only one group with the all of the URL as Wasm stack traces don't
+// include line and column information, even with source maps.
+final _v8WasmUrlLocation = RegExp(r'^wasm:\/\/.*$');
 
 // eval as function (https://example.com/stuff.dart.js:560:28), efn:3:28
 // eval as function (https://example.com/stuff.dart.js:560:28)
@@ -179,14 +196,22 @@ class Frame {
             return Frame(Uri.parse('native'), null, null, member);
           }
 
-          var urlMatch = _v8UrlLocation.firstMatch(location);
-          if (urlMatch == null) return UnparsedFrame(frame);
+          final v8UrlMatch = _v8JsUrlLocation.firstMatch(location);
+          if (v8UrlMatch != null) {
+            final uri = _uriOrPathToUri(v8UrlMatch[1]!);
+            final line = int.parse(v8UrlMatch[2]!);
+            final columnMatch = v8UrlMatch[3];
+            final column = columnMatch != null ? int.parse(columnMatch) : null;
+            return Frame(uri, line, column, member);
+          }
 
-          final uri = _uriOrPathToUri(urlMatch[1]!);
-          final line = int.parse(urlMatch[2]!);
-          final columnMatch = urlMatch[3];
-          final column = columnMatch != null ? int.parse(columnMatch) : null;
-          return Frame(uri, line, column, member);
+          final v8WasmUrlMatch = _v8WasmUrlLocation.firstMatch(location);
+          if (v8WasmUrlMatch != null) {
+            final uri = _uriOrPathToUri(v8WasmUrlMatch[0]!);
+            return Frame(uri, null, null, member);
+          }
+
+          return UnparsedFrame(frame);
         }
 
         // V8 stack frames can be in two forms.
