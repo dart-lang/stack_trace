@@ -58,7 +58,7 @@ final _firefoxEvalLocation =
 // .VW.call$0/name<@https://example.com/stuff.dart.js:560
 // .VW.call$0@https://example.com/stuff.dart.js:560:36
 // https://example.com/stuff.dart.js:560
-final _firefoxSafariFrame = RegExp(r'^'
+final _firefoxSafariJSFrame = RegExp(r'^'
     r'(?:' // Member description. Not present in some Safari frames.
     r'([^@(/]*)' // The actual name of the member.
     r'(?:\(.*\))?' // Arguments to the member, sometimes captured by Firefox.
@@ -72,6 +72,38 @@ final _firefoxSafariFrame = RegExp(r'^'
     r'(?::(\d*))?' // The column number. Not present in older browsers and
     // empty in Safari if it's unknown.
     r'$');
+
+// With names:
+//
+// g@http://localhost:8080/test.wasm:wasm-function[796]:0x143b4
+// f@http://localhost:8080/test.wasm:wasm-function[795]:0x143a8
+// main@http://localhost:8080/test.wasm:wasm-function[792]:0x14390
+//
+// Without names:
+//
+// @http://localhost:8080/test.wasm:wasm-function[796]:0x143b4
+// @http://localhost:8080/test.wasm:wasm-function[795]:0x143a8
+// @http://localhost:8080/test.wasm:wasm-function[792]:0x14390
+//
+// Group 1: Function name, may be empty.
+// Group 2: URI after the '@'.
+// Group 3: Function index.
+final _firefoxWasmFrame = RegExp(r'^(.*)@(.*\[(\d+)\]:.*)$');
+
+// With names:
+//
+// <?>.wasm-function[g]@[wasm code]
+// <?>.wasm-function[f]@[wasm code]
+// <?>.wasm-function[main]@[wasm code]
+//
+// Without names:
+//
+// <?>.wasm-function[796]@[wasm code]
+// <?>.wasm-function[795]@[wasm code]
+// <?>.wasm-function[792]@[wasm code]
+//
+// Group 1: Function name or index.
+final _safariWasmFrame = RegExp(r'^.*\[(.*)\]@\[wasm code\]$');
 
 // foo/bar.dart 10:11 Foo._bar
 // foo/bar.dart 10:11 (anonymous function).dart.fn
@@ -259,35 +291,52 @@ class Frame {
         return Frame(uri, line, null, member);
       });
 
-  /// Parses a string representation of a Firefox stack frame.
+  /// Parses a string representation of a Firefox or Safari stack frame.
   factory Frame.parseFirefox(String frame) => _catchFormatException(frame, () {
-        var match = _firefoxSafariFrame.firstMatch(frame);
-        if (match == null) return UnparsedFrame(frame);
+        var match = _firefoxSafariJSFrame.firstMatch(frame);
+        if (match != null) {
+          if (match[3]!.contains(' line ')) {
+            return Frame._parseFirefoxEval(frame);
+          }
 
-        if (match[3]!.contains(' line ')) {
-          return Frame._parseFirefoxEval(frame);
+          // Normally this is a URI, but in a jsshell trace it can be a path.
+          var uri = _uriOrPathToUri(match[3]!);
+
+          var member = match[1];
+          if (member != null) {
+            member +=
+                List.filled('/'.allMatches(match[2]!).length, '.<fn>').join();
+            if (member == '') member = '<fn>';
+
+            // Some Firefox members have initial dots. We remove them for
+            // consistency with other platforms.
+            member = member.replaceFirst(_initialDot, '');
+          } else {
+            member = '<fn>';
+          }
+
+          var line = match[4] == '' ? null : int.parse(match[4]!);
+          var column =
+              match[5] == null || match[5] == '' ? null : int.parse(match[5]!);
+          return Frame(uri, line, column, member);
         }
 
-        // Normally this is a URI, but in a jsshell trace it can be a path.
-        var uri = _uriOrPathToUri(match[3]!);
-
-        var member = match[1];
-        if (member != null) {
-          member +=
-              List.filled('/'.allMatches(match[2]!).length, '.<fn>').join();
-          if (member == '') member = '<fn>';
-
-          // Some Firefox members have initial dots. We remove them for
-          // consistency with other platforms.
-          member = member.replaceFirst(_initialDot, '');
-        } else {
-          member = '<fn>';
+        match = _firefoxWasmFrame.firstMatch(frame);
+        if (match != null) {
+          final member = match[1]!;
+          final uri = _uriOrPathToUri(match[2]!);
+          final functionIndex = match[3]!;
+          return Frame(
+              uri, null, null, member.isNotEmpty ? member : functionIndex);
         }
 
-        var line = match[4] == '' ? null : int.parse(match[4]!);
-        var column =
-            match[5] == null || match[5] == '' ? null : int.parse(match[5]!);
-        return Frame(uri, line, column, member);
+        match = _safariWasmFrame.firstMatch(frame);
+        if (match != null) {
+          final member = match[1]!;
+          return Frame(Uri(path: 'wasm code'), null, null, member);
+        }
+
+        return UnparsedFrame(frame);
       });
 
   /// Parses a string representation of a Safari 6.0 stack frame.
