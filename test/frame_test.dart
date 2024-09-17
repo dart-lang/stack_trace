@@ -654,24 +654,18 @@ baz@https://pub.dev/buz.js:56355:55
   test('parses a Firefox Wasm frame with a name', () {
     var frame = Frame.parseFirefox(
         'g@http://localhost:8080/test.wasm:wasm-function[796]:0x143b4');
-    expect(
-        frame.uri,
-        Uri.parse(
-            'http://localhost:8080/test.wasm:wasm-function[796]:0x143b4'));
-    expect(frame.line, null);
-    expect(frame.column, null);
+    expect(frame.uri, Uri.parse('http://localhost:8080/test.wasm'));
+    expect(frame.line, 0);
+    expect(frame.column, 0x143b4);
     expect(frame.member, 'g');
   });
 
   test('parses a Firefox Wasm frame without a name', () {
     var frame = Frame.parseFirefox(
         '@http://localhost:8080/test.wasm:wasm-function[796]:0x143b4');
-    expect(
-        frame.uri,
-        Uri.parse(
-            'http://localhost:8080/test.wasm:wasm-function[796]:0x143b4'));
-    expect(frame.line, null);
-    expect(frame.column, null);
+    expect(frame.uri, Uri.parse('http://localhost:8080/test.wasm'));
+    expect(frame.line, 0);
+    expect(frame.column, 0x143b4);
     expect(frame.member, '796');
   });
 

@@ -97,10 +97,12 @@ final _firefoxSafariJSFrame = RegExp(r'^'
 // @http://localhost:8080/test.wasm:wasm-function[795]:0x143a8
 // @http://localhost:8080/test.wasm:wasm-function[792]:0x14390
 //
-// Group 1: Function name, may be empty.
-// Group 2: URI after the '@'.
-// Group 3: Function index.
-final _firefoxWasmFrame = RegExp(r'^(.*)@(.*\[(\d+)\]:.*)$');
+// Group 1: Function name, may be empty: `g`.
+// Group 2: URI: `http://localhost:8080/test.wasm`.
+// Group 3: Function index: `796`.
+// Group 4: Function offset in hex: `143b4`.
+final _firefoxWasmFrame =
+    RegExp(r'^(.*)@(?:(.*):wasm-function\[(\d+)\]:0x([0-9 a-f A-F]+))$');
 
 // With names:
 //
@@ -114,7 +116,7 @@ final _firefoxWasmFrame = RegExp(r'^(.*)@(.*\[(\d+)\]:.*)$');
 // <?>.wasm-function[795]@[wasm code]
 // <?>.wasm-function[792]@[wasm code]
 //
-// Group 1: Function name or index.
+// Group 1: Function name or index: `g` or `796`.
 final _safariWasmFrame = RegExp(r'^.*\[(.*)\]@\[wasm code\]$');
 
 // foo/bar.dart 10:11 Foo._bar
@@ -345,8 +347,9 @@ class Frame {
           final member = match[1]!;
           final uri = _uriOrPathToUri(match[2]!);
           final functionIndex = match[3]!;
-          return Frame(
-              uri, null, null, member.isNotEmpty ? member : functionIndex);
+          final functionOffset = int.parse(match[4]!, radix: 16);
+          return Frame(uri, 0, functionOffset,
+              member.isNotEmpty ? member : functionIndex);
         }
 
         match = _safariWasmFrame.firstMatch(frame);
