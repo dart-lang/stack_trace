@@ -31,7 +31,7 @@ final _v8TraceLine = RegExp(r'    ?at ');
 ///
 /// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/stack
 ///
-/// These stack traces looks like:
+/// These stack traces look like:
 ///
 /// ````
 /// anonymous/<@https://example.com/stuff.js line 693 > Function:3:40
