@@ -12,19 +12,12 @@ import 'unparsed_frame.dart';
 // #1      Foo._bar (file:///home/nweiz/code/stuff.dart)
 final _vmFrame = RegExp(r'^#\d+\s+(\S.*) \((.+?)((?::\d+){0,2})\)$');
 
-// JS examples:
-//
 //     at Object.stringify (native)
 //     at VW.call$0 (https://example.com/stuff.dart.js:560:28)
 //     at VW.call$0 (eval as fn
 //         (https://example.com/stuff.dart.js:560:28), efn:3:28)
 //     at https://example.com/stuff.dart.js:560:28
-//
-// Wasm examples:
-//
-//     at Error._throwWithCurrentStackTrace (wasm://wasm/0006d966:wasm-function[119]:0xbb13)
-//     at g (wasm://wasm/0006d966:wasm-function[796]:0x143b4)
-final _v8Frame =
+final _v8JsFrame =
     RegExp(r'^\s*at (?:(\S.*?)(?: \[as [^\]]+\])? \((.*)\)|(.*))$');
 
 // https://example.com/stuff.dart.js:560:28
@@ -34,6 +27,28 @@ final _v8Frame =
 // Group 2: line number, required
 // Group 3: column number, optional
 final _v8JsUrlLocation = RegExp(r'^(.*?):(\d+)(?::(\d+))?$|native$');
+
+// With names:
+//
+//     at Error.f (wasm://wasm/0006d966:wasm-function[119]:0xbb13)
+//     at g (wasm://wasm/0006d966:wasm-function[796]:0x143b4)
+//
+// Without names:
+//
+//     at wasm://wasm/0005168a:wasm-function[119]:0xbb13
+//     at wasm://wasm/0005168a:wasm-function[796]:0x143b4
+//
+// Group 1: Function name, optional
+
+// When group 1 is available:
+//   Group 2: URI
+//   Group 3: Function index
+//
+// Otherwise:
+//   Group 4: URI
+//   Group 5: function index
+final _v8WasmFrame = RegExp(r'^\s*at(?: (\S+))? '
+    r'(?:\((wasm:\S+\[(\d+)\]\S+)\)|(wasm:\S+\[(\d+)\]\S+))$');
 
 // wasm://wasm/0006d966:wasm-function[796]:0x143b4
 //
@@ -212,56 +227,59 @@ class Frame {
 
   /// Parses a string representation of a Chrome/V8 stack frame.
   factory Frame.parseV8(String frame) => _catchFormatException(frame, () {
-        var match = _v8Frame.firstMatch(frame);
-        if (match == null) return UnparsedFrame(frame);
+        // Try to match a Wasm frame first: the Wasm frame regex won't match a
+        // JS frame but the JS frame regex may match a Wasm frame.
+        var match = _v8WasmFrame.firstMatch(frame);
+        if (match != null) {
+          final member = match[1];
+          final uri = _uriOrPathToUri(member != null ? match[2]! : match[4]!);
+          return Frame(uri, null, null, member ?? match[5]!);
+        }
 
-        // v8 location strings can be arbitrarily-nested, since it adds a layer
-        // of nesting for each eval performed on that line.
-        Frame parseLocation(String location, String member) {
-          var evalMatch = _v8EvalLocation.firstMatch(location);
-          while (evalMatch != null) {
-            location = evalMatch[1]!;
-            evalMatch = _v8EvalLocation.firstMatch(location);
-          }
+        match = _v8JsFrame.firstMatch(frame);
+        if (match != null) {
+          // v8 location strings can be arbitrarily-nested, since it adds a layer
+          // of nesting for each eval performed on that line.
+          Frame parseJsLocation(String location, String member) {
+            var evalMatch = _v8EvalLocation.firstMatch(location);
+            while (evalMatch != null) {
+              location = evalMatch[1]!;
+              evalMatch = _v8EvalLocation.firstMatch(location);
+            }
 
-          if (location == 'native') {
-            return Frame(Uri.parse('native'), null, null, member);
-          }
+            if (location == 'native') {
+              return Frame(Uri.parse('native'), null, null, member);
+            }
 
-          final v8UrlMatch = _v8JsUrlLocation.firstMatch(location);
-          if (v8UrlMatch != null) {
-            final uri = _uriOrPathToUri(v8UrlMatch[1]!);
-            final line = int.parse(v8UrlMatch[2]!);
-            final columnMatch = v8UrlMatch[3];
+            var urlMatch = _v8JsUrlLocation.firstMatch(location);
+            if (urlMatch == null) return UnparsedFrame(frame);
+
+            final uri = _uriOrPathToUri(urlMatch[1]!);
+            final line = int.parse(urlMatch[2]!);
+            final columnMatch = urlMatch[3];
             final column = columnMatch != null ? int.parse(columnMatch) : null;
             return Frame(uri, line, column, member);
           }
 
-          final v8WasmUrlMatch = _v8WasmUrlLocation.firstMatch(location);
-          if (v8WasmUrlMatch != null) {
-            final uri = _uriOrPathToUri(v8WasmUrlMatch[0]!);
-            return Frame(uri, null, null, member);
+          // V8 stack frames can be in two forms.
+          if (match[2] != null) {
+            // The first form looks like " at FUNCTION (LOCATION)". V8 proper
+            // lists anonymous functions within eval as "<anonymous>", while IE10
+            // lists them as "Anonymous function".
+            return parseJsLocation(
+                match[2]!,
+                match[1]!
+                    .replaceAll('<anonymous>', '<fn>')
+                    .replaceAll('Anonymous function', '<fn>')
+                    .replaceAll('(anonymous function)', '<fn>'));
+          } else {
+            // The second form looks like " at LOCATION", and is used for
+            // anonymous functions.
+            return parseJsLocation(match[3]!, '<fn>');
           }
-
-          return UnparsedFrame(frame);
         }
 
-        // V8 stack frames can be in two forms.
-        if (match[2] != null) {
-          // The first form looks like " at FUNCTION (LOCATION)". V8 proper
-          // lists anonymous functions within eval as "<anonymous>", while IE10
-          // lists them as "Anonymous function".
-          return parseLocation(
-              match[2]!,
-              match[1]!
-                  .replaceAll('<anonymous>', '<fn>')
-                  .replaceAll('Anonymous function', '<fn>')
-                  .replaceAll('(anonymous function)', '<fn>'));
-        } else {
-          // The second form looks like " at LOCATION", and is used for
-          // anonymous functions.
-          return parseLocation(match[3]!, '<fn>');
-        }
+        return UnparsedFrame(frame);
       });
 
   /// Parses a string representation of a JavaScriptCore stack trace.

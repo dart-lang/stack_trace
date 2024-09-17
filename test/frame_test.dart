@@ -632,6 +632,26 @@ baz@https://pub.dev/buz.js:56355:55
           equals('$relative 5:10 in Foo'));
     });
   });
+
+  test('parses a V8 Wasm frame with a name', () {
+    var frame = Frame.parseV8('    at Error._throwWithCurrentStackTrace '
+        '(wasm://wasm/0006d966:wasm-function[119]:0xbb13)');
+    expect(
+        frame.uri, Uri.parse('wasm://wasm/0006d966:wasm-function[119]:0xbb13'));
+    expect(frame.line, null);
+    expect(frame.column, null);
+    expect(frame.member, 'Error._throwWithCurrentStackTrace');
+  });
+
+  test('parses a V8 Wasm frame without a name', () {
+    var frame =
+        Frame.parseV8('    at wasm://wasm/0006d966:wasm-function[119]:0xbb13');
+    expect(
+        frame.uri, Uri.parse('wasm://wasm/0006d966:wasm-function[119]:0xbb13'));
+    expect(frame.line, null);
+    expect(frame.column, null);
+    expect(frame.member, '119');
+  });
 }
 
 void expectIsUnparsed(Frame Function(String) constructor, String text) {
