@@ -232,8 +232,8 @@ class Frame {
 
         match = _v8JsFrame.firstMatch(frame);
         if (match != null) {
-          // v8 location strings can be arbitrarily-nested, since it adds a layer
-          // of nesting for each eval performed on that line.
+          // v8 location strings can be arbitrarily-nested, since it adds a
+          // layer of nesting for each eval performed on that line.
           Frame parseJsLocation(String location, String member) {
             var evalMatch = _v8EvalLocation.firstMatch(location);
             while (evalMatch != null) {
@@ -258,8 +258,8 @@ class Frame {
           // V8 stack frames can be in two forms.
           if (match[2] != null) {
             // The first form looks like " at FUNCTION (LOCATION)". V8 proper
-            // lists anonymous functions within eval as "<anonymous>", while IE10
-            // lists them as "Anonymous function".
+            // lists anonymous functions within eval as "<anonymous>", while
+            // IE10 lists them as "Anonymous function".
             return parseJsLocation(
                 match[2]!,
                 match[1]!
