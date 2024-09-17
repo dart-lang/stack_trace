@@ -218,9 +218,12 @@ class Frame {
 
   /// Parses a Firefox 'eval' or 'function' stack frame.
   ///
-  /// for example:
+  /// For example:
+  ///
+  /// ```
   /// anonymous/<@https://example.com/stuff.js line 693 > Function:3:40
   /// anonymous/<@https://example.com/stuff.js line 693 > eval:3:40
+  /// ```
   factory Frame._parseFirefoxEval(String frame) =>
       _catchFormatException(frame, () {
         final match = _firefoxEvalLocation.firstMatch(frame);
