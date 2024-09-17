@@ -38,20 +38,15 @@ final _v8JsUrlLocation = RegExp(r'^(.*?):(\d+)(?::(\d+))?$|native$');
 //     at wasm://wasm/0005168a:wasm-function[119]:0xbb13
 //     at wasm://wasm/0005168a:wasm-function[796]:0x143b4
 //
-// Group 1: Function name, optional: `Error.f`.
+// Matches named groups:
 //
-// When group 1 is available:
-//   Group 2: URI: `wasm://wasm/0006d966`.
-//   Group 3: Function index: `119`.
-//   Group 4: Function offset in hex: `bb13`.
-//
-// Otherwise:
-//   Group 5: URI, same as group 2.
-//   Group 6: Function index, same as group 3.
-//   Group 7: Function offset in hex, same as group 4.
-final _v8WasmFrame = RegExp(r'^\s*at(?: (\S+))? '
-    r'(?:\((?:(wasm:\S+):wasm-function\[(\d+)\]\:0x([0-9 a-f A-F]+))\)|'
-    r'(?:(wasm:\S+):wasm-function\[(\d+)\]\:0x([0-9 a-f A-F]+)))$');
+// - "member": optional, `Error.f` in the first example, NA in the second.
+// - "uri":  `wasm://wasm/0006d966`.
+// - "index": `119`.
+// - "offset": (hex number) `bb13`.
+final _v8WasmFrame = RegExp(r'^\s*at (?:(?<member>\S+) )?'
+    r'(?:\(?(?:(?<uri>wasm:\S+):wasm-function\[(?<index>\d+)\]'
+    r'\:0x(?<offset>[0-9 a-f A-F]+))\)?)$');
 
 // eval as function (https://example.com/stuff.dart.js:560:28), efn:3:28
 // eval as function (https://example.com/stuff.dart.js:560:28)
@@ -230,12 +225,11 @@ class Frame {
         // JS frame but the JS frame regex may match a Wasm frame.
         var match = _v8WasmFrame.firstMatch(frame);
         if (match != null) {
-          final member = match[1];
-          final uriGroupIndex = member == null ? 5 : 2;
-          final uri = _uriOrPathToUri(match[uriGroupIndex]!);
-          final functionIndex = match[uriGroupIndex + 1]!;
+          final member = match.namedGroup('member');
+          final uri = _uriOrPathToUri(match.namedGroup('uri')!);
+          final functionIndex = match.namedGroup('index')!;
           final functionOffset =
-              int.parse(match[uriGroupIndex + 2]!, radix: 16);
+              int.parse(match.namedGroup('offset')!, radix: 16);
           return Frame(uri, 0, functionOffset, member ?? functionIndex);
         }
 
