@@ -38,17 +38,20 @@ final _v8JsUrlLocation = RegExp(r'^(.*?):(\d+)(?::(\d+))?$|native$');
 //     at wasm://wasm/0005168a:wasm-function[119]:0xbb13
 //     at wasm://wasm/0005168a:wasm-function[796]:0x143b4
 //
-// Group 1: Function name, optional
+// Group 1: Function name, optional: `Error.f`.
 //
 // When group 1 is available:
-//   Group 2: URI
-//   Group 3: Function index
+//   Group 2: URI: `wasm://wasm/0006d966`.
+//   Group 3: Function index: `119`.
+//   Group 4: Function offset in hex: `bb13`.
 //
 // Otherwise:
-//   Group 4: URI
-//   Group 5: function index
+//   Group 5: URI, same as group 2.
+//   Group 6: Function index, same as group 3.
+//   Group 7: Function offset in hex, same as group 4.
 final _v8WasmFrame = RegExp(r'^\s*at(?: (\S+))? '
-    r'(?:\((wasm:\S+\[(\d+)\]\S+)\)|(wasm:\S+\[(\d+)\]\S+))$');
+    r'(?:\((?:(wasm:\S+):wasm-function\[(\d+)\]\:0x([0-9 a-f A-F]+))\)|'
+    r'(?:(wasm:\S+):wasm-function\[(\d+)\]\:0x([0-9 a-f A-F]+)))$');
 
 // eval as function (https://example.com/stuff.dart.js:560:28), efn:3:28
 // eval as function (https://example.com/stuff.dart.js:560:28)
@@ -226,8 +229,12 @@ class Frame {
         var match = _v8WasmFrame.firstMatch(frame);
         if (match != null) {
           final member = match[1];
-          final uri = _uriOrPathToUri(member != null ? match[2]! : match[4]!);
-          return Frame(uri, null, null, member ?? match[5]!);
+          final uriGroupIndex = member == null ? 5 : 2;
+          final uri = _uriOrPathToUri(match[uriGroupIndex]!);
+          final functionIndex = match[uriGroupIndex + 1]!;
+          final functionOffset =
+              int.parse(match[uriGroupIndex + 2]!, radix: 16);
+          return Frame(uri, 0, functionOffset, member ?? functionIndex);
         }
 
         match = _v8JsFrame.firstMatch(frame);
