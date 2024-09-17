@@ -113,8 +113,8 @@ final _firefoxWasmFrame = RegExp(r'^(?<member>.*)@(?:(?<uri>.*):wasm-function'
 // <?>.wasm-function[795]@[wasm code]
 // <?>.wasm-function[792]@[wasm code]
 //
-// Group 1: Function name or index: `g` or `796`.
-final _safariWasmFrame = RegExp(r'^.*\[(.*)\]@\[wasm code\]$');
+// Matches named group "member": `g` or `796`.
+final _safariWasmFrame = RegExp(r'^.*\[(?<member>.*)\]@\[wasm code\]$');
 
 // foo/bar.dart 10:11 Foo._bar
 // foo/bar.dart 10:11 (anonymous function).dart.fn
@@ -351,7 +351,7 @@ class Frame {
 
         match = _safariWasmFrame.firstMatch(frame);
         if (match != null) {
-          final member = match[1]!;
+          final member = match.namedGroup('member')!;
           return Frame(Uri(path: 'wasm code'), null, null, member);
         }
 
