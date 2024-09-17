@@ -652,6 +652,30 @@ baz@https://pub.dev/buz.js:56355:55
     expect(frame.column, null);
     expect(frame.member, '119');
   });
+
+  test('parses a Firefox Wasm frame with a name', () {
+    var frame = Frame.parseFirefox(
+        'g@http://localhost:8080/test.wasm:wasm-function[796]:0x143b4');
+    expect(
+        frame.uri,
+        Uri.parse(
+            'http://localhost:8080/test.wasm:wasm-function[796]:0x143b4'));
+    expect(frame.line, null);
+    expect(frame.column, null);
+    expect(frame.member, 'g');
+  });
+
+  test('parses a Firefox Wasm frame without a name', () {
+    var frame = Frame.parseFirefox(
+        '@http://localhost:8080/test.wasm:wasm-function[796]:0x143b4');
+    expect(
+        frame.uri,
+        Uri.parse(
+            'http://localhost:8080/test.wasm:wasm-function[796]:0x143b4'));
+    expect(frame.line, null);
+    expect(frame.column, null);
+    expect(frame.member, '796');
+  });
 }
 
 void expectIsUnparsed(Frame Function(String) constructor, String text) {
