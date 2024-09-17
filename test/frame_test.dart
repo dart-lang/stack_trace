@@ -676,6 +676,22 @@ baz@https://pub.dev/buz.js:56355:55
     expect(frame.column, null);
     expect(frame.member, '796');
   });
+
+  test('parses a Safari Wasm frame with a name', () {
+    var frame = Frame.parseSafari('<?>.wasm-function[g]@[wasm code]');
+    expect(frame.uri, Uri.parse('wasm code'));
+    expect(frame.line, null);
+    expect(frame.column, null);
+    expect(frame.member, 'g');
+  });
+
+  test('parses a Safari Wasm frame without a name', () {
+    var frame = Frame.parseSafari('<?>.wasm-function[796]@[wasm code]');
+    expect(frame.uri, Uri.parse('wasm code'));
+    expect(frame.line, null);
+    expect(frame.column, null);
+    expect(frame.member, '796');
+  });
 }
 
 void expectIsUnparsed(Frame Function(String) constructor, String text) {
