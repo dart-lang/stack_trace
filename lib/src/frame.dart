@@ -50,12 +50,6 @@ final _v8JsUrlLocation = RegExp(r'^(.*?):(\d+)(?::(\d+))?$|native$');
 final _v8WasmFrame = RegExp(r'^\s*at(?: (\S+))? '
     r'(?:\((wasm:\S+\[(\d+)\]\S+)\)|(wasm:\S+\[(\d+)\]\S+))$');
 
-// wasm://wasm/0006d966:wasm-function[796]:0x143b4
-//
-// Captures only one group with the all of the URL as Wasm stack traces don't
-// include line and column information, even with source maps.
-final _v8WasmUrlLocation = RegExp(r'^wasm:\/\/.*$');
-
 // eval as function (https://example.com/stuff.dart.js:560:28), efn:3:28
 // eval as function (https://example.com/stuff.dart.js:560:28)
 // eval as function (eval as otherFunction
