@@ -94,10 +94,10 @@ final _firefoxSafariJSFrame = RegExp(r'^'
 //
 // Matches named groups:
 //
-// "member": Function name, may be empty: `g`.
-// "uri": `http://localhost:8080/test.wasm`.
-// "index": `796`.
-// "offset": (in hex) `143b4`.
+// - "member": Function name, may be empty: `g`.
+// - "uri": `http://localhost:8080/test.wasm`.
+// - "index": `796`.
+// - "offset": (in hex) `143b4`.
 final _firefoxWasmFrame = RegExp(r'^(?<member>.*)@(?:(?<uri>.*):wasm-function'
     r'\[(?<index>\d+)\]:0x(?<offset>[0-9 a-f A-F]+))$');
 
