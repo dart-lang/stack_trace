@@ -39,7 +39,7 @@ final _v8JsUrlLocation = RegExp(r'^(.*?):(\d+)(?::(\d+))?$|native$');
 //     at wasm://wasm/0005168a:wasm-function[796]:0x143b4
 //
 // Group 1: Function name, optional
-
+//
 // When group 1 is available:
 //   Group 2: URI
 //   Group 3: Function index
