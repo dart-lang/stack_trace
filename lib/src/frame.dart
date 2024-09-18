@@ -232,7 +232,7 @@ class Frame {
           final functionIndex = match.namedGroup('index')!;
           final functionOffset =
               int.parse(match.namedGroup('offset')!, radix: 16);
-          return Frame(uri, 1, functionOffset, member ?? functionIndex);
+          return Frame(uri, 1, functionOffset + 1, member ?? functionIndex);
         }
 
         match = _v8JsFrame.firstMatch(frame);
@@ -348,7 +348,7 @@ class Frame {
           final functionIndex = match.namedGroup('index')!;
           final functionOffset =
               int.parse(match.namedGroup('offset')!, radix: 16);
-          return Frame(uri, 1, functionOffset,
+          return Frame(uri, 1, functionOffset + 1,
               member.isNotEmpty ? member : functionIndex);
         }
 
