@@ -637,7 +637,7 @@ baz@https://pub.dev/buz.js:56355:55
     var frame = Frame.parseV8('    at Error._throwWithCurrentStackTrace '
         '(wasm://wasm/0006d966:wasm-function[119]:0xbb13)');
     expect(frame.uri, Uri.parse('wasm://wasm/0006d966'));
-    expect(frame.line, 0);
+    expect(frame.line, 1);
     expect(frame.column, 0xbb13);
     expect(frame.member, 'Error._throwWithCurrentStackTrace');
   });
@@ -646,7 +646,7 @@ baz@https://pub.dev/buz.js:56355:55
     var frame = Frame.parseV8('   at main tear-off trampoline '
         '(wasm://wasm/0017fbea:wasm-function[863]:0x23cc8)');
     expect(frame.uri, Uri.parse('wasm://wasm/0017fbea'));
-    expect(frame.line, 0);
+    expect(frame.line, 1);
     expect(frame.column, 0x23cc8);
     expect(frame.member, 'main tear-off trampoline');
   });
@@ -655,7 +655,7 @@ baz@https://pub.dev/buz.js:56355:55
     var frame =
         Frame.parseV8('    at wasm://wasm/0006d966:wasm-function[119]:0xbb13');
     expect(frame.uri, Uri.parse('wasm://wasm/0006d966'));
-    expect(frame.line, 0);
+    expect(frame.line, 1);
     expect(frame.column, 0xbb13);
     expect(frame.member, '119');
   });
@@ -664,7 +664,7 @@ baz@https://pub.dev/buz.js:56355:55
     var frame = Frame.parseFirefox(
         'g@http://localhost:8080/test.wasm:wasm-function[796]:0x143b4');
     expect(frame.uri, Uri.parse('http://localhost:8080/test.wasm'));
-    expect(frame.line, 0);
+    expect(frame.line, 1);
     expect(frame.column, 0x143b4);
     expect(frame.member, 'g');
   });
@@ -673,7 +673,7 @@ baz@https://pub.dev/buz.js:56355:55
     var frame = Frame.parseFirefox(
         'main tear-off trampoline@http://localhost:8080/test.wasm:wasm-function[794]:0x14387');
     expect(frame.uri, Uri.parse('http://localhost:8080/test.wasm'));
-    expect(frame.line, 0);
+    expect(frame.line, 1);
     expect(frame.column, 0x14387);
     expect(frame.member, 'main tear-off trampoline');
   });
@@ -682,7 +682,7 @@ baz@https://pub.dev/buz.js:56355:55
     var frame = Frame.parseFirefox(
         '@http://localhost:8080/test.wasm:wasm-function[796]:0x143b4');
     expect(frame.uri, Uri.parse('http://localhost:8080/test.wasm'));
-    expect(frame.line, 0);
+    expect(frame.line, 1);
     expect(frame.column, 0x143b4);
     expect(frame.member, '796');
   });
