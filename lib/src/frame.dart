@@ -44,7 +44,7 @@ final _v8JsUrlLocation = RegExp(r'^(.*?):(\d+)(?::(\d+))?$|native$');
 // - "uri":  `wasm://wasm/0006d966`.
 // - "index": `119`.
 // - "offset": (hex number) `bb13`.
-final _v8WasmFrame = RegExp(r'^\s*at (?:(?<member>\S+) )?'
+final _v8WasmFrame = RegExp(r'^\s*at (?:(?<member>.+) )?'
     r'(?:\(?(?:(?<uri>wasm:\S+):wasm-function\[(?<index>\d+)\]'
     r'\:0x(?<offset>[0-9 a-f A-F]+))\)?)$');
 
