@@ -651,6 +651,15 @@ baz@https://pub.dev/buz.js:56355:55
     expect(frame.member, 'main tear-off trampoline');
   });
 
+  test('parses a V8 Wasm frame with a name with colons and parens', () {
+    var frame = Frame.parseV8('   at a::b::c() '
+        '(https://a.b.com/x/y/z.wasm:wasm-function[66334]:0x12c28ad)');
+    expect(frame.uri, Uri.parse('https://a.b.com/x/y/z.wasm'));
+    expect(frame.line, 1);
+    expect(frame.column, 0x12c28ad + 1);
+    expect(frame.member, 'a::b::c()');
+  });
+
   test('parses a V8 Wasm frame without a name', () {
     var frame =
         Frame.parseV8('    at wasm://wasm/0006d966:wasm-function[119]:0xbb13');
