@@ -48,7 +48,7 @@ final _v8JsUrlLocation = RegExp(r'^(.*?):(\d+)(?::(\d+))?$|native$');
 // To avoid having multiple groups for the same part of the frame, this regex
 // matches unmatched parentheses after the member name.
 final _v8WasmFrame = RegExp(r'^\s*at (?:(?<member>.+) )?'
-    r'(?:\(?(?:(?<uri>wasm:\S+):wasm-function\[(?<index>\d+)\]'
+    r'(?:\(?(?:(?<uri>\S+):wasm-function\[(?<index>\d+)\]'
     r'\:0x(?<offset>[0-9a-fA-F]+))\)?)$');
 
 // eval as function (https://example.com/stuff.dart.js:560:28), efn:3:28
