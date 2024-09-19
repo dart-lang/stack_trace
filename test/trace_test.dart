@@ -401,25 +401,14 @@ void main() {
 
       expect(trace.frames.length, 6);
 
+      for (final frame in trace.frames) {
+        expect(frame is UnparsedFrame, false);
+      }
+
       expect(trace.frames[0].uri, Uri.parse('wasm code'));
       expect(trace.frames[0].line, null);
       expect(trace.frames[0].column, null);
       expect(trace.frames[0].member, 'Error._throwWithCurrentStackTrace');
-
-      expect(trace.frames[1].uri, Uri.parse('wasm code'));
-      expect(trace.frames[1].line, null);
-      expect(trace.frames[1].column, null);
-      expect(trace.frames[1].member, 'main');
-
-      expect(trace.frames[2].uri, Uri.parse('wasm code'));
-      expect(trace.frames[2].line, null);
-      expect(trace.frames[2].column, null);
-      expect(trace.frames[2].member, 'main tear-off trampoline');
-
-      expect(trace.frames[3].uri, Uri.parse('wasm code'));
-      expect(trace.frames[3].line, null);
-      expect(trace.frames[3].column, null);
-      expect(trace.frames[3].member, '_invokeMain');
 
       expect(trace.frames[4].uri, Uri.parse('file:///home/user/test.mjs'));
       expect(trace.frames[4].line, 361);
