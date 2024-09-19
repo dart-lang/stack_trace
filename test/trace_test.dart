@@ -387,6 +387,37 @@ void main() {
       expect(trace.frames[4].member, 'invoke');
     });
 
+    test('parses JSShell stack frace with Wasm frames correctly', () {
+      var trace = Trace.parse(
+          'Error._throwWithCurrentStackTrace@/home/user/test.mjs line 29 > WebAssembly.compile:wasm-function[119]:0xbaf8\n'
+          'main@/home/user/test.mjs line 29 > WebAssembly.compile:wasm-function[792]:0x14378\n'
+          'main tear-off trampoline@/home/user/test.mjs line 29 > WebAssembly.compile:wasm-function[794]:0x14387\n'
+          '_invokeMain@/home/user/test.mjs line 29 > WebAssembly.compile:wasm-function[70]:0xa56c\n'
+          'invokeMain@/home/user/test.mjs:361:37\n'
+          'main@/home/user/run_wasm.js:416:21\n'
+          'async*action@/home/user/run_wasm.js:353:44\n'
+          'eventLoop@/home/user/run_wasm.js:329:15\n'
+          'self.dartMainRunner@/home/user/run_wasm.js:354:14\n'
+          '@/home/user/run_wasm.js:419:15');
+
+      expect(trace.frames.length, 10);
+
+      expect(trace.frames[0].uri, Uri.parse('file:///home/user/test.mjs'));
+      expect(trace.frames[0].line, 1);
+      expect(trace.frames[0].column, 0xbaf8 + 1);
+      expect(trace.frames[0].member, 'Error._throwWithCurrentStackTrace');
+
+      expect(trace.frames[4].uri, Uri.parse('file:///home/user/test.mjs'));
+      expect(trace.frames[4].line, 361);
+      expect(trace.frames[4].column, 37);
+      expect(trace.frames[4].member, 'invokeMain');
+
+      expect(trace.frames[9].uri, Uri.parse('file:///home/user/run_wasm.js'));
+      expect(trace.frames[9].line, 419);
+      expect(trace.frames[9].column, 15);
+      expect(trace.frames[9].member, '<fn>');
+    });
+
     test('parses Safari stack frace with Wasm frames correctly', () {
       var trace = Trace.parse(
           '<?>.wasm-function[Error._throwWithCurrentStackTrace]@[wasm code]\n'

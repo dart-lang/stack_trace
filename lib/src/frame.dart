@@ -95,14 +95,26 @@ final _firefoxSafariJSFrame = RegExp(r'^'
 // @http://localhost:8080/test.wasm:wasm-function[795]:0x143a8
 // @http://localhost:8080/test.wasm:wasm-function[792]:0x14390
 //
+// JSShell in the command line uses a different format, which this regex also
+// parses.
+//
+// With names:
+//
+// main@/home/user/test.mjs line 29 > WebAssembly.compile:wasm-function[792]:0x14378
+//
+// Without names:
+//
+// @/home/user/test.mjs line 29 > WebAssembly.compile:wasm-function[792]:0x14378
+//
 // Matches named groups:
 //
 // - "member": Function name, may be empty: `g`.
 // - "uri": `http://localhost:8080/test.wasm`.
 // - "index": `796`.
 // - "offset": (in hex) `143b4`.
-final _firefoxWasmFrame = RegExp(r'^(?<member>.*?)@(?:(?<uri>.*?):wasm-function'
-    r'\[(?<index>\d+)\]:0x(?<offset>[0-9a-fA-F]+))$');
+final _firefoxWasmFrame =
+    RegExp(r'^(?<member>.*?)@(?:(?<uri>\S+).*?:wasm-function'
+        r'\[(?<index>\d+)\]:0x(?<offset>[0-9a-fA-F]+))$');
 
 // With names:
 //
