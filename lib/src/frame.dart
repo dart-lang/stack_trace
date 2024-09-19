@@ -106,6 +106,9 @@ final _firefoxWasmFrame = RegExp(r'^(?<member>.*?)@(?:(?<uri>.*?):wasm-function'
 
 // With names:
 //
+// (Note: Lines below are literal text, e.g. <?> is not a placeholder, it's a
+// part of the stack frame.)
+//
 // <?>.wasm-function[g]@[wasm code]
 // <?>.wasm-function[f]@[wasm code]
 // <?>.wasm-function[main]@[wasm code]
