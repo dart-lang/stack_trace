@@ -632,6 +632,85 @@ baz@https://pub.dev/buz.js:56355:55
           equals('$relative 5:10 in Foo'));
     });
   });
+
+  test('parses a V8 Wasm frame with a name', () {
+    var frame = Frame.parseV8('    at Error._throwWithCurrentStackTrace '
+        '(wasm://wasm/0006d966:wasm-function[119]:0xbb13)');
+    expect(frame.uri, Uri.parse('wasm://wasm/0006d966'));
+    expect(frame.line, 1);
+    expect(frame.column, 0xbb13 + 1);
+    expect(frame.member, 'Error._throwWithCurrentStackTrace');
+  });
+
+  test('parses a V8 Wasm frame with a name with spaces', () {
+    var frame = Frame.parseV8('   at main tear-off trampoline '
+        '(wasm://wasm/0017fbea:wasm-function[863]:0x23cc8)');
+    expect(frame.uri, Uri.parse('wasm://wasm/0017fbea'));
+    expect(frame.line, 1);
+    expect(frame.column, 0x23cc8 + 1);
+    expect(frame.member, 'main tear-off trampoline');
+  });
+
+  test('parses a V8 Wasm frame without a name', () {
+    var frame =
+        Frame.parseV8('    at wasm://wasm/0006d966:wasm-function[119]:0xbb13');
+    expect(frame.uri, Uri.parse('wasm://wasm/0006d966'));
+    expect(frame.line, 1);
+    expect(frame.column, 0xbb13 + 1);
+    expect(frame.member, '119');
+  });
+
+  test('parses a Firefox Wasm frame with a name', () {
+    var frame = Frame.parseFirefox(
+        'g@http://localhost:8080/test.wasm:wasm-function[796]:0x143b4');
+    expect(frame.uri, Uri.parse('http://localhost:8080/test.wasm'));
+    expect(frame.line, 1);
+    expect(frame.column, 0x143b4 + 1);
+    expect(frame.member, 'g');
+  });
+
+  test('parses a Firefox Wasm frame with a name with spaces', () {
+    var frame = Frame.parseFirefox(
+        'main tear-off trampoline@http://localhost:8080/test.wasm:wasm-function[794]:0x14387');
+    expect(frame.uri, Uri.parse('http://localhost:8080/test.wasm'));
+    expect(frame.line, 1);
+    expect(frame.column, 0x14387 + 1);
+    expect(frame.member, 'main tear-off trampoline');
+  });
+
+  test('parses a Firefox Wasm frame without a name', () {
+    var frame = Frame.parseFirefox(
+        '@http://localhost:8080/test.wasm:wasm-function[796]:0x143b4');
+    expect(frame.uri, Uri.parse('http://localhost:8080/test.wasm'));
+    expect(frame.line, 1);
+    expect(frame.column, 0x143b4 + 1);
+    expect(frame.member, '796');
+  });
+
+  test('parses a Safari Wasm frame with a name', () {
+    var frame = Frame.parseSafari('<?>.wasm-function[g]@[wasm code]');
+    expect(frame.uri, Uri.parse('wasm code'));
+    expect(frame.line, null);
+    expect(frame.column, null);
+    expect(frame.member, 'g');
+  });
+
+  test('parses a Safari Wasm frame with a name', () {
+    var frame = Frame.parseSafari(
+        '<?>.wasm-function[main tear-off trampoline]@[wasm code]');
+    expect(frame.uri, Uri.parse('wasm code'));
+    expect(frame.line, null);
+    expect(frame.column, null);
+    expect(frame.member, 'main tear-off trampoline');
+  });
+
+  test('parses a Safari Wasm frame without a name', () {
+    var frame = Frame.parseSafari('<?>.wasm-function[796]@[wasm code]');
+    expect(frame.uri, Uri.parse('wasm code'));
+    expect(frame.line, null);
+    expect(frame.column, null);
+    expect(frame.member, '796');
+  });
 }
 
 void expectIsUnparsed(Frame Function(String) constructor, String text) {

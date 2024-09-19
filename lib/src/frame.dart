@@ -17,12 +17,39 @@ final _vmFrame = RegExp(r'^#\d+\s+(\S.*) \((.+?)((?::\d+){0,2})\)$');
 //     at VW.call$0 (eval as fn
 //         (https://example.com/stuff.dart.js:560:28), efn:3:28)
 //     at https://example.com/stuff.dart.js:560:28
-final _v8Frame =
+final _v8JsFrame =
     RegExp(r'^\s*at (?:(\S.*?)(?: \[as [^\]]+\])? \((.*)\)|(.*))$');
 
 // https://example.com/stuff.dart.js:560:28
 // https://example.com/stuff.dart.js:560
-final _v8UrlLocation = RegExp(r'^(.*?):(\d+)(?::(\d+))?$|native$');
+//
+// Group 1: URI, required
+// Group 2: line number, required
+// Group 3: column number, optional
+final _v8JsUrlLocation = RegExp(r'^(.*?):(\d+)(?::(\d+))?$|native$');
+
+// With names:
+//
+//     at Error.f (wasm://wasm/0006d966:wasm-function[119]:0xbb13)
+//     at g (wasm://wasm/0006d966:wasm-function[796]:0x143b4)
+//
+// Without names:
+//
+//     at wasm://wasm/0005168a:wasm-function[119]:0xbb13
+//     at wasm://wasm/0005168a:wasm-function[796]:0x143b4
+//
+// Matches named groups:
+//
+// - "member": optional, `Error.f` in the first example, NA in the second.
+// - "uri":  `wasm://wasm/0006d966`.
+// - "index": `119`.
+// - "offset": (hex number) `bb13`.
+//
+// To avoid having multiple groups for the same part of the frame, this regex
+// matches unmatched parentheses after the member name.
+final _v8WasmFrame = RegExp(r'^\s*at (?:(?<member>.+) )?'
+    r'(?:\(?(?:(?<uri>wasm:\S+):wasm-function\[(?<index>\d+)\]'
+    r'\:0x(?<offset>[0-9a-fA-F]+))\)?)$');
 
 // eval as function (https://example.com/stuff.dart.js:560:28), efn:3:28
 // eval as function (https://example.com/stuff.dart.js:560:28)
@@ -41,7 +68,7 @@ final _firefoxEvalLocation =
 // .VW.call$0/name<@https://example.com/stuff.dart.js:560
 // .VW.call$0@https://example.com/stuff.dart.js:560:36
 // https://example.com/stuff.dart.js:560
-final _firefoxSafariFrame = RegExp(r'^'
+final _firefoxSafariJSFrame = RegExp(r'^'
     r'(?:' // Member description. Not present in some Safari frames.
     r'([^@(/]*)' // The actual name of the member.
     r'(?:\(.*\))?' // Arguments to the member, sometimes captured by Firefox.
@@ -55,6 +82,58 @@ final _firefoxSafariFrame = RegExp(r'^'
     r'(?::(\d*))?' // The column number. Not present in older browsers and
     // empty in Safari if it's unknown.
     r'$');
+
+// With names:
+//
+// g@http://localhost:8080/test.wasm:wasm-function[796]:0x143b4
+// f@http://localhost:8080/test.wasm:wasm-function[795]:0x143a8
+// main@http://localhost:8080/test.wasm:wasm-function[792]:0x14390
+//
+// Without names:
+//
+// @http://localhost:8080/test.wasm:wasm-function[796]:0x143b4
+// @http://localhost:8080/test.wasm:wasm-function[795]:0x143a8
+// @http://localhost:8080/test.wasm:wasm-function[792]:0x14390
+//
+// JSShell in the command line uses a different format, which this regex also
+// parses.
+//
+// With names:
+//
+// main@/home/user/test.mjs line 29 > WebAssembly.compile:wasm-function[792]:0x14378
+//
+// Without names:
+//
+// @/home/user/test.mjs line 29 > WebAssembly.compile:wasm-function[792]:0x14378
+//
+// Matches named groups:
+//
+// - "member": Function name, may be empty: `g`.
+// - "uri": `http://localhost:8080/test.wasm`.
+// - "index": `796`.
+// - "offset": (in hex) `143b4`.
+final _firefoxWasmFrame =
+    RegExp(r'^(?<member>.*?)@(?:(?<uri>\S+).*?:wasm-function'
+        r'\[(?<index>\d+)\]:0x(?<offset>[0-9a-fA-F]+))$');
+
+// With names:
+//
+// (Note: Lines below are literal text, e.g. <?> is not a placeholder, it's a
+// part of the stack frame.)
+//
+// <?>.wasm-function[g]@[wasm code]
+// <?>.wasm-function[f]@[wasm code]
+// <?>.wasm-function[main]@[wasm code]
+//
+// Without names:
+//
+// <?>.wasm-function[796]@[wasm code]
+// <?>.wasm-function[795]@[wasm code]
+// <?>.wasm-function[792]@[wasm code]
+//
+// Matches named group "member": `g` or `796`.
+final _safariWasmFrame =
+    RegExp(r'^.*?wasm-function\[(?<member>.*)\]@\[wasm code\]$');
 
 // foo/bar.dart 10:11 Foo._bar
 // foo/bar.dart 10:11 (anonymous function).dart.fn
@@ -163,48 +242,62 @@ class Frame {
 
   /// Parses a string representation of a Chrome/V8 stack frame.
   factory Frame.parseV8(String frame) => _catchFormatException(frame, () {
-        var match = _v8Frame.firstMatch(frame);
-        if (match == null) return UnparsedFrame(frame);
-
-        // v8 location strings can be arbitrarily-nested, since it adds a layer
-        // of nesting for each eval performed on that line.
-        Frame parseLocation(String location, String member) {
-          var evalMatch = _v8EvalLocation.firstMatch(location);
-          while (evalMatch != null) {
-            location = evalMatch[1]!;
-            evalMatch = _v8EvalLocation.firstMatch(location);
-          }
-
-          if (location == 'native') {
-            return Frame(Uri.parse('native'), null, null, member);
-          }
-
-          var urlMatch = _v8UrlLocation.firstMatch(location);
-          if (urlMatch == null) return UnparsedFrame(frame);
-
-          final uri = _uriOrPathToUri(urlMatch[1]!);
-          final line = int.parse(urlMatch[2]!);
-          final columnMatch = urlMatch[3];
-          final column = columnMatch != null ? int.parse(columnMatch) : null;
-          return Frame(uri, line, column, member);
+        // Try to match a Wasm frame first: the Wasm frame regex won't match a
+        // JS frame but the JS frame regex may match a Wasm frame.
+        var match = _v8WasmFrame.firstMatch(frame);
+        if (match != null) {
+          final member = match.namedGroup('member');
+          final uri = _uriOrPathToUri(match.namedGroup('uri')!);
+          final functionIndex = match.namedGroup('index')!;
+          final functionOffset =
+              int.parse(match.namedGroup('offset')!, radix: 16);
+          return Frame(uri, 1, functionOffset + 1, member ?? functionIndex);
         }
 
-        // V8 stack frames can be in two forms.
-        if (match[2] != null) {
-          // The first form looks like " at FUNCTION (LOCATION)". V8 proper
-          // lists anonymous functions within eval as "<anonymous>", while IE10
-          // lists them as "Anonymous function".
-          return parseLocation(
-              match[2]!,
-              match[1]!
-                  .replaceAll('<anonymous>', '<fn>')
-                  .replaceAll('Anonymous function', '<fn>')
-                  .replaceAll('(anonymous function)', '<fn>'));
-        } else {
-          // The second form looks like " at LOCATION", and is used for
-          // anonymous functions.
-          return parseLocation(match[3]!, '<fn>');
+        match = _v8JsFrame.firstMatch(frame);
+        if (match != null) {
+          // v8 location strings can be arbitrarily-nested, since it adds a
+          // layer of nesting for each eval performed on that line.
+          Frame parseJsLocation(String location, String member) {
+            var evalMatch = _v8EvalLocation.firstMatch(location);
+            while (evalMatch != null) {
+              location = evalMatch[1]!;
+              evalMatch = _v8EvalLocation.firstMatch(location);
+            }
+
+            if (location == 'native') {
+              return Frame(Uri.parse('native'), null, null, member);
+            }
+
+            var urlMatch = _v8JsUrlLocation.firstMatch(location);
+            if (urlMatch == null) return UnparsedFrame(frame);
+
+            final uri = _uriOrPathToUri(urlMatch[1]!);
+            final line = int.parse(urlMatch[2]!);
+            final columnMatch = urlMatch[3];
+            final column = columnMatch != null ? int.parse(columnMatch) : null;
+            return Frame(uri, line, column, member);
+          }
+
+          // V8 stack frames can be in two forms.
+          if (match[2] != null) {
+            // The first form looks like " at FUNCTION (LOCATION)". V8 proper
+            // lists anonymous functions within eval as "<anonymous>", while
+            // IE10 lists them as "Anonymous function".
+            return parseJsLocation(
+                match[2]!,
+                match[1]!
+                    .replaceAll('<anonymous>', '<fn>')
+                    .replaceAll('Anonymous function', '<fn>')
+                    .replaceAll('(anonymous function)', '<fn>'));
+          } else {
+            // The second form looks like " at LOCATION", and is used for
+            // anonymous functions.
+            return parseJsLocation(match[3]!, '<fn>');
+          }
         }
+
+        return UnparsedFrame(frame);
       });
 
   /// Parses a string representation of a JavaScriptCore stack trace.
@@ -237,35 +330,54 @@ class Frame {
         return Frame(uri, line, null, member);
       });
 
-  /// Parses a string representation of a Firefox stack frame.
+  /// Parses a string representation of a Firefox or Safari stack frame.
   factory Frame.parseFirefox(String frame) => _catchFormatException(frame, () {
-        var match = _firefoxSafariFrame.firstMatch(frame);
-        if (match == null) return UnparsedFrame(frame);
+        var match = _firefoxSafariJSFrame.firstMatch(frame);
+        if (match != null) {
+          if (match[3]!.contains(' line ')) {
+            return Frame._parseFirefoxEval(frame);
+          }
 
-        if (match[3]!.contains(' line ')) {
-          return Frame._parseFirefoxEval(frame);
+          // Normally this is a URI, but in a jsshell trace it can be a path.
+          var uri = _uriOrPathToUri(match[3]!);
+
+          var member = match[1];
+          if (member != null) {
+            member +=
+                List.filled('/'.allMatches(match[2]!).length, '.<fn>').join();
+            if (member == '') member = '<fn>';
+
+            // Some Firefox members have initial dots. We remove them for
+            // consistency with other platforms.
+            member = member.replaceFirst(_initialDot, '');
+          } else {
+            member = '<fn>';
+          }
+
+          var line = match[4] == '' ? null : int.parse(match[4]!);
+          var column =
+              match[5] == null || match[5] == '' ? null : int.parse(match[5]!);
+          return Frame(uri, line, column, member);
         }
 
-        // Normally this is a URI, but in a jsshell trace it can be a path.
-        var uri = _uriOrPathToUri(match[3]!);
-
-        var member = match[1];
-        if (member != null) {
-          member +=
-              List.filled('/'.allMatches(match[2]!).length, '.<fn>').join();
-          if (member == '') member = '<fn>';
-
-          // Some Firefox members have initial dots. We remove them for
-          // consistency with other platforms.
-          member = member.replaceFirst(_initialDot, '');
-        } else {
-          member = '<fn>';
+        match = _firefoxWasmFrame.firstMatch(frame);
+        if (match != null) {
+          final member = match.namedGroup('member')!;
+          final uri = _uriOrPathToUri(match.namedGroup('uri')!);
+          final functionIndex = match.namedGroup('index')!;
+          final functionOffset =
+              int.parse(match.namedGroup('offset')!, radix: 16);
+          return Frame(uri, 1, functionOffset + 1,
+              member.isNotEmpty ? member : functionIndex);
         }
 
-        var line = match[4] == '' ? null : int.parse(match[4]!);
-        var column =
-            match[5] == null || match[5] == '' ? null : int.parse(match[5]!);
-        return Frame(uri, line, column, member);
+        match = _safariWasmFrame.firstMatch(frame);
+        if (match != null) {
+          final member = match.namedGroup('member')!;
+          return Frame(Uri(path: 'wasm code'), null, null, member);
+        }
+
+        return UnparsedFrame(frame);
       });
 
   /// Parses a string representation of a Safari 6.0 stack frame.

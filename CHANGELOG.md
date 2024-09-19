@@ -1,6 +1,7 @@
 ## 1.11.2-wip
 
 * Require Dart 3.1 or greater
+* Added support for parsing Wasm frames of Chrome (V8), Firefox, Safari.
 
 ## 1.11.1
 
