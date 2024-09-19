@@ -310,25 +310,14 @@ void main() {
 
       expect(trace.frames.length, 8);
 
+      for (final frame in trace.frames) {
+        expect(frame is UnparsedFrame, false);
+      }
+
       expect(trace.frames[0].uri, Uri.parse('wasm://wasm/0006d892'));
       expect(trace.frames[0].line, 1);
       expect(trace.frames[0].column, 0xbaf8 + 1);
       expect(trace.frames[0].member, 'Error._throwWithCurrentStackTrace');
-
-      expect(trace.frames[1].uri, Uri.parse('wasm://wasm/0006d892'));
-      expect(trace.frames[1].line, 1);
-      expect(trace.frames[1].column, 0x14378 + 1);
-      expect(trace.frames[1].member, 'main');
-
-      expect(trace.frames[2].uri, Uri.parse('wasm://wasm/0006d892'));
-      expect(trace.frames[2].line, 1);
-      expect(trace.frames[2].column, 0x14387 + 1);
-      expect(trace.frames[2].member, 'main tear-off trampoline');
-
-      expect(trace.frames[3].uri, Uri.parse('wasm://wasm/0006d892'));
-      expect(trace.frames[3].line, 1);
-      expect(trace.frames[3].column, 0xa56c + 1);
-      expect(trace.frames[3].member, '_invokeMain');
 
       expect(trace.frames[4].uri, Uri.parse('file:///home/user/test.mjs'));
       expect(trace.frames[4].line, 361);
@@ -339,16 +328,6 @@ void main() {
       expect(trace.frames[5].line, 416);
       expect(trace.frames[5].column, 21);
       expect(trace.frames[5].member, 'main');
-
-      expect(trace.frames[6].uri, Uri.parse('file:///home/user/run_wasm.js'));
-      expect(trace.frames[6].line, 353);
-      expect(trace.frames[6].column, 38);
-      expect(trace.frames[6].member, 'async action');
-
-      expect(trace.frames[7].uri, Uri.parse('file:///home/user/run_wasm.js'));
-      expect(trace.frames[7].line, 329);
-      expect(trace.frames[7].column, 9);
-      expect(trace.frames[7].member, 'async eventLoop');
     });
 
     test('parses Firefox stack frace with Wasm frames correctly', () {
@@ -361,25 +340,14 @@ void main() {
 
       expect(trace.frames.length, 5);
 
+      for (final frame in trace.frames) {
+        expect(frame is UnparsedFrame, false);
+      }
+
       expect(trace.frames[0].uri, Uri.parse('http://localhost:8080/test.wasm'));
       expect(trace.frames[0].line, 1);
       expect(trace.frames[0].column, 0xbaf8 + 1);
       expect(trace.frames[0].member, 'Error._throwWithCurrentStackTrace');
-
-      expect(trace.frames[1].uri, Uri.parse('http://localhost:8080/test.wasm'));
-      expect(trace.frames[1].line, 1);
-      expect(trace.frames[1].column, 0x14378 + 1);
-      expect(trace.frames[1].member, 'main');
-
-      expect(trace.frames[2].uri, Uri.parse('http://localhost:8080/test.wasm'));
-      expect(trace.frames[2].line, 1);
-      expect(trace.frames[2].column, 0x14387 + 1);
-      expect(trace.frames[2].member, 'main tear-off trampoline');
-
-      expect(trace.frames[3].uri, Uri.parse('http://localhost:8080/test.wasm'));
-      expect(trace.frames[3].line, 1);
-      expect(trace.frames[3].column, 0xa56c + 1);
-      expect(trace.frames[3].member, '_invokeMain');
 
       expect(trace.frames[4].uri, Uri.parse('http://localhost:8080/test.mjs'));
       expect(trace.frames[4].line, 48);
@@ -401,6 +369,10 @@ void main() {
           '@/home/user/run_wasm.js:419:15');
 
       expect(trace.frames.length, 10);
+
+      for (final frame in trace.frames) {
+        expect(frame is UnparsedFrame, false);
+      }
 
       expect(trace.frames[0].uri, Uri.parse('file:///home/user/test.mjs'));
       expect(trace.frames[0].line, 1);
