@@ -44,9 +44,12 @@ final _v8JsUrlLocation = RegExp(r'^(.*?):(\d+)(?::(\d+))?$|native$');
 // - "uri":  `wasm://wasm/0006d966`.
 // - "index": `119`.
 // - "offset": (hex number) `bb13`.
+//
+// To avoid having multiple groups for the same part of the frame, this regex
+// matches unmatched parentheses after the member name.
 final _v8WasmFrame = RegExp(r'^\s*at (?:(?<member>.+) )?'
     r'(?:\(?(?:(?<uri>wasm:\S+):wasm-function\[(?<index>\d+)\]'
-    r'\:0x(?<offset>[0-9 a-f A-F]+))\)?)$');
+    r'\:0x(?<offset>[0-9a-fA-F]+))\)?)$');
 
 // eval as function (https://example.com/stuff.dart.js:560:28), efn:3:28
 // eval as function (https://example.com/stuff.dart.js:560:28)
@@ -98,8 +101,8 @@ final _firefoxSafariJSFrame = RegExp(r'^'
 // - "uri": `http://localhost:8080/test.wasm`.
 // - "index": `796`.
 // - "offset": (in hex) `143b4`.
-final _firefoxWasmFrame = RegExp(r'^(?<member>.*)@(?:(?<uri>.*):wasm-function'
-    r'\[(?<index>\d+)\]:0x(?<offset>[0-9 a-f A-F]+))$');
+final _firefoxWasmFrame = RegExp(r'^(?<member>.*?)@(?:(?<uri>.*?):wasm-function'
+    r'\[(?<index>\d+)\]:0x(?<offset>[0-9a-fA-F]+))$');
 
 // With names:
 //
@@ -114,7 +117,8 @@ final _firefoxWasmFrame = RegExp(r'^(?<member>.*)@(?:(?<uri>.*):wasm-function'
 // <?>.wasm-function[792]@[wasm code]
 //
 // Matches named group "member": `g` or `796`.
-final _safariWasmFrame = RegExp(r'^.*\[(?<member>.*)\]@\[wasm code\]$');
+final _safariWasmFrame =
+    RegExp(r'^.*?wasm-function\[(?<member>.*)\]@\[wasm code\]$');
 
 // foo/bar.dart 10:11 Foo._bar
 // foo/bar.dart 10:11 (anonymous function).dart.fn
