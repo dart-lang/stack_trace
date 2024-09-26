@@ -158,7 +158,7 @@ class StackZoneSpecification {
     try {
       // TODO(rnystrom): Is the null-assertion correct here? It is nullable in
       // Zone. Should we check for that here?
-      self.parent!.runBinary(_onError!, error, stackChain);
+      self.parent!.runBinary(_onError, error, stackChain);
     } on Object catch (newError, newStackTrace) {
       if (identical(newError, error)) {
         parent.handleUncaughtError(zone, error, stackChain);
