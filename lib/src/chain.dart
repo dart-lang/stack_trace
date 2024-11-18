@@ -74,24 +74,67 @@ class Chain implements StackTrace {
   /// If [callback] returns a value, it will be returned by [capture] as well.
   ///
   /// [zoneValues] is added to the [runZoned] calls.
-  static T capture<T>(T Function() callback,
-      {void Function(Object error, Chain)? onError,
-      bool when = true,
-      bool errorZone = true,
-      Map<Object?, Object?>? zoneValues}) {
+  ///
+  /// Other values from [ZoneSpecification] are exposed in this constructor and
+  /// will be forwarded to the [Zone] created.
+  static T capture<T>(
+    T Function() callback, {
+    void Function(Object error, Chain)? onError,
+    bool when = true,
+    bool errorZone = true,
+    Map<Object?, Object?>? zoneValues,
+    RunHandler? run,
+    RunUnaryHandler? runUnary,
+    RunBinaryHandler? runBinary,
+    ScheduleMicrotaskHandler? scheduleMicrotask,
+    CreateTimerHandler? createTimer,
+    CreatePeriodicTimerHandler? createPeriodicTimer,
+    PrintHandler? print,
+    ForkHandler? fork,
+  }) {
     if (!errorZone && onError != null) {
       throw ArgumentError.value(
           onError, 'onError', 'must be null if errorZone is false');
     }
 
     if (!when) {
-      if (onError == null) return runZoned(callback, zoneValues: zoneValues);
-      return runZonedGuarded(callback, (error, stackTrace) {
-        onError(error, Chain.forTrace(stackTrace));
-      }, zoneValues: zoneValues) as T;
+      final zoneSpec = ZoneSpecification(
+        run: run,
+        runUnary: runUnary,
+        runBinary: runBinary,
+        scheduleMicrotask: scheduleMicrotask,
+        createTimer: createTimer,
+        createPeriodicTimer: createPeriodicTimer,
+        print: print,
+        fork: fork,
+      );
+
+      if (onError == null) {
+        return runZoned(callback,
+            zoneValues: zoneValues, zoneSpecification: zoneSpec);
+      }
+      return runZonedGuarded(
+        callback,
+        (error, stackTrace) {
+          onError(error, Chain.forTrace(stackTrace));
+        },
+        zoneValues: zoneValues,
+        zoneSpecification: zoneSpec,
+      ) as T;
     }
 
-    var spec = StackZoneSpecification(onError, errorZone: errorZone);
+    var spec = StackZoneSpecification(
+      onError,
+      errorZone: errorZone,
+      run: run,
+      runUnary: runUnary,
+      runBinary: runBinary,
+      scheduleMicrotask: scheduleMicrotask,
+      createTimer: createTimer,
+      createPeriodicTimer: createPeriodicTimer,
+      print: print,
+      fork: fork,
+    );
     return runZoned(() {
       try {
         return callback();
@@ -117,11 +160,19 @@ class Chain implements StackTrace {
   /// [callback] in a [Zone] in which chain capturing is disabled.
   ///
   /// If [callback] returns a value, it will be returned by [disable] as well.
-  static T disable<T>(T Function() callback, {bool when = true}) {
+  static T disable<T>(
+    T Function() callback, {
+    ZoneSpecification? zoneSpecification,
+    bool when = true,
+  }) {
     var zoneValues =
         when ? {_specKey: null, StackZoneSpecification.disableKey: true} : null;
 
-    return runZoned(callback, zoneValues: zoneValues);
+    return runZoned(
+      callback,
+      zoneValues: zoneValues,
+      zoneSpecification: zoneSpecification,
+    );
   }
 
   /// Returns [futureOrStream] unmodified.
