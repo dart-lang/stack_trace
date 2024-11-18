@@ -61,16 +61,59 @@ class StackZoneSpecification {
   /// Whether this is an error zone.
   final bool _errorZone;
 
-  StackZoneSpecification(this._onError, {bool errorZone = true})
-      : _errorZone = errorZone;
+  /// A custom [Zone.run] implementation for a new zone.
+  final RunHandler? run;
+
+  /// A custom [Zone.runUnary] implementation for a new zone.
+  final RunUnaryHandler? runUnary;
+
+  /// A custom [Zone.runBinary] implementation for a new zone.
+  final RunBinaryHandler? runBinary;
+
+  /// A custom [Zone.scheduleMicrotask] implementation for a new zone.
+  final ScheduleMicrotaskHandler? scheduleMicrotask;
+
+  /// A custom [Zone.createTimer] implementation for a new zone.
+  final CreateTimerHandler? createTimer;
+
+  /// A custom [Zone.createPeriodicTimer] implementation for a new zone.
+  final CreatePeriodicTimerHandler? createPeriodicTimer;
+
+  /// A custom [Zone.print] implementation for a new zone.
+  final PrintHandler? print;
+
+  /// A custom [Zone.handleUncaughtError] implementation for a new zone.
+  final ForkHandler? fork;
+
+  StackZoneSpecification(
+    this._onError, {
+    bool errorZone = true,
+    this.run,
+    this.runUnary,
+    this.runBinary,
+    this.scheduleMicrotask,
+    this.createTimer,
+    this.createPeriodicTimer,
+    this.print,
+    this.fork,
+  }) : _errorZone = errorZone;
 
   /// Converts this specification to a real [ZoneSpecification].
   ZoneSpecification toSpec() => ZoneSpecification(
-      handleUncaughtError: _errorZone ? _handleUncaughtError : null,
-      registerCallback: _registerCallback,
-      registerUnaryCallback: _registerUnaryCallback,
-      registerBinaryCallback: _registerBinaryCallback,
-      errorCallback: _errorCallback);
+        handleUncaughtError: _errorZone ? _handleUncaughtError : null,
+        registerCallback: _registerCallback,
+        registerUnaryCallback: _registerUnaryCallback,
+        registerBinaryCallback: _registerBinaryCallback,
+        errorCallback: _errorCallback,
+        run: run,
+        runBinary: runBinary,
+        runUnary: runUnary,
+        scheduleMicrotask: scheduleMicrotask,
+        createTimer: createTimer,
+        createPeriodicTimer: createPeriodicTimer,
+        print: print,
+        fork: fork,
+      );
 
   /// Returns the current stack chain.
   ///
